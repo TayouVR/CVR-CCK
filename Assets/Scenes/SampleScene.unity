@@ -130,11 +130,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 255349296}
-  - component: {fileID: 255349295}
   - component: {fileID: 255349294}
+  - component: {fileID: 255349295}
   - component: {fileID: 255349293}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: '"Avatar"'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -191,11 +191,6 @@ MonoBehaviour:
     - type: 0
       toggleSettings:
         defaultValue: 0
-        gameObjectTargets:
-        - isCollapsed: 1
-          gameObject: {fileID: 0}
-          treePath: 
-          onState: 0
       materialColorSettings:
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
@@ -215,18 +210,21 @@ MonoBehaviour:
         defaultValue: {x: 0, y: 0}
       inputVector3Settings:
         defaultValue: {x: 0, y: 0, z: 0}
-      name: Aaa
-      machineName: Aaa
+      name: Toggle
+      machineName: Toggle
     - type: 1
       toggleSettings:
         defaultValue: 0
-        gameObjectTargets: []
       materialColorSettings:
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
       dropDownSettings:
         defaultValue: 0
-        options: []
+        options:
+        - name: 1
+          isCollapsed: 1
+        - name: 2
+          isCollapsed: 1
       sliderSettings:
         defaultValue: 0
         materialPropertyTargets: []
@@ -240,58 +238,8 @@ MonoBehaviour:
         defaultValue: {x: 0, y: 0}
       inputVector3Settings:
         defaultValue: {x: 0, y: 0, z: 0}
-      name: Bbb
-      machineName: Bbb
-    - type: 2
-      toggleSettings:
-        defaultValue: 0
-        gameObjectTargets: []
-      materialColorSettings:
-        defaultValue: {r: 1, g: 1, b: 1, a: 1}
-        materialColorTargets: []
-      dropDownSettings:
-        defaultValue: 0
-        options: []
-      sliderSettings:
-        defaultValue: 0
-        materialPropertyTargets: []
-      joystick2DSetting:
-        defaultValue: {x: 0, y: 0}
-      joystick3DSetting:
-        defaultValue: {x: 0, y: 0, z: 0}
-      inputSingleSettings:
-        defaultValue: 0
-      inputVector2Settings:
-        defaultValue: {x: 0, y: 0}
-      inputVector3Settings:
-        defaultValue: {x: 0, y: 0, z: 0}
-      name: 
-      machineName: 
-    - type: 3
-      toggleSettings:
-        defaultValue: 0
-        gameObjectTargets: []
-      materialColorSettings:
-        defaultValue: {r: 1, g: 1, b: 1, a: 1}
-        materialColorTargets: []
-      dropDownSettings:
-        defaultValue: 0
-        options: []
-      sliderSettings:
-        defaultValue: 0
-        materialPropertyTargets: []
-      joystick2DSetting:
-        defaultValue: {x: 0, y: 0}
-      joystick3DSetting:
-        defaultValue: {x: 0, y: 0, z: 0}
-      inputSingleSettings:
-        defaultValue: 0
-      inputVector2Settings:
-        defaultValue: {x: 0, y: 0}
-      inputVector3Settings:
-        defaultValue: {x: 0, y: 0, z: 0}
-      name: 
-      machineName: 
+      name: Toggle2
+      machineName: Toggle2
 --- !u!95 &255349294
 Animator:
   serializedVersion: 3
@@ -337,6 +285,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1327174768}
+  - {fileID: 1115784637}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -515,6 +464,99 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1115784636
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1115784637}
+  - component: {fileID: 1115784640}
+  - component: {fileID: 1115784639}
+  - component: {fileID: 1115784638}
+  m_Layer: 0
+  m_Name: AObjectToToggle (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1115784637
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115784636}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 255349296}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1115784638
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115784636}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1115784639
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115784636}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &1115784640
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115784636}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1327174767
 GameObject:
   m_ObjectHideFlags: 0
@@ -528,7 +570,7 @@ GameObject:
   - component: {fileID: 1327174770}
   - component: {fileID: 1327174769}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: AObjectToToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
