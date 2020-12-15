@@ -7,6 +7,14 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" />
+        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" />
+      </list>
+    </option>
+  </component>
   <component name="ProjectId" id="1lhfHODGUQkvvecF98t41bBUPzk" />
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
@@ -58,5 +66,11 @@
   <component name="UnityUnitTestConfiguration" currentTestLauncher="EditMode" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="2459" y="186" key="#Inspection_severity" timestamp="1608055157266">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2459" y="186" key="#Inspection_severity/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608055157266" />
   </component>
 </project>
