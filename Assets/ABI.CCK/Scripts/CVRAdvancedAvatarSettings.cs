@@ -136,6 +136,8 @@ namespace ABI.CCK.Scripts
     public class CVRAdvancesAvatarSettingBase
     {
         #if UNITY_EDITOR
+
+        [NonSerialized] public bool isCollapsed;
         public virtual void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             
@@ -153,7 +155,6 @@ namespace ABI.CCK.Scripts
         public List<CVRAdvancedSettingsTargetEntryGameObject> gameObjectTargets =
             new List<CVRAdvancedSettingsTargetEntryGameObject>();
 
-        private CVRAdvancedSettingsTargetEntryGameObject entity;
         private ReorderableList gameObjectList;
         private CVRAvatar target;
         
@@ -258,49 +259,59 @@ namespace ABI.CCK.Scripts
 
         private float OnHeightElement(int index)
         {
-            return EditorGUIUtility.singleLineHeight * 3.75f;
+            CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
+            if (entity.isCollapsed) {
+                return EditorGUIUtility.singleLineHeight * 1.25f;
+            } else {
+                return EditorGUIUtility.singleLineHeight * 3.75f;
+            }
         }
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
         {
             if (index > gameObjectTargets.Count) return;
-            entity = gameObjectTargets[index];
+            CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
             
             rect.y += 2;
+            rect.x += 12;
+            rect.width -= 12;
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            EditorGUI.LabelField(_rect, "Game Object");
+            entity.isCollapsed = !EditorGUI.Foldout(_rect, !entity.isCollapsed, "Name", true);
             _rect.x += 80;
             _rect.width = rect.width - 80;
             var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
-            if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
-            {
-                entity.gameObject = targetGameObject;
-                entity.treePath = AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
-            }
-            else if (entity.gameObject != targetGameObject)
-            {
-                entity.gameObject = null;
-                entity.treePath = "";
-            }
 
-            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            if (!entity.isCollapsed) {
+                if (targetGameObject != null &&
+                    targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
+                    entity.gameObject = targetGameObject;
+                    entity.treePath =
+                        AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
+                }
+                else if (entity.gameObject != targetGameObject) {
+                    entity.gameObject = null;
+                    entity.treePath = "";
+                }
 
-            EditorGUI.LabelField(_rect, "Path");
-            _rect.x += 80;
-            _rect.width = rect.width - 80;
-            EditorGUI.LabelField(_rect, entity.treePath);
-            
-            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-            
-            EditorGUI.LabelField(_rect, new GUIContent("Set to", 
-                "If checked, the object will be active once the toggle was pressed. If unchecked the object "+
-                "will be deactivated when the toggle is pressed."));
-            _rect.x += 80;
-            _rect.width = rect.width - 80;
-            entity.onState = EditorGUI.Toggle(_rect, entity.onState);
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                EditorGUI.LabelField(_rect, "Path");
+                _rect.x += 80;
+                _rect.width = rect.width - 80;
+                EditorGUI.LabelField(_rect, entity.treePath);
+
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                EditorGUI.LabelField(_rect, new GUIContent("Set to",
+                                                           "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
+                                                           "will be deactivated when the toggle is pressed."));
+                _rect.x += 80;
+                _rect.width = rect.width - 80;
+                entity.onState = EditorGUI.Toggle(_rect, entity.onState);
+            }
         }
 
         private void OnDrawHeader(Rect rect)
@@ -320,7 +331,6 @@ namespace ABI.CCK.Scripts
         
         #if UNITY_EDITOR
         
-        private CVRAdvancedSettingsDropDownEntry entity;
         private ReorderableList gameObjectList;
         private CVRAvatar target;
         
@@ -396,7 +406,7 @@ namespace ABI.CCK.Scripts
                 var j = 0;
                 foreach (var activeOption in options)
                 {
-                    foreach (var gameObjectTarget in activeOption.gameObjectTargets)
+                    foreach (var gameObjectTarget in activeOption.gameObjectList.gameObjectTargets)
                     {
                         if (gameObjectTarget == null || gameObjectTarget.gameObject == null || gameObjectTarget.treePath == null) continue;
                         animation.SetCurve(
@@ -451,29 +461,45 @@ namespace ABI.CCK.Scripts
 
         private float OnHeightElement(int index)
         {
-            if (index > options.Count) return 0f;
-            entity = options[index];
-            return EditorGUIUtility.singleLineHeight * ( 5f + (Math.Max(entity.gameObjectTargets.Count, 1f) * 2.5f));
+            CVRAdvancedSettingsDropDownEntry entity = options[index];
+            if (entity.isCollapsed) {
+                return EditorGUIUtility.singleLineHeight * 1.25f;
+            } else {
+                if (index > options.Count) return 0f;
+                float height = 5.25f;
+                foreach (var target in entity.gameObjectList.gameObjectTargets) {
+                    if (target.isCollapsed) {
+                        height += 1.25f;
+                    } else {
+                        height += 3.75f;
+                    }
+                }
+                return EditorGUIUtility.singleLineHeight * height;
+            }
         }
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
         {
             if (index > options.Count) return;
-            entity = options[index];
-            
+            CVRAdvancedSettingsDropDownEntry entity = options[index];
+        
             rect.y += 2;
+            rect.x += 12;
+            rect.width -= 12;
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            EditorGUI.LabelField(_rect, "Name");
+            entity.isCollapsed = !EditorGUI.Foldout(_rect, !entity.isCollapsed, "Name", true);
             _rect.x += 80;
             _rect.width = rect.width - 80;
             entity.name = EditorGUI.TextField(_rect, entity.name);
 
-            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-            
-            var gameObjects = entity.GetReorderableList(target);
-            gameObjects.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
+            if (!entity.isCollapsed) {
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                var gameObjects = entity.GetReorderableList(target);
+                gameObjects.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
+            }
         }
 
         private void OnDrawHeader(Rect rect)
@@ -714,7 +740,11 @@ namespace ABI.CCK.Scripts
 
         private float OnHeightElement(int index)
         {
-            return EditorGUIUtility.singleLineHeight * 3.75f;
+            if (isCollapsed) {
+                return EditorGUIUtility.singleLineHeight * 1.25f;
+            } else {
+                return EditorGUIUtility.singleLineHeight * 3.75f;
+            }
         }
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
@@ -1828,11 +1858,13 @@ namespace ABI.CCK.Scripts
     }
     
     [System.Serializable]
-    public class CVRAdvancedSettingsTargetEntryGameObject 
-    {
+    public class CVRAdvancedSettingsTargetEntryGameObject {
+#if UNITY_EDITOR
+        public bool isCollapsed;
+#endif
         public GameObject gameObject;
         public string treePath;
-        public bool onState;
+        public bool onState = true;
     }
 
     [System.Serializable]
@@ -1841,6 +1873,52 @@ namespace ABI.CCK.Scripts
         public string name;
 
         #if UNITY_EDITOR
+        public bool isCollapsed;
+
+        public GameObjectReorderableList gameObjectList = new GameObjectReorderableList();
+        
+        public ReorderableList GetReorderableList(CVRAvatar avatar)
+        {
+            return gameObjectList.GetReorderableList(avatar);
+        }
+        
+        #endif
+    }
+    
+    [System.Serializable]
+    public class CVRAdvancedSettingsTargetEntryMaterialColor 
+    {
+#if UNITY_EDITOR
+        public bool isCollapsed;
+#endif
+        public GameObject gameObject;
+        public string treePath;
+        public Type propertyType;
+        public string propertyTypeIdentifier;
+        public string propertyName;
+    }
+    
+    [System.Serializable]
+    public class CVRAdvancedSettingsTargetEntryMaterialProperty 
+    {
+#if UNITY_EDITOR
+        public bool isCollapsed;
+#endif
+        public GameObject gameObject;
+        public string treePath;
+        public Type propertyType;
+        public string propertyTypeIdentifier;
+        public string propertyName;
+        public float minValue;
+        public float maxValue;
+    }
+
+    public class GameObjectReorderableList {
+        
+        public string name;
+
+        #if UNITY_EDITOR
+        public bool isCollapsed;
         
         public List<CVRAdvancedSettingsTargetEntryGameObject> gameObjectTargets =
             new List<CVRAdvancedSettingsTargetEntryGameObject>();
@@ -1881,7 +1959,12 @@ namespace ABI.CCK.Scripts
 
         private float OnHeightElement(int index)
         {
-            return EditorGUIUtility.singleLineHeight * 2.5f;
+            entity = gameObjectTargets[index];
+            if (entity.isCollapsed) {
+                return EditorGUIUtility.singleLineHeight * 1.25f;
+            } else {
+                return EditorGUIUtility.singleLineHeight * 3.75f;
+            }
         }
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
@@ -1890,30 +1973,45 @@ namespace ABI.CCK.Scripts
             entity = gameObjectTargets[index];
             
             rect.y += 2;
+            rect.x += 12;
+            rect.width -= 12;
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            EditorGUI.LabelField(_rect, "Game Object");
+            entity.isCollapsed = !EditorGUI.Foldout(_rect, !entity.isCollapsed, "Name", true);
             _rect.x += 80;
             _rect.width = rect.width - 80;
             var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
-            if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
-            {
-                entity.gameObject = targetGameObject;
-                entity.treePath = AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
-            }
-            else if (entity.gameObject != targetGameObject)
-            {
-                entity.gameObject = null;
-                entity.treePath = "";
-            }
 
-            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            if (!entity.isCollapsed) {
+                if (targetGameObject != null &&
+                    targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
+                    entity.gameObject = targetGameObject;
+                    entity.treePath =
+                        AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
+                }
+                else if (entity.gameObject != targetGameObject) {
+                    entity.gameObject = null;
+                    entity.treePath = "";
+                }
 
-            EditorGUI.LabelField(_rect, "Path");
-            _rect.x += 80;
-            _rect.width = rect.width - 80;
-            EditorGUI.LabelField(_rect, entity.treePath);
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                EditorGUI.LabelField(_rect, "Path");
+                _rect.x += 80;
+                _rect.width = rect.width - 80;
+                EditorGUI.LabelField(_rect, entity.treePath);
+
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                EditorGUI.LabelField(_rect, new GUIContent("Set to",
+                                                           "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
+                                                           "will be deactivated when the toggle is pressed."));
+                _rect.x += 80;
+                _rect.width = rect.width - 80;
+                entity.onState = EditorGUI.Toggle(_rect, entity.onState);
+            }
         }
 
         private void OnDrawHeader(Rect rect)
@@ -1923,27 +2021,5 @@ namespace ABI.CCK.Scripts
         }
         
         #endif
-    }
-    
-    [System.Serializable]
-    public class CVRAdvancedSettingsTargetEntryMaterialColor 
-    {
-        public GameObject gameObject;
-        public string treePath;
-        public Type propertyType;
-        public string propertyTypeIdentifier;
-        public string propertyName;
-    }
-    
-    [System.Serializable]
-    public class CVRAdvancedSettingsTargetEntryMaterialProperty 
-    {
-        public GameObject gameObject;
-        public string treePath;
-        public Type propertyType;
-        public string propertyTypeIdentifier;
-        public string propertyName;
-        public float minValue;
-        public float maxValue;
     }
 }
