@@ -10,8 +10,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" />
         <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" />
+        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" />
       </list>
     </option>
   </component>

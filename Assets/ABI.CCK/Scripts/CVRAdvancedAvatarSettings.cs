@@ -151,11 +151,8 @@ namespace ABI.CCK.Scripts
         public bool defaultValue;
 
         #if UNITY_EDITOR
-        
-        public List<CVRAdvancedSettingsTargetEntryGameObject> gameObjectTargets =
-            new List<CVRAdvancedSettingsTargetEntryGameObject>();
 
-        private ReorderableList gameObjectList;
+        public GameObjectReorderableList gameObjectList = new GameObjectReorderableList();
         private CVRAvatar target;
         
         public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
@@ -207,7 +204,7 @@ namespace ABI.CCK.Scripts
             keyframe.outTangent = Mathf.Infinity;
             animationCurveOff.AddKey(keyframe);
 
-            foreach (var target in gameObjectTargets)
+            foreach (var target in gameObjectList.gameObjectTargets)
             {
                 if(target.gameObject == null || target.treePath == null) continue;
                 
@@ -226,98 +223,10 @@ namespace ABI.CCK.Scripts
             AssetDatabase.AddObjectToAsset(blendTree, AssetDatabase.GetAssetPath(controller));
             blendTree.hideFlags = HideFlags.HideInHierarchy;
         }
-
-        private void generateReorderableList()
-        {
-            gameObjectList = new ReorderableList(gameObjectTargets, typeof(CVRAdvancedSettingsTargetEntryGameObject), 
-                true, true, true, true);
-            gameObjectList.drawHeaderCallback = OnDrawHeader;
-            gameObjectList.drawElementCallback = OnDrawElement;
-            gameObjectList.elementHeightCallback = OnHeightElement;
-            gameObjectList.onAddCallback = OnAdd;
-            gameObjectList.onChangedCallback = OnChanged;
-        }
         
         public ReorderableList GetReorderableList(CVRAvatar avatar)
         {
-            target = avatar;
-            
-            if (gameObjectList == null) generateReorderableList();
-
-            return gameObjectList;
-        }
-
-        private void OnChanged(ReorderableList list)
-        {
-            EditorUtility.SetDirty(target);
-        }
-
-        private void OnAdd(ReorderableList list)
-        {
-            gameObjectTargets.Add(new CVRAdvancedSettingsTargetEntryGameObject());
-        }
-
-        private float OnHeightElement(int index)
-        {
-            CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
-            if (entity.isCollapsed) {
-                return EditorGUIUtility.singleLineHeight * 1.25f;
-            } else {
-                return EditorGUIUtility.singleLineHeight * 3.75f;
-            }
-        }
-
-        private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
-        {
-            if (index > gameObjectTargets.Count) return;
-            CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
-            
-            rect.y += 2;
-            rect.x += 12;
-            rect.width -= 12;
-            Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-            entity.isCollapsed = !EditorGUI.Foldout(_rect, !entity.isCollapsed, "Name", true);
-            _rect.x += 80;
-            _rect.width = rect.width - 80;
-            var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
-
-            if (!entity.isCollapsed) {
-                if (targetGameObject != null &&
-                    targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
-                    entity.gameObject = targetGameObject;
-                    entity.treePath =
-                        AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
-                }
-                else if (entity.gameObject != targetGameObject) {
-                    entity.gameObject = null;
-                    entity.treePath = "";
-                }
-
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                EditorGUI.LabelField(_rect, "Path");
-                _rect.x += 80;
-                _rect.width = rect.width - 80;
-                EditorGUI.LabelField(_rect, entity.treePath);
-
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                EditorGUI.LabelField(_rect, new GUIContent("Set to",
-                                                           "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
-                                                           "will be deactivated when the toggle is pressed."));
-                _rect.x += 80;
-                _rect.width = rect.width - 80;
-                entity.onState = EditorGUI.Toggle(_rect, entity.onState);
-            }
-        }
-
-        private void OnDrawHeader(Rect rect)
-        {
-            Rect _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
-            GUI.Label(_rect, "GameObjects");
+            return gameObjectList.GetReorderableList(avatar);
         }
         
         #endif
@@ -1922,8 +1831,7 @@ namespace ABI.CCK.Scripts
         
         public List<CVRAdvancedSettingsTargetEntryGameObject> gameObjectTargets =
             new List<CVRAdvancedSettingsTargetEntryGameObject>();
-
-        private CVRAdvancedSettingsTargetEntryGameObject entity;
+        
         private ReorderableList gameObjectList;
         private CVRAvatar target;
         
@@ -1959,7 +1867,7 @@ namespace ABI.CCK.Scripts
 
         private float OnHeightElement(int index)
         {
-            entity = gameObjectTargets[index];
+            CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
             if (entity.isCollapsed) {
                 return EditorGUIUtility.singleLineHeight * 1.25f;
             } else {
@@ -1970,7 +1878,7 @@ namespace ABI.CCK.Scripts
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
         {
             if (index > gameObjectTargets.Count) return;
-            entity = gameObjectTargets[index];
+            CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
             
             rect.y += 2;
             rect.x += 12;

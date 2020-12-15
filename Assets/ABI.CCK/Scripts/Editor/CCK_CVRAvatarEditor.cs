@@ -278,17 +278,17 @@ namespace ABI.CCK.Scripts.Editor
                 switch (entity.type) {
                     case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle: {
                         var gameObjectToggle = (CVRAdvancesAvatarSettingGameObjectToggle) entity.setting;
-                        if (gameObjectToggle == null || gameObjectToggle.gameObjectTargets == null)
+                        if (gameObjectToggle == null || gameObjectToggle.gameObjectList.gameObjectTargets == null)
                             return EditorGUIUtility.singleLineHeight * 9f;
                         float height = 8f;
-                        foreach (var target in gameObjectToggle.gameObjectTargets) {
+                        foreach (var target in gameObjectToggle.gameObjectList.gameObjectTargets) {
                             if (target.isCollapsed) {
                                 height += 1.25f;
                             } else {
                                 height += 3.75f;
                             }
                         }
-                        if (gameObjectToggle.gameObjectTargets.Count == 0) {
+                        if (gameObjectToggle.gameObjectList.gameObjectTargets.Count == 0) {
                             height += 1f;
                         }
                         return EditorGUIUtility.singleLineHeight * height;
