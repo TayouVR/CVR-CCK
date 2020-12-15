@@ -81,7 +81,7 @@ using UnityEngine;
             EditorGUI.LabelField(_rect, "Thumbnail");
             _rect.x += 80;
             _rect.width = rect.width - 80;
-            entity.thumbnail = (Texture2D) EditorGUI.ObjectField(_rect, entity.thumbnail, typeof(Texture2D));
+            entity.thumbnail = (Texture2D) EditorGUI.ObjectField(_rect, entity.thumbnail, typeof(Texture2D), true);
 
         }
         
@@ -115,7 +115,7 @@ using UnityEngine;
             _player.localPlaybackSpeed = EditorGUILayout.Slider("Playback Speed", _player.localPlaybackSpeed, 0.5f, 2.0f);
             EditorGUILayout.Space();
 
-            _player.projectionMesh = (MeshRenderer) EditorGUILayout.ObjectField("Projection Mesh", _player.projectionMesh, typeof(MeshRenderer));
+            _player.projectionMesh = (MeshRenderer) EditorGUILayout.ObjectField("Projection Mesh", _player.projectionMesh, typeof(MeshRenderer), true);
             EditorGUILayout.Space();
             
             _player.interactiveUI = EditorGUILayout.Toggle("Use Default Interactive Library UI", _player.interactiveUI);

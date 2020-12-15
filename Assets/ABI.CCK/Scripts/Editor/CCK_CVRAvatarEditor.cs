@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -125,7 +125,7 @@ namespace ABI.CCK.Scripts.Editor
                 }
 
                 _avatar.avatarSettings.baseController = (RuntimeAnimatorController) EditorGUILayout.ObjectField("Base Animator",
-                    _avatar.avatarSettings.baseController, typeof(RuntimeAnimatorController));
+                    _avatar.avatarSettings.baseController, typeof(RuntimeAnimatorController), true);
                 
                 EditorGUILayout.HelpBox("This is the Base Animator that is extended for the creation of your Advanced Avatar Settings. "+
                                         "If you do not want to extend a specific Animator Controller, make sure that the Default Avatar Animator "+

@@ -69,7 +69,7 @@ public class CCK_Init
             EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
             PlayerSettings.colorSpace = UnityEngine.ColorSpace.Linear;
 
-            PlayerSettings.apiCompatibilityLevel = ApiCompatibilityLevel.NET_4_6;
+            PlayerSettings.SetApiCompatibilityLevel(BuildTargetGroup.Standalone, ApiCompatibilityLevel.NET_4_6);
             
             PlayerSettings.virtualRealitySupported = true;
             PlayerSettings.SetVirtualRealitySDKs(BuildTargetGroup.Standalone, new string[] { "None", "Oculus", "OpenVR", "MockHMD" });
