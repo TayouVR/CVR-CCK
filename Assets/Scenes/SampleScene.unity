@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 255349295}
   - component: {fileID: 255349293}
   m_Layer: 0
-  m_Name: '"Avatar"'
+  m_Name: MyAvatar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -180,17 +180,24 @@ MonoBehaviour:
   - -none-
   - -none-
   - -none-
-  overrides: {fileID: 0}
+  overrides: {fileID: 22100000, guid: 66d842e2156772347b63d424198386ae, type: 2}
   avatarUsesAdvancedSettings: 1
   avatarSettings:
     initialized: 1
     baseController: {fileID: 9100000, guid: ff926e022d914b84e8975ba6188a26f0, type: 2}
-    animator: {fileID: 0}
-    overrides: {fileID: 0}
+    animator: {fileID: 9100000, guid: 1ac22169c7fb5e3468e7922707d17e11, type: 2}
+    overrides: {fileID: 22100000, guid: 66d842e2156772347b63d424198386ae, type: 2}
     settings:
     - type: 0
       toggleSettings:
         defaultValue: 0
+        useAnimationClip: 1
+        animationClip: {fileID: 7400000, guid: addde997b1677114da28dbc81b1eacfa, type: 2}
+        gameObjectTargets:
+        - isCollapsed: 0
+          gameObject: {fileID: 0}
+          treePath: 
+          onState: 1
       materialColorSettings:
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
@@ -215,6 +222,9 @@ MonoBehaviour:
     - type: 1
       toggleSettings:
         defaultValue: 0
+        useAnimationClip: 0
+        animationClip: {fileID: 0}
+        gameObjectTargets: []
       materialColorSettings:
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
@@ -222,9 +232,40 @@ MonoBehaviour:
         defaultValue: 0
         options:
         - name: 1
-          isCollapsed: 1
+          isCollapsed: 0
+          useAnimationClip: 0
+          animationClip: {fileID: 7400000, guid: addde997b1677114da28dbc81b1eacfa,
+            type: 2}
+          gameObjectTargets:
+          - isCollapsed: 0
+            gameObject: {fileID: 1327174767}
+            treePath: AObjectToToggle
+            onState: 1
+          - isCollapsed: 0
+            gameObject: {fileID: 1115784636}
+            treePath: AObjectToToggle (1)
+            onState: 1
         - name: 2
-          isCollapsed: 1
+          isCollapsed: 0
+          useAnimationClip: 0
+          animationClip: {fileID: 0}
+          gameObjectTargets:
+          - isCollapsed: 0
+            gameObject: {fileID: 1327174767}
+            treePath: AObjectToToggle
+            onState: 1
+        - name: 
+          isCollapsed: 0
+          useAnimationClip: 1
+          animationClip: {fileID: 7400000, guid: addde997b1677114da28dbc81b1eacfa,
+            type: 2}
+          gameObjectTargets: []
+        - name: 
+          isCollapsed: 0
+          useAnimationClip: 1
+          animationClip: {fileID: 7400000, guid: addde997b1677114da28dbc81b1eacfa,
+            type: 2}
+          gameObjectTargets: []
       sliderSettings:
         defaultValue: 0
         materialPropertyTargets: []

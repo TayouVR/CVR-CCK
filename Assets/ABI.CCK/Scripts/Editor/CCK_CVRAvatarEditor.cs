@@ -275,18 +275,22 @@ namespace ABI.CCK.Scripts.Editor
                 switch (entity.type) {
                     case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle: {
                         var gameObjectToggle = (CVRAdvancesAvatarSettingGameObjectToggle) entity.setting;
-                        if (gameObjectToggle == null || gameObjectToggle.gameObjectList.gameObjectTargets == null)
+                        if (gameObjectToggle == null || gameObjectToggle.gameObjectTargets == null)
                             return EditorGUIUtility.singleLineHeight * 9f;
-                        float height = 8f;
-                        foreach (var target in gameObjectToggle.gameObjectList.gameObjectTargets) {
-                            if (target.isCollapsed) {
-                                height += 1.25f;
-                            } else {
-                                height += 3.75f;
+                        float height = 9.25f;
+                        if (gameObjectToggle.useAnimationClip) {
+                            height -= 1.25f;
+                        } else {
+                            foreach (var target in gameObjectToggle.gameObjectTargets) {
+                                if (target.isCollapsed) {
+                                    height += 1.25f;
+                                } else {
+                                    height += 3.75f;
+                                }
                             }
-                        }
-                        if (gameObjectToggle.gameObjectList.gameObjectTargets.Count == 0) {
-                            height += 1f;
+                            if (gameObjectToggle.gameObjectTargets.Count == 0) {
+                                height += 1f;
+                            }
                         }
                         return EditorGUIUtility.singleLineHeight * height;
                     }
@@ -295,22 +299,27 @@ namespace ABI.CCK.Scripts.Editor
                         var gameObjectDropdown = (CVRAdvancesAvatarSettingGameObjectDropdown) entity.setting;
                         if (gameObjectDropdown == null || gameObjectDropdown.options == null)
                             return EditorGUIUtility.singleLineHeight * 8f;
-                        var height = 9f;
+                        float height = 7;
                         foreach (var option in gameObjectDropdown.options) {
-                            if (option.isCollapsed) {
-                                height += 1.25f;
-                            } else {
-                                height += 5f;
-                                foreach (var target in option.gameObjectList.gameObjectTargets) {
-                                    if (target.isCollapsed) {
-                                        height += 1f;
-                                    } else {
-                                        height += 3.75f;
+                            height += 1;
+                            if (!option.isCollapsed) {
+                                height += 4;
+                                if (option.useAnimationClip) {
+                                    height -= 1.5f;
+                                } else {
+                                    if (option.gameObjectTargets.Count != 0) {
+                                        foreach (var target in option.gameObjectTargets) {
+                                            if (target.isCollapsed) {
+                                                height += 1;
+                                            } else {
+                                                height += 3;
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
-                        return EditorGUIUtility.singleLineHeight * height;
+                        return EditorGUIUtility.singleLineHeight * height * 1.25f;
                     }
                     case CVRAdvancedSettingsEntry.SettingsType.MaterialColor: {
                         
@@ -371,8 +380,8 @@ namespace ABI.CCK.Scripts.Editor
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
             entity.setting.isCollapsed = !EditorGUI.Foldout(_rect, !entity.setting.isCollapsed, "Name", true);
-            _rect.x += 80;
-            _rect.width = rect.width - 80;
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
             entity.name = EditorGUI.TextField(_rect, entity.name);
 
             if (!entity.setting.isCollapsed) {
@@ -384,16 +393,16 @@ namespace ABI.CCK.Scripts.Editor
                 _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
                 EditorGUI.LabelField(_rect, "Parameter");
-                _rect.x += 80;
-                _rect.width = rect.width - 80;
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
                 EditorGUI.LabelField(_rect, entity.machineName);
 
                 rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
                 _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
                 EditorGUI.LabelField(_rect, "Type");
-                _rect.x += 80;
-                _rect.width = rect.width - 80;
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
                 var type = (CVRAdvancedSettingsEntry.SettingsType) EditorGUI.EnumPopup(_rect, entity.type);
 
                 if (type != entity.type) {
@@ -447,15 +456,35 @@ namespace ABI.CCK.Scripts.Editor
 
                         var gameObjectToggle = (CVRAdvancesAvatarSettingGameObjectToggle) entity.setting;
 
+                        // Default State
                         EditorGUI.LabelField(_rect, "Default");
-                        _rect.x += 80;
-                        _rect.width = rect.width - 80;
+                        _rect.x += 100;
+                        _rect.width = rect.width - 100;
                         gameObjectToggle.defaultValue = EditorGUI.Toggle(_rect, gameObjectToggle.defaultValue);
 
                         rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                        _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-                        var gameObjectList = gameObjectToggle.GetReorderableList(_avatar);
-                        gameObjectList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
+                        // Use Animation Clip
+                        EditorGUI.LabelField(_rect, "Use Animation");
+                        _rect.x += 100;
+                        _rect.width = rect.width - 100;
+                        gameObjectToggle.useAnimationClip = EditorGUI.Toggle(_rect, gameObjectToggle.useAnimationClip);
+
+                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                        if (gameObjectToggle.useAnimationClip) {
+                            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                            // Animation Clip Slot
+                            EditorGUI.LabelField(_rect, "Clip");
+                            _rect.x += 100;
+                            _rect.width = rect.width - 100;
+                            gameObjectToggle.animationClip = (AnimationClip)EditorGUI.ObjectField(_rect, gameObjectToggle.animationClip, typeof(AnimationClip), true);
+                        }else {
+
+                            var gameObjectList = gameObjectToggle.GetReorderableList(_avatar);
+                            gameObjectList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
+                        }
                         break;
                     case CVRAdvancedSettingsEntry.SettingsType.GameObjectDropdown:
                         if (animatorParameters.Contains(entity.machineName)) {
@@ -471,8 +500,8 @@ namespace ABI.CCK.Scripts.Editor
                         var gameObjectDropdown = (CVRAdvancesAvatarSettingGameObjectDropdown) entity.setting;
 
                         EditorGUI.LabelField(_rect, "Default");
-                        _rect.x += 80;
-                        _rect.width = rect.width - 80;
+                        _rect.x += 100;
+                        _rect.width = rect.width - 100;
                         gameObjectDropdown.defaultValue =
                             EditorGUI.Popup(_rect, gameObjectDropdown.defaultValue,
                                             gameObjectDropdown.getOptionsList());
@@ -517,8 +546,8 @@ namespace ABI.CCK.Scripts.Editor
                         var materialColor = (CVRAdvancedAvatarSettingMaterialColor) entity.setting;
 
                         EditorGUI.LabelField(_rect, "Default");
-                        _rect.x += 80;
-                        _rect.width = rect.width - 80;
+                        _rect.x += 100;
+                        _rect.width = rect.width - 100;
                         materialColor.defaultValue =
                             EditorGUI.ColorField(_rect, new GUIContent(), materialColor.defaultValue, true, false,
                                                  false);
@@ -542,8 +571,8 @@ namespace ABI.CCK.Scripts.Editor
                         var slider = (CVRAdvancesAvatarSettingSlider) entity.setting;
 
                         EditorGUI.LabelField(_rect, "Default");
-                        _rect.x += 80;
-                        _rect.width = rect.width - 80;
+                        _rect.x += 100;
+                        _rect.width = rect.width - 100;
                         slider.defaultValue = EditorGUI.Slider(_rect, slider.defaultValue, 0f, 1f);
 
                         rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
@@ -654,8 +683,8 @@ namespace ABI.CCK.Scripts.Editor
                         var inputSingle = (CVRAdvancesAvatarSettingInputSingle) entity.setting;
 
                         EditorGUI.LabelField(_rect, "Default");
-                        _rect.x += 80;
-                        _rect.width = rect.width - 80;
+                        _rect.x += 100;
+                        _rect.width = rect.width - 100;
                         inputSingle.defaultValue = EditorGUI.FloatField(_rect, inputSingle.defaultValue);
 
                         rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
