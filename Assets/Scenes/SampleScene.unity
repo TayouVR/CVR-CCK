@@ -121,6 +121,36 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &202609543
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 202609544}
+  m_Layer: 0
+  m_Name: Top
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &202609544
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202609543}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1019574111}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &255349292
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,6 +311,145 @@ MonoBehaviour:
         defaultValue: {x: 0, y: 0, z: 0}
       name: Toggle2
       machineName: Toggle2
+    - type: 1
+      toggleSettings:
+        defaultValue: 0
+        useAnimationClip: 0
+        animationClip: {fileID: 0}
+        gameObjectTargets: []
+      materialColorSettings:
+        defaultValue: {r: 1, g: 1, b: 1, a: 1}
+        materialColorTargets: []
+      dropDownSettings:
+        defaultValue: 0
+        options:
+        - name: Outfit
+          isCollapsed: 0
+          useAnimationClip: 0
+          animationClip: {fileID: 0}
+          gameObjectTargets:
+          - isCollapsed: 0
+            gameObject: {fileID: 1019574110}
+            treePath: Outfit1
+            onState: 1
+        - name: Outfit 2
+          isCollapsed: 0
+          useAnimationClip: 0
+          animationClip: {fileID: 0}
+          gameObjectTargets:
+          - isCollapsed: 0
+            gameObject: {fileID: 2016550043}
+            treePath: Outfit2
+            onState: 1
+        - name: Nothing
+          isCollapsed: 0
+          useAnimationClip: 0
+          animationClip: {fileID: 0}
+          gameObjectTargets: []
+      sliderSettings:
+        defaultValue: 0
+        materialPropertyTargets: []
+      joystick2DSetting:
+        defaultValue: {x: 0, y: 0}
+      joystick3DSetting:
+        defaultValue: {x: 0, y: 0, z: 0}
+      inputSingleSettings:
+        defaultValue: 0
+      inputVector2Settings:
+        defaultValue: {x: 0, y: 0}
+      inputVector3Settings:
+        defaultValue: {x: 0, y: 0, z: 0}
+      name: Outfits
+      machineName: Outfits
+    - type: 0
+      toggleSettings:
+        defaultValue: 1
+        useAnimationClip: 0
+        animationClip: {fileID: 0}
+        gameObjectTargets:
+        - isCollapsed: 0
+          gameObject: {fileID: 202609543}
+          treePath: Outfit1/Top
+          onState: 1
+        - isCollapsed: 0
+          gameObject: {fileID: 1302825468}
+          treePath: Outfit2/Top
+          onState: 1
+      materialColorSettings:
+        defaultValue: {r: 1, g: 1, b: 1, a: 1}
+        materialColorTargets: []
+      dropDownSettings:
+        defaultValue: 0
+        options: []
+      sliderSettings:
+        defaultValue: 0
+        materialPropertyTargets: []
+      joystick2DSetting:
+        defaultValue: {x: 0, y: 0}
+      joystick3DSetting:
+        defaultValue: {x: 0, y: 0, z: 0}
+      inputSingleSettings:
+        defaultValue: 0
+      inputVector2Settings:
+        defaultValue: {x: 0, y: 0}
+      inputVector3Settings:
+        defaultValue: {x: 0, y: 0, z: 0}
+      name: Top
+      machineName: Top
+    - type: 0
+      toggleSettings:
+        defaultValue: 0
+        useAnimationClip: 0
+        animationClip: {fileID: 0}
+        gameObjectTargets: []
+      materialColorSettings:
+        defaultValue: {r: 1, g: 1, b: 1, a: 1}
+        materialColorTargets: []
+      dropDownSettings:
+        defaultValue: 0
+        options: []
+      sliderSettings:
+        defaultValue: 0
+        materialPropertyTargets: []
+      joystick2DSetting:
+        defaultValue: {x: 0, y: 0}
+      joystick3DSetting:
+        defaultValue: {x: 0, y: 0, z: 0}
+      inputSingleSettings:
+        defaultValue: 0
+      inputVector2Settings:
+        defaultValue: {x: 0, y: 0}
+      inputVector3Settings:
+        defaultValue: {x: 0, y: 0, z: 0}
+      name: 
+      machineName: 
+    - type: 3
+      toggleSettings:
+        defaultValue: 0
+        useAnimationClip: 0
+        animationClip: {fileID: 0}
+        gameObjectTargets: []
+      materialColorSettings:
+        defaultValue: {r: 1, g: 1, b: 1, a: 1}
+        materialColorTargets: []
+      dropDownSettings:
+        defaultValue: 0
+        options: []
+      sliderSettings:
+        defaultValue: 0
+        materialPropertyTargets: []
+      joystick2DSetting:
+        defaultValue: {x: 0, y: 0}
+      joystick3DSetting:
+        defaultValue: {x: 0, y: 0, z: 0}
+      inputSingleSettings:
+        defaultValue: 0
+      inputVector2Settings:
+        defaultValue: {x: 0, y: 0}
+      inputVector3Settings:
+        defaultValue: {x: 0, y: 0, z: 0}
+      name: Hair Length
+      machineName: HairLength
 --- !u!95 &255349294
 Animator:
   serializedVersion: 3
@@ -327,6 +496,8 @@ Transform:
   m_Children:
   - {fileID: 1327174768}
   - {fileID: 1115784637}
+  - {fileID: 1019574111}
+  - {fileID: 2016550044}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -422,6 +593,36 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &783371062
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 783371063}
+  m_Layer: 0
+  m_Name: Bottom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &783371063
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783371062}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2016550044}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,6 +705,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1019574110
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1019574111}
+  m_Layer: 0
+  m_Name: Outfit1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1019574111
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1019574110}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 202609544}
+  - {fileID: 1164402617}
+  m_Father: {fileID: 255349296}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1115784636
 GameObject:
@@ -598,6 +831,66 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1115784636}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1164402616
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1164402617}
+  m_Layer: 0
+  m_Name: Bottom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1164402617
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1164402616}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1019574111}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1302825468
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1302825469}
+  m_Layer: 0
+  m_Name: Top
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1302825469
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1302825468}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2016550044}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1327174767
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,3 +984,35 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1327174767}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &2016550043
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2016550044}
+  m_Layer: 0
+  m_Name: Outfit2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2016550044
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2016550043}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1302825469}
+  - {fileID: 783371063}
+  m_Father: {fileID: 255349296}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

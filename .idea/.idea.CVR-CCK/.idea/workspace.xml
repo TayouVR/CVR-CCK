@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="6d4744b1-dc45-4a35-8750-e0fb96fcd2f3" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,8 +40,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" />
         <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" />
+        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" />
       </list>
     </option>
   </component>
@@ -52,10 +69,10 @@
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="28676">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="28676" />
+      <option name="pid" />
       <option name="selectedOptions">
         <set />
       </option>
@@ -74,6 +91,7 @@
       <workItem from="1608101530598" duration="1355000" />
       <workItem from="1608109198546" duration="2197000" />
       <workItem from="1608123995504" duration="16374000" />
+      <workItem from="1608198882788" duration="2022000" />
     </task>
     <servers />
   </component>
@@ -82,6 +100,17 @@
   </component>
   <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="EditMode" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
