@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+#pragma warning disable
+
 [InitializeOnLoad]
 public class CCK_Init
 {

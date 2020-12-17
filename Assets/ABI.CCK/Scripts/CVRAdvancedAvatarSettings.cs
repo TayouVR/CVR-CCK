@@ -415,7 +415,9 @@ namespace ABI.CCK.Scripts
             {
                 animation = new AnimationClip();
                 var j = 0;
-                if (!option.useAnimationClip) {
+                if (option.useAnimationClip && option.animationClip != null) {
+                    animation = option.animationClip;
+                } else {
                     foreach (var activeOption in options)
                     {
                         foreach (var gameObjectTarget in activeOption.gameObjectTargets)
@@ -428,14 +430,8 @@ namespace ABI.CCK.Scripts
                                                i == j ? animationCurveOn : animationCurveOff
                                               );
                         }
+                        j++;
                     }
-                } else {
-                    if (option.animationClip != null) {
-                        animation = option.animationClip;
-                    }
-                    j++;
-                }
-                if (!option.useAnimationClip) {
                     AssetDatabase.CreateAsset(animation, folderPath + "/Anim_" + machineName + "_Dropdown_" + i + ".anim");
                 }
                 blendTree.AddChild(animation, i);

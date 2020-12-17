@@ -215,7 +215,7 @@ MonoBehaviour:
   avatarSettings:
     initialized: 1
     baseController: {fileID: 9100000, guid: ff926e022d914b84e8975ba6188a26f0, type: 2}
-    animator: {fileID: 9100000, guid: 1ac22169c7fb5e3468e7922707d17e11, type: 2}
+    animator: {fileID: 9100000, guid: a338f6bf8234c3648a01391b39dc0e89, type: 2}
     overrides: {fileID: 22100000, guid: 66d842e2156772347b63d424198386ae, type: 2}
     settings:
     - type: 0
@@ -401,7 +401,15 @@ MonoBehaviour:
         defaultValue: 0
         useAnimationClip: 0
         animationClip: {fileID: 0}
-        gameObjectTargets: []
+        gameObjectTargets:
+        - isCollapsed: 0
+          gameObject: {fileID: 0}
+          treePath: 
+          onState: 1
+        - isCollapsed: 0
+          gameObject: {fileID: 0}
+          treePath: 
+          onState: 1
       materialColorSettings:
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []

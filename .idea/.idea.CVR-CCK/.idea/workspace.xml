@@ -21,7 +21,12 @@
   <component name="ChangeListManager">
     <list default="true" id="6d4744b1-dc45-4a35-8750-e0fb96fcd2f3" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRMirror.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRMirror.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_Init.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_Init.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AdvancedSettings.Generated/MyAvatar_AAS/MyAvatar_aas.controller" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AdvancedSettings.Generated/MyAvatar_AAS/MyAvatar_aas.controller" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AdvancedSettings.Generated/MyAvatar_AAS/MyAvatar_aas.controller.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AdvancedSettings.Generated/MyAvatar_AAS/MyAvatar_aas.controller.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AdvancedSettings.Generated/MyAvatar_AAS/MyAvatar_aas_overrides.overrideController" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AdvancedSettings.Generated/MyAvatar_AAS/MyAvatar_aas_overrides.overrideController" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -41,6 +46,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" />
+        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRMirror.cs" />
+        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_Init.cs" />
         <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" />
       </list>
     </option>
@@ -91,7 +98,7 @@
       <workItem from="1608101530598" duration="1355000" />
       <workItem from="1608109198546" duration="2197000" />
       <workItem from="1608123995504" duration="16374000" />
-      <workItem from="1608198882788" duration="2022000" />
+      <workItem from="1608198882788" duration="3923000" />
     </task>
     <servers />
   </component>

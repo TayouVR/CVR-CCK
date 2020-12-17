@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
+#pragma warning disable
+
 public class CVRMirror : MonoBehaviour
 {
     public bool m_DisablePixelLights = true;
