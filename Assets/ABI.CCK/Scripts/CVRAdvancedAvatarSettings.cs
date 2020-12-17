@@ -137,7 +137,7 @@ namespace ABI.CCK.Scripts
     {
         #if UNITY_EDITOR
 
-        [NonSerialized] public bool isCollapsed;
+        public bool isCollapsed;
         public virtual void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             

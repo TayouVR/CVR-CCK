@@ -220,6 +220,7 @@ MonoBehaviour:
     settings:
     - type: 0
       toggleSettings:
+        isCollapsed: 1
         defaultValue: 0
         useAnimationClip: 1
         animationClip: {fileID: 7400000, guid: addde997b1677114da28dbc81b1eacfa, type: 2}
@@ -229,36 +230,47 @@ MonoBehaviour:
           treePath: 
           onState: 1
       materialColorSettings:
+        isCollapsed: 0
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
       dropDownSettings:
+        isCollapsed: 0
         defaultValue: 0
         options: []
       sliderSettings:
+        isCollapsed: 0
         defaultValue: 0
         materialPropertyTargets: []
       joystick2DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       joystick3DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       inputSingleSettings:
+        isCollapsed: 0
         defaultValue: 0
       inputVector2Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       inputVector3Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       name: Toggle
       machineName: Toggle
     - type: 1
       toggleSettings:
+        isCollapsed: 0
         defaultValue: 0
         useAnimationClip: 0
         animationClip: {fileID: 0}
         gameObjectTargets: []
       materialColorSettings:
+        isCollapsed: 0
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
       dropDownSettings:
+        isCollapsed: 1
         defaultValue: 0
         options:
         - name: 1
@@ -297,30 +309,39 @@ MonoBehaviour:
             type: 2}
           gameObjectTargets: []
       sliderSettings:
+        isCollapsed: 0
         defaultValue: 0
         materialPropertyTargets: []
       joystick2DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       joystick3DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       inputSingleSettings:
+        isCollapsed: 0
         defaultValue: 0
       inputVector2Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       inputVector3Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       name: Toggle2
       machineName: Toggle2
     - type: 1
       toggleSettings:
+        isCollapsed: 0
         defaultValue: 0
         useAnimationClip: 0
         animationClip: {fileID: 0}
         gameObjectTargets: []
       materialColorSettings:
+        isCollapsed: 0
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
       dropDownSettings:
+        isCollapsed: 1
         defaultValue: 0
         options:
         - name: Outfit
@@ -347,22 +368,29 @@ MonoBehaviour:
           animationClip: {fileID: 0}
           gameObjectTargets: []
       sliderSettings:
+        isCollapsed: 0
         defaultValue: 0
         materialPropertyTargets: []
       joystick2DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       joystick3DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       inputSingleSettings:
+        isCollapsed: 0
         defaultValue: 0
       inputVector2Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       inputVector3Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       name: Outfits
       machineName: Outfits
     - type: 0
       toggleSettings:
+        isCollapsed: 1
         defaultValue: 1
         useAnimationClip: 0
         animationClip: {fileID: 0}
@@ -376,28 +404,37 @@ MonoBehaviour:
           treePath: Outfit2/Top
           onState: 1
       materialColorSettings:
+        isCollapsed: 0
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
       dropDownSettings:
+        isCollapsed: 0
         defaultValue: 0
         options: []
       sliderSettings:
+        isCollapsed: 0
         defaultValue: 0
         materialPropertyTargets: []
       joystick2DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       joystick3DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       inputSingleSettings:
+        isCollapsed: 0
         defaultValue: 0
       inputVector2Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       inputVector3Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       name: Top
       machineName: Top
     - type: 0
       toggleSettings:
+        isCollapsed: 1
         defaultValue: 0
         useAnimationClip: 0
         animationClip: {fileID: 0}
@@ -411,50 +448,67 @@ MonoBehaviour:
           treePath: 
           onState: 1
       materialColorSettings:
+        isCollapsed: 0
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
       dropDownSettings:
+        isCollapsed: 0
         defaultValue: 0
         options: []
       sliderSettings:
+        isCollapsed: 0
         defaultValue: 0
         materialPropertyTargets: []
       joystick2DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       joystick3DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       inputSingleSettings:
+        isCollapsed: 0
         defaultValue: 0
       inputVector2Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       inputVector3Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       name: 
       machineName: 
     - type: 3
       toggleSettings:
+        isCollapsed: 0
         defaultValue: 0
         useAnimationClip: 0
         animationClip: {fileID: 0}
         gameObjectTargets: []
       materialColorSettings:
+        isCollapsed: 0
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
       dropDownSettings:
+        isCollapsed: 0
         defaultValue: 0
         options: []
       sliderSettings:
+        isCollapsed: 1
         defaultValue: 0
         materialPropertyTargets: []
       joystick2DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       joystick3DSetting:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       inputSingleSettings:
+        isCollapsed: 0
         defaultValue: 0
       inputVector2Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0}
       inputVector3Settings:
+        isCollapsed: 0
         defaultValue: {x: 0, y: 0, z: 0}
       name: Hair Length
       machineName: HairLength

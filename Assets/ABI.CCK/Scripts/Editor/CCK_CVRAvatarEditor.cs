@@ -379,7 +379,7 @@ namespace ABI.CCK.Scripts.Editor
             rect.width -= 12;
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            entity.setting.isCollapsed = !EditorGUI.Foldout(_rect, !entity.setting.isCollapsed, "Name", true);
+            entity.setting.isCollapsed = EditorGUI.Foldout(_rect, entity.setting.isCollapsed, "Name", true);
             _rect.x += 100;
             _rect.width = rect.width - 100;
             entity.name = EditorGUI.TextField(_rect, entity.name);
