@@ -269,19 +269,13 @@ namespace ABI.CCK.Scripts
         private float OnHeightElement(int index)
         {
             CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
+            float height = 0;
             if (entity.isCollapsed) {
-                return EditorGUIUtility.singleLineHeight * 1.25f;
+                height += 1;
             } else {
-                float height = 0;
-                foreach (var target in gameObjectTargets) {
-                    if (target.isCollapsed) {
-                        height += 1;
-                    } else {
-                        height += 3f;
-                    }
-                }
-                return EditorGUIUtility.singleLineHeight * height * 1.25f;
+                height += 3f;
             }
+            return EditorGUIUtility.singleLineHeight * height * 1.25f;
         }
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
