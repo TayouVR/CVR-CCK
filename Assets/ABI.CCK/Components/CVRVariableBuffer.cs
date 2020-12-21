@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#pragma warning disable
+
 namespace ABI.CCK.Components
 {
     public class CVRVariableBuffer : MonoBehaviour

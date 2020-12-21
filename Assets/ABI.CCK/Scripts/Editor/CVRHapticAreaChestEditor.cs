@@ -3,6 +3,8 @@ using ABI.CCK.Components;
 using UnityEditor;
 using UnityEngine;
 
+#pragma warning disable
+
 [CustomEditor(typeof(CVRHapticAreaChest))]
 public class CVRHapticAreaChestEditor : UnityEditor.Editor
 {

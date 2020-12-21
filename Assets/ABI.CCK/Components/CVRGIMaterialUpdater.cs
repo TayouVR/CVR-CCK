@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Serialization;
 
+#pragma warning disable
+
 namespace ABI.CCK.Components
 {
     public class CVRGIMaterialUpdater : MonoBehaviour

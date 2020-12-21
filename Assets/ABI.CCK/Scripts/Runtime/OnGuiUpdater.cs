@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
+#pragma warning disable
+
 namespace ABI.CCK.Scripts.Runtime
 {
     public class OnGuiUpdater : MonoBehaviour
