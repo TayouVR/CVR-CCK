@@ -20,11 +20,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d4744b1-dc45-4a35-8750-e0fb96fcd2f3" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRGIMaterialUpdater.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRGIMaterialUpdater.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRVariableBuffer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRVariableBuffer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CVRHapticAreaChestEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CVRHapticAreaChestEditor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Runtime/OnGuiUpdater.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Runtime/OnGuiUpdater.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,20 +39,15 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1FE7A3C0-284A-456B-9681-B7A93141C89A/12/3cd6c155/AnimatorController.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1FE7A3C0-284A-456B-9681-B7A93141C89A/ef/393c3436/AssetDatabase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7765070B-AFF7-442E-A7A7-D482361E5065/b1/356ce6c3/AnimationClip.cs" root0="SKIP_HIGHLIGHTING" />
-  </component>
   <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRMirror.cs" />
-        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_Init.cs" />
-        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" />
-        <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" />
-      </list>
-    </option>
+    <changedPaths>
+      <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" />
+      <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Runtime/OnGuiUpdater.cs" />
+      <option value="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRGIMaterialUpdater.cs" />
+      <option value="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRVariableBuffer.cs" />
+      <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CVRHapticAreaChestEditor.cs" />
+      <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" />
+    </changedPaths>
   </component>
   <component name="ProjectId" id="1lhfHODGUQkvvecF98t41bBUPzk" />
   <component name="ProjectViewState">
@@ -60,6 +60,7 @@
     <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.29989153" />
     <property name="Discover.Launch.Via.Unity" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -69,16 +70,16 @@
       <option name="listenPortForConnections" value="false" />
       <option name="pid" />
       <option name="selectedOptions">
-        <set />
+        <list />
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="1808">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" />
+      <option name="pid" value="1808" />
       <option name="selectedOptions">
-        <set />
+        <list />
       </option>
       <method v="2" />
     </configuration>
@@ -97,6 +98,7 @@
       <workItem from="1608123995504" duration="16374000" />
       <workItem from="1608198882788" duration="5789000" />
       <workItem from="1608229673040" duration="608000" />
+      <workItem from="1608543633135" duration="3908000" />
     </task>
     <servers />
   </component>
@@ -120,82 +122,11 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
-  <component name="WindowStateProjectService">
-    <state x="2459" y="186" key="#Inspection_severity" timestamp="1608055157266">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state x="2459" y="186" key="#Inspection_severity/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608055157266" />
-    <state width="416" height="464" key="DebuggerActiveHint" timestamp="1608142081003">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="416" height="464" key="DebuggerActiveHint/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608142081003" />
-    <state width="1875" height="390" key="GridCell.Tab.0.bottom" timestamp="1608141994678">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.0.bottom/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@0.0.1920.1080" timestamp="1608141595364" />
-    <state width="1875" height="390" key="GridCell.Tab.0.bottom/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994678" />
-    <state width="1875" height="390" key="GridCell.Tab.0.center" timestamp="1608141994677">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.0.center/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@0.0.1920.1080" timestamp="1608141595364" />
-    <state width="1875" height="390" key="GridCell.Tab.0.center/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994677" />
-    <state width="1875" height="390" key="GridCell.Tab.0.left" timestamp="1608141994677">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.0.left/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@0.0.1920.1080" timestamp="1608141595364" />
-    <state width="1875" height="390" key="GridCell.Tab.0.left/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994677" />
-    <state width="1875" height="390" key="GridCell.Tab.0.right" timestamp="1608141994678">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@0.0.1920.1080" timestamp="1608141595364" />
-    <state width="1875" height="390" key="GridCell.Tab.0.right/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994678" />
-    <state width="1875" height="390" key="GridCell.Tab.1.bottom" timestamp="1608141999121">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.1.bottom/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141999121" />
-    <state width="1875" height="390" key="GridCell.Tab.1.center" timestamp="1608141999120">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.1.center/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141999120" />
-    <state width="1875" height="390" key="GridCell.Tab.1.left" timestamp="1608141999120">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.1.left/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141999120" />
-    <state width="1875" height="390" key="GridCell.Tab.1.right" timestamp="1608141999120">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.1.right/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141999120" />
-    <state width="1875" height="390" key="GridCell.Tab.2.bottom" timestamp="1608141994552">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.2.bottom/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994552" />
-    <state width="1875" height="390" key="GridCell.Tab.2.center" timestamp="1608141994552">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.2.center/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994552" />
-    <state width="1875" height="390" key="GridCell.Tab.2.left" timestamp="1608141994552">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.2.left/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994552" />
-    <state width="1875" height="390" key="GridCell.Tab.2.right" timestamp="1608141994552">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.2.right/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994552" />
-    <state width="1875" height="390" key="GridCell.Tab.3.bottom" timestamp="1608141994553">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.3.bottom/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994553" />
-    <state width="1875" height="390" key="GridCell.Tab.3.center" timestamp="1608141994553">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.3.center/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994553" />
-    <state width="1875" height="390" key="GridCell.Tab.3.left" timestamp="1608141994553">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.3.left/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994553" />
-    <state width="1875" height="390" key="GridCell.Tab.3.right" timestamp="1608141994553">
-      <screen x="1920" y="0" width="1920" height="1080" />
-    </state>
-    <state width="1875" height="390" key="GridCell.Tab.3.right/0.0.1920.1080/1920.0.1920.1080/-1920.0.1920.1040@1920.0.1920.1080" timestamp="1608141994553" />
+  <component name="XDebuggerManager">
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="Type#ABI.CCK.Scripts.CVRAdvancesAvatarSettingSlider" memberName="materialPropertyTargets" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
 </project>

@@ -492,9 +492,23 @@ MonoBehaviour:
         defaultValue: 0
         options: []
       sliderSettings:
-        isCollapsed: 1
+        isCollapsed: 0
         defaultValue: 0
-        materialPropertyTargets: []
+        materialPropertyTargets:
+        - isCollapsed: 1
+          gameObject: {fileID: 0}
+          treePath: 
+          propertyTypeIdentifier: 
+          propertyName: 
+          minValue: 0
+          maxValue: 0
+        - isCollapsed: 1
+          gameObject: {fileID: 0}
+          treePath: 
+          propertyTypeIdentifier: 
+          propertyName: 
+          minValue: 0
+          maxValue: 0
       joystick2DSetting:
         isCollapsed: 0
         defaultValue: {x: 0, y: 0}
@@ -512,6 +526,52 @@ MonoBehaviour:
         defaultValue: {x: 0, y: 0, z: 0}
       name: Hair Length
       machineName: HairLength
+    - type: 2
+      toggleSettings:
+        isCollapsed: 0
+        defaultValue: 0
+        useAnimationClip: 0
+        animationClip: {fileID: 0}
+        gameObjectTargets: []
+      materialColorSettings:
+        isCollapsed: 0
+        defaultValue: {r: 1, g: 1, b: 1, a: 1}
+        materialColorTargets:
+        - isCollapsed: 1
+          gameObject: {fileID: 0}
+          treePath: 
+          propertyTypeIdentifier: 
+          propertyName: 
+        - isCollapsed: 1
+          gameObject: {fileID: 0}
+          treePath: 
+          propertyTypeIdentifier: 
+          propertyName: 
+      dropDownSettings:
+        isCollapsed: 0
+        defaultValue: 0
+        options: []
+      sliderSettings:
+        isCollapsed: 0
+        defaultValue: 0
+        materialPropertyTargets: []
+      joystick2DSetting:
+        isCollapsed: 0
+        defaultValue: {x: 0, y: 0}
+      joystick3DSetting:
+        isCollapsed: 0
+        defaultValue: {x: 0, y: 0, z: 0}
+      inputSingleSettings:
+        isCollapsed: 0
+        defaultValue: 0
+      inputVector2Settings:
+        isCollapsed: 0
+        defaultValue: {x: 0, y: 0}
+      inputVector3Settings:
+        isCollapsed: 0
+        defaultValue: {x: 0, y: 0, z: 0}
+      name: 
+      machineName: 
 --- !u!95 &255349294
 Animator:
   serializedVersion: 3

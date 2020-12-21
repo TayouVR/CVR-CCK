@@ -343,16 +343,16 @@ namespace ABI.CCK.Scripts.Editor
                         var slider = (CVRAdvancesAvatarSettingSlider) entity.setting;
                         if (slider == null || slider.materialPropertyTargets == null)
                             return EditorGUIUtility.singleLineHeight * 8f;
-                        float height = 9f;
+                        float height = 11.25f;
                         foreach (var option in slider.materialPropertyTargets) {
                             if (option.isCollapsed) {
                                 height += 1.25f;
                             } else {
-                                height += 6.25f;
+                                height += 5 * 1.25f;
                             }
                         }
-                        if (slider.materialPropertyTargets.Count != 0) {
-                            height += 2.25f;
+                        if (slider.materialPropertyTargets.Count == 0) {
+                            height += 1.25f;
                         }
                         return EditorGUIUtility.singleLineHeight * height;
                     }
@@ -580,8 +580,10 @@ namespace ABI.CCK.Scripts.Editor
                         var materialPropertyList = slider.GetReorderableList(_avatar);
                         materialPropertyList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
 
-                        rect.y += Math.Max(materialPropertyList.count, 1) * EditorGUIUtility.singleLineHeight * 6.25f +
-                                  EditorGUIUtility.singleLineHeight * 3f;
+                        foreach (var target in slider.materialPropertyTargets) {
+                            rect.y += EditorGUIUtility.singleLineHeight * 1.25f * (target.isCollapsed ? 1 : 5);
+                        }
+                        rect.y += EditorGUIUtility.singleLineHeight * (3f + (slider.materialPropertyTargets.Count == 0 ? 1.25f : 0));
                         _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
 
                         EditorGUI.HelpBox(_rect,
