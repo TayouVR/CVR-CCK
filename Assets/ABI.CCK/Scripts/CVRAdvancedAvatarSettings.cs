@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using ABI.CCK.Components;
 using UnityEngine;
@@ -428,7 +428,7 @@ namespace ABI.CCK.Scripts
                                                gameObjectTarget.treePath, 
                                                typeof(GameObject), 
                                                "m_IsActive", 
-                                               i == j ? animationCurveOn : animationCurveOff
+                                               i == j ? (gameObjectTarget.onState ? animationCurveOn : animationCurveOff) : (gameObjectTarget.onState ? animationCurveOff : animationCurveOn)
                                               );
                         }
                         j++;

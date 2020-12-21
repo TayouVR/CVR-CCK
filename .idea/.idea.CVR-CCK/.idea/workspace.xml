@@ -23,6 +23,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,7 +93,7 @@
       <workItem from="1608198882788" duration="5789000" />
       <workItem from="1608229673040" duration="608000" />
       <workItem from="1608543633135" duration="4506000" />
-      <workItem from="1608563294819" duration="445000" />
+      <workItem from="1608563294819" duration="3137000" />
     </task>
     <servers />
   </component>

@@ -220,7 +220,7 @@ MonoBehaviour:
     settings:
     - type: 0
       toggleSettings:
-        isCollapsed: 1
+        isCollapsed: 0
         defaultValue: 0
         useAnimationClip: 1
         animationClip: {fileID: 7400000, guid: addde997b1677114da28dbc81b1eacfa, type: 2}
@@ -341,11 +341,11 @@ MonoBehaviour:
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
       dropDownSettings:
-        isCollapsed: 1
+        isCollapsed: 0
         defaultValue: 0
         options:
         - name: Outfit
-          isCollapsed: 0
+          isCollapsed: 1
           useAnimationClip: 0
           animationClip: {fileID: 0}
           gameObjectTargets:
@@ -354,7 +354,7 @@ MonoBehaviour:
             treePath: Outfit1
             onState: 1
         - name: Outfit 2
-          isCollapsed: 0
+          isCollapsed: 1
           useAnimationClip: 0
           animationClip: {fileID: 0}
           gameObjectTargets:

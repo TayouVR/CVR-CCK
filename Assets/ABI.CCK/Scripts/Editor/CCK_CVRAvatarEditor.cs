@@ -273,7 +273,7 @@ namespace ABI.CCK.Scripts.Editor
 
             // When collapsed only return one line height
             if (entity.setting.isCollapsed) return EditorGUIUtility.singleLineHeight * 1.25f;
-            
+
             switch (entity.type) {
                 case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle: {
                     var gameObjectToggle = (CVRAdvancesAvatarSettingGameObjectToggle) entity.setting;
@@ -382,7 +382,7 @@ namespace ABI.CCK.Scripts.Editor
             _rect.width = rect.width - 100;
             entity.name = EditorGUI.TextField(_rect, entity.name);
 
-            // check if collapsed
+            // when collapsed skip rest of UI drawing
             if (entity.setting.isCollapsed) return;
 
             if (entity.name != null) {
@@ -437,349 +437,346 @@ namespace ABI.CCK.Scripts.Editor
                         entity.setting = new CVRAdvancesAvatarSettingInputVector3();
                         break;
                 }
+            }
 
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-                switch (entity.type) {
-                    case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle:
-                        if (animatorParameters.Contains(entity.machineName)) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect, $"The Parameter \"{entity.machineName}\" was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+            switch (entity.type) {
+                case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle:
+                    if (animatorParameters.Contains(entity.machineName)) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect, $"The Parameter \"{entity.machineName}\" was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        animatorParameters.Add(entity.machineName);
+                    animatorParameters.Add(entity.machineName);
 
-                        var gameObjectToggle = (CVRAdvancesAvatarSettingGameObjectToggle) entity.setting;
+                    var gameObjectToggle = (CVRAdvancesAvatarSettingGameObjectToggle) entity.setting;
 
-                        // Default State
-                        EditorGUI.LabelField(_rect, "Default");
-                        _rect.x += 100;
-                        _rect.width = rect.width - 100;
-                        gameObjectToggle.defaultValue = EditorGUI.Toggle(_rect, gameObjectToggle.defaultValue);
+                    // Default State
+                    EditorGUI.LabelField(_rect, "Default");
+                    _rect.x += 100;
+                    _rect.width = rect.width - 100;
+                    gameObjectToggle.defaultValue = EditorGUI.Toggle(_rect, gameObjectToggle.defaultValue);
 
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                    _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                    // Use Animation Clip
+                    EditorGUI.LabelField(_rect, "Use Animation");
+                    _rect.x += 100;
+                    _rect.width = rect.width - 100;
+                    gameObjectToggle.useAnimationClip = EditorGUI.Toggle(_rect, gameObjectToggle.useAnimationClip);
+
+                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                    if (gameObjectToggle.useAnimationClip) {
                         _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-                        // Use Animation Clip
-                        EditorGUI.LabelField(_rect, "Use Animation");
+                        // Animation Clip Slot
+                        EditorGUI.LabelField(_rect, "Clip");
                         _rect.x += 100;
                         _rect.width = rect.width - 100;
-                        gameObjectToggle.useAnimationClip = EditorGUI.Toggle(_rect, gameObjectToggle.useAnimationClip);
+                        gameObjectToggle.animationClip = (AnimationClip)EditorGUI.ObjectField(_rect, gameObjectToggle.animationClip, typeof(AnimationClip), true);
+                    }else {
 
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                        if (gameObjectToggle.useAnimationClip) {
-                            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+                        var gameObjectList = gameObjectToggle.GetReorderableList(_avatar);
+                        gameObjectList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
+                    }
+                    break;
+                case CVRAdvancedSettingsEntry.SettingsType.GameObjectDropdown:
+                    if (animatorParameters.Contains(entity.machineName)) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect, $"The Parameter \"{entity.machineName}\" was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                            // Animation Clip Slot
-                            EditorGUI.LabelField(_rect, "Clip");
-                            _rect.x += 100;
-                            _rect.width = rect.width - 100;
-                            gameObjectToggle.animationClip = (AnimationClip)EditorGUI.ObjectField(_rect, gameObjectToggle.animationClip, typeof(AnimationClip), true);
-                        }else {
+                    animatorParameters.Add(entity.machineName);
 
-                            var gameObjectList = gameObjectToggle.GetReorderableList(_avatar);
-                            gameObjectList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
-                        }
-                        break;
-                    case CVRAdvancedSettingsEntry.SettingsType.GameObjectDropdown:
-                        if (animatorParameters.Contains(entity.machineName)) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect, $"The Parameter \"{entity.machineName}\" was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    var gameObjectDropdown = (CVRAdvancesAvatarSettingGameObjectDropdown) entity.setting;
 
-                        animatorParameters.Add(entity.machineName);
+                    EditorGUI.LabelField(_rect, "Default");
+                    _rect.x += 100;
+                    _rect.width = rect.width - 100;
+                    gameObjectDropdown.defaultValue =
+                        EditorGUI.Popup(_rect, gameObjectDropdown.defaultValue,
+                                        gameObjectDropdown.getOptionsList());
 
-                        var gameObjectDropdown = (CVRAdvancesAvatarSettingGameObjectDropdown) entity.setting;
+                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
 
-                        EditorGUI.LabelField(_rect, "Default");
-                        _rect.x += 100;
-                        _rect.width = rect.width - 100;
-                        gameObjectDropdown.defaultValue =
-                            EditorGUI.Popup(_rect, gameObjectDropdown.defaultValue,
-                                            gameObjectDropdown.getOptionsList());
-
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-
-                        var options = gameObjectDropdown.GetReorderableList(_avatar);
-                        options.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
-                        break;
-                    case CVRAdvancedSettingsEntry.SettingsType.MaterialColor:
-                        if (animatorParameters.Contains(entity.machineName + "-r")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-r) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
-
-                        if (animatorParameters.Contains(entity.machineName + "-g")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-g) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
-
-                        if (animatorParameters.Contains(entity.machineName + "-b")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-b) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
-
-                        animatorParameters.Add(entity.machineName + "-r");
-                        animatorParameters.Add(entity.machineName + "-g");
-                        animatorParameters.Add(entity.machineName + "-b");
-
-                        var materialColor = (CVRAdvancedAvatarSettingMaterialColor) entity.setting;
-
-                        EditorGUI.LabelField(_rect, "Default");
-                        _rect.x += 100;
-                        _rect.width = rect.width - 100;
-                        materialColor.defaultValue =
-                            EditorGUI.ColorField(_rect, new GUIContent(), materialColor.defaultValue, true, false,
-                                                 false);
-
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-
-                        var materialColorList = materialColor.GetReorderableList(_avatar);
-                        materialColorList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
-                        break;
-                    case CVRAdvancedSettingsEntry.SettingsType.Slider:
-                        if (animatorParameters.Contains(entity.machineName)) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect, $"The Parameter \"{entity.machineName}\" was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
-
-                        animatorParameters.Add(entity.machineName);
-
-                        var slider = (CVRAdvancesAvatarSettingSlider) entity.setting;
-
-                        EditorGUI.LabelField(_rect, "Default");
-                        _rect.x += 100;
-                        _rect.width = rect.width - 100;
-                        slider.defaultValue = EditorGUI.Slider(_rect, slider.defaultValue, 0f, 1f);
-
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-
-                        var materialPropertyList = slider.GetReorderableList(_avatar);
-                        materialPropertyList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
-
-                        foreach (var target in slider.materialPropertyTargets) {
-                            rect.y += EditorGUIUtility.singleLineHeight * 1.25f * (target.isCollapsed ? 1 : 5);
-                        }
-                        rect.y += EditorGUIUtility.singleLineHeight * (3f + (slider.materialPropertyTargets.Count == 0 ? 1.25f : 0));
-                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
-
+                    var options = gameObjectDropdown.GetReorderableList(_avatar);
+                    options.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
+                    break;
+                case CVRAdvancedSettingsEntry.SettingsType.MaterialColor:
+                    if (animatorParameters.Contains(entity.machineName + "-r")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
                         EditorGUI.HelpBox(_rect,
-                                          "The Setup Utility will help you create a slider for Material properties " +
-                                          "If you want to bind other properties you can edit the animation files generated " +
-                                          "by the System after the animator was created.", MessageType.Info);
-                        break;
-                    case CVRAdvancedSettingsEntry.SettingsType.Joystick2D:
-                        if (animatorParameters.Contains(entity.machineName + "-x")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-x) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-r) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        if (animatorParameters.Contains(entity.machineName + "-y")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-y) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    if (animatorParameters.Contains(entity.machineName + "-g")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-g) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        animatorParameters.Add(entity.machineName + "-x");
-                        animatorParameters.Add(entity.machineName + "-y");
+                    if (animatorParameters.Contains(entity.machineName + "-b")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-b) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        var joystick = (CVRAdvancesAvatarSettingJoystick2D) entity.setting;
+                    animatorParameters.Add(entity.machineName + "-r");
+                    animatorParameters.Add(entity.machineName + "-g");
+                    animatorParameters.Add(entity.machineName + "-b");
 
-                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
-                        joystick.defaultValue = EditorGUI.Vector2Field(_rect, "Default", joystick.defaultValue);
+                    var materialColor = (CVRAdvancedAvatarSettingMaterialColor) entity.setting;
 
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+                    EditorGUI.LabelField(_rect, "Default");
+                    _rect.x += 100;
+                    _rect.width = rect.width - 100;
+                    materialColor.defaultValue =
+                        EditorGUI.ColorField(_rect, new GUIContent(), materialColor.defaultValue, true, false,
+                                             false);
 
-                        EditorGUI.HelpBox(_rect, "This Settings does not provide a Setup Utility. " +
-                                                 "But it will create the necessary Animator Layers, Parameters and Animations. " +
-                                                 "So you can edit them to your liking after the animator was created.",
-                                          MessageType.Info);
-                        break;
-                    case CVRAdvancedSettingsEntry.SettingsType.Joystick3D:
-                        if (animatorParameters.Contains(entity.machineName + "-x")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-x) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
 
-                        if (animatorParameters.Contains(entity.machineName + "-y")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-y) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    var materialColorList = materialColor.GetReorderableList(_avatar);
+                    materialColorList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
+                    break;
+                case CVRAdvancedSettingsEntry.SettingsType.Slider:
+                    if (animatorParameters.Contains(entity.machineName)) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect, $"The Parameter \"{entity.machineName}\" was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        if (animatorParameters.Contains(entity.machineName + "-z")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-z) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    animatorParameters.Add(entity.machineName);
 
-                        animatorParameters.Add(entity.machineName + "-x");
-                        animatorParameters.Add(entity.machineName + "-y");
-                        animatorParameters.Add(entity.machineName + "-z");
+                    var slider = (CVRAdvancesAvatarSettingSlider) entity.setting;
 
-                        var joystick3D = (CVRAdvancesAvatarSettingJoystick3D) entity.setting;
+                    EditorGUI.LabelField(_rect, "Default");
+                    _rect.x += 100;
+                    _rect.width = rect.width - 100;
+                    slider.defaultValue = EditorGUI.Slider(_rect, slider.defaultValue, 0f, 1f);
 
-                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
-                        joystick3D.defaultValue = EditorGUI.Vector3Field(_rect, "Default", joystick3D.defaultValue);
+                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
 
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+                    var materialPropertyList = slider.GetReorderableList(_avatar);
+                    materialPropertyList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
 
-                        EditorGUI.HelpBox(_rect, "This Settings does not provide a Setup Utility. " +
-                                                 "But it will create the necessary Animator Layers, Parameters and Animations. " +
-                                                 "So you can edit them to your liking after the animator was created.",
-                                          MessageType.Info);
-                        break;
-                    case CVRAdvancedSettingsEntry.SettingsType.InputSingle:
-                        if (animatorParameters.Contains(entity.machineName)) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect, $"The Parameter \"{entity.machineName}\" was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    foreach (var target in slider.materialPropertyTargets) {
+                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f * (target.isCollapsed ? 1 : 5);
+                    }
+                    rect.y += EditorGUIUtility.singleLineHeight * (3f + (slider.materialPropertyTargets.Count == 0 ? 1.25f : 0));
+                    _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
 
-                        animatorParameters.Add(entity.machineName);
+                    EditorGUI.HelpBox(_rect,
+                                      "The Setup Utility will help you create a slider for Material properties " +
+                                      "If you want to bind other properties you can edit the animation files generated " +
+                                      "by the System after the animator was created.", MessageType.Info);
+                    break;
+                case CVRAdvancedSettingsEntry.SettingsType.Joystick2D:
+                    if (animatorParameters.Contains(entity.machineName + "-x")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-x) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        var inputSingle = (CVRAdvancesAvatarSettingInputSingle) entity.setting;
+                    if (animatorParameters.Contains(entity.machineName + "-y")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-y) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        EditorGUI.LabelField(_rect, "Default");
-                        _rect.x += 100;
-                        _rect.width = rect.width - 100;
-                        inputSingle.defaultValue = EditorGUI.FloatField(_rect, inputSingle.defaultValue);
+                    animatorParameters.Add(entity.machineName + "-x");
+                    animatorParameters.Add(entity.machineName + "-y");
 
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+                    var joystick = (CVRAdvancesAvatarSettingJoystick2D) entity.setting;
 
-                        EditorGUI.HelpBox(_rect, "This Settings does not provide a Setup Utility. " +
-                                                 "But it will create the necessary Animator Layers, Parameters and Animations. " +
-                                                 "So you can edit them to your liking after the animator was created.",
-                                          MessageType.Info);
-                        break;
-                    case CVRAdvancedSettingsEntry.SettingsType.InputVector2:
-                        if (animatorParameters.Contains(entity.machineName + "-x")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-x) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+                    joystick.defaultValue = EditorGUI.Vector2Field(_rect, "Default", joystick.defaultValue);
 
-                        if (animatorParameters.Contains(entity.machineName + "-y")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-y) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                    _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
 
-                        animatorParameters.Add(entity.machineName + "-x");
-                        animatorParameters.Add(entity.machineName + "-y");
+                    EditorGUI.HelpBox(_rect, "This Settings does not provide a Setup Utility. " +
+                                             "But it will create the necessary Animator Layers, Parameters and Animations. " +
+                                             "So you can edit them to your liking after the animator was created.",
+                                      MessageType.Info);
+                    break;
+                case CVRAdvancedSettingsEntry.SettingsType.Joystick3D:
+                    if (animatorParameters.Contains(entity.machineName + "-x")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-x) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        var inputVector2 = (CVRAdvancesAvatarSettingInputVector2) entity.setting;
+                    if (animatorParameters.Contains(entity.machineName + "-y")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-y) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
-                        inputVector2.defaultValue = EditorGUI.Vector2Field(_rect, "Default", inputVector2.defaultValue);
+                    if (animatorParameters.Contains(entity.machineName + "-z")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-z) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+                    animatorParameters.Add(entity.machineName + "-x");
+                    animatorParameters.Add(entity.machineName + "-y");
+                    animatorParameters.Add(entity.machineName + "-z");
 
-                        EditorGUI.HelpBox(_rect, "This Settings does not provide a Setup Utility. " +
-                                                 "But it will create the necessary Animator Layers, Parameters and Animations. " +
-                                                 "So you can edit them to your liking after the animator was created.",
-                                          MessageType.Info);
-                        break;
-                    case CVRAdvancedSettingsEntry.SettingsType.InputVector3:
-                        if (animatorParameters.Contains(entity.machineName + "-x")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-x) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    var joystick3D = (CVRAdvancesAvatarSettingJoystick3D) entity.setting;
 
-                        if (animatorParameters.Contains(entity.machineName + "-y")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-y) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+                    joystick3D.defaultValue = EditorGUI.Vector3Field(_rect, "Default", joystick3D.defaultValue);
 
-                        if (animatorParameters.Contains(entity.machineName + "-z")) {
-                            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
-                            EditorGUI.HelpBox(_rect,
-                                              $"The Parameter \"{entity.machineName}\" ({entity.machineName}-z) was already defined.",
-                                              MessageType.Error);
-                            definitionContainsError = true;
-                            return;
-                        }
+                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                    _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
 
-                        animatorParameters.Add(entity.machineName + "-x");
-                        animatorParameters.Add(entity.machineName + "-y");
-                        animatorParameters.Add(entity.machineName + "-z");
+                    EditorGUI.HelpBox(_rect, "This Settings does not provide a Setup Utility. " +
+                                             "But it will create the necessary Animator Layers, Parameters and Animations. " +
+                                             "So you can edit them to your liking after the animator was created.",
+                                      MessageType.Info);
+                    break;
+                case CVRAdvancedSettingsEntry.SettingsType.InputSingle:
+                    if (animatorParameters.Contains(entity.machineName)) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect, $"The Parameter \"{entity.machineName}\" was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
 
-                        var inputVector3 = (CVRAdvancesAvatarSettingInputVector3) entity.setting;
+                    animatorParameters.Add(entity.machineName);
 
-                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
-                        inputVector3.defaultValue = EditorGUI.Vector3Field(_rect, "Default", inputVector3.defaultValue);
+                    var inputSingle = (CVRAdvancesAvatarSettingInputSingle) entity.setting;
 
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+                    EditorGUI.LabelField(_rect, "Default");
+                    _rect.x += 100;
+                    _rect.width = rect.width - 100;
+                    inputSingle.defaultValue = EditorGUI.FloatField(_rect, inputSingle.defaultValue);
 
-                        EditorGUI.HelpBox(_rect, "This Settings does not provide a Setup Utility. " +
-                                                 "But it will create the necessary Animator Layers, Parameters and Animations. " +
-                                                 "So you can edit them to your liking after the animator was created.",
-                                          MessageType.Info);
-                        break;
-                }
-            }
-            else {
-                rect.height = EditorGUIUtility.singleLineHeight;
+                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                    _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+
+                    EditorGUI.HelpBox(_rect, "This Settings does not provide a Setup Utility. " +
+                                             "But it will create the necessary Animator Layers, Parameters and Animations. " +
+                                             "So you can edit them to your liking after the animator was created.",
+                                      MessageType.Info);
+                    break;
+                case CVRAdvancedSettingsEntry.SettingsType.InputVector2:
+                    if (animatorParameters.Contains(entity.machineName + "-x")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-x) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
+
+                    if (animatorParameters.Contains(entity.machineName + "-y")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-y) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
+
+                    animatorParameters.Add(entity.machineName + "-x");
+                    animatorParameters.Add(entity.machineName + "-y");
+
+                    var inputVector2 = (CVRAdvancesAvatarSettingInputVector2) entity.setting;
+
+                    _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+                    inputVector2.defaultValue = EditorGUI.Vector2Field(_rect, "Default", inputVector2.defaultValue);
+
+                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                    _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+
+                    EditorGUI.HelpBox(_rect, "This Settings does not provide a Setup Utility. " +
+                                             "But it will create the necessary Animator Layers, Parameters and Animations. " +
+                                             "So you can edit them to your liking after the animator was created.",
+                                      MessageType.Info);
+                    break;
+                case CVRAdvancedSettingsEntry.SettingsType.InputVector3:
+                    if (animatorParameters.Contains(entity.machineName + "-x")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-x) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
+
+                    if (animatorParameters.Contains(entity.machineName + "-y")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-y) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
+
+                    if (animatorParameters.Contains(entity.machineName + "-z")) {
+                        _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 2f);
+                        EditorGUI.HelpBox(_rect,
+                                          $"The Parameter \"{entity.machineName}\" ({entity.machineName}-z) was already defined.",
+                                          MessageType.Error);
+                        definitionContainsError = true;
+                        return;
+                    }
+
+                    animatorParameters.Add(entity.machineName + "-x");
+                    animatorParameters.Add(entity.machineName + "-y");
+                    animatorParameters.Add(entity.machineName + "-z");
+
+                    var inputVector3 = (CVRAdvancesAvatarSettingInputVector3) entity.setting;
+
+                    _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+                    inputVector3.defaultValue = EditorGUI.Vector3Field(_rect, "Default", inputVector3.defaultValue);
+
+                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                    _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);
+
+                    EditorGUI.HelpBox(_rect, "This Settings does not provide a Setup Utility. " +
+                                             "But it will create the necessary Animator Layers, Parameters and Animations. " +
+                                             "So you can edit them to your liking after the animator was created.",
+                                      MessageType.Info);
+                    break;
             }
         }
 
