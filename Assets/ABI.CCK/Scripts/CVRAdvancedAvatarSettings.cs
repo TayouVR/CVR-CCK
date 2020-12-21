@@ -293,36 +293,37 @@ namespace ABI.CCK.Scripts
             _rect.width = rect.width - 100;
             var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
 
-            if (!entity.isCollapsed) {
-                if (targetGameObject != null &&
-                    targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
-                    entity.gameObject = targetGameObject;
-                    entity.treePath =
-                        AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
-                }
-                else if (entity.gameObject != targetGameObject) {
-                    entity.gameObject = null;
-                    entity.treePath = "";
-                }
+            // is Collapsed
+            if (entity.isCollapsed) return;
 
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                EditorGUI.LabelField(_rect, "Path");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                EditorGUI.LabelField(_rect, entity.treePath);
-
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                EditorGUI.LabelField(_rect, new GUIContent("Set to",
-                                                           "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
-                                                           "will be deactivated when the toggle is pressed."));
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                entity.onState = EditorGUI.Toggle(_rect, entity.onState);
+            if (targetGameObject != null &&
+                targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
+                entity.gameObject = targetGameObject;
+                entity.treePath =
+                    AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
             }
+            else if (entity.gameObject != targetGameObject) {
+                entity.gameObject = null;
+                entity.treePath = "";
+            }
+
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+            EditorGUI.LabelField(_rect, "Path");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            EditorGUI.LabelField(_rect, entity.treePath);
+
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+            EditorGUI.LabelField(_rect, new GUIContent("Set to",
+                                                       "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
+                                                       "will be deactivated when the toggle is pressed."));
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            entity.onState = EditorGUI.Toggle(_rect, entity.onState);
         }
 
         private void OnDrawHeader(Rect rect)
@@ -516,32 +517,32 @@ namespace ABI.CCK.Scripts
             _rect.width = rect.width - 100;
             entity.name = EditorGUI.TextField(_rect, entity.name);
 
-            if (!entity.isCollapsed) {
+            // is Collapsed
+            if (entity.isCollapsed) return;
 
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+            // Use Animation Clip
+            EditorGUI.LabelField(_rect, "Use Animation");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            entity.useAnimationClip = EditorGUI.Toggle(_rect, entity.useAnimationClip);
+
+            if (entity.useAnimationClip) {
                 rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
                 _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-                // Use Animation Clip
-                EditorGUI.LabelField(_rect, "Use Animation");
+                // Animation Clip Slot
+                EditorGUI.LabelField(_rect, "Clip");
                 _rect.x += 100;
                 _rect.width = rect.width - 100;
-                entity.useAnimationClip = EditorGUI.Toggle(_rect, entity.useAnimationClip);
+                entity.animationClip = (AnimationClip)EditorGUI.ObjectField(_rect, entity.animationClip, typeof(AnimationClip), true);
+            }else {
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
 
-                if (entity.useAnimationClip) {
-                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                    _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                    // Animation Clip Slot
-                    EditorGUI.LabelField(_rect, "Clip");
-                    _rect.x += 100;
-                    _rect.width = rect.width - 100;
-                    entity.animationClip = (AnimationClip)EditorGUI.ObjectField(_rect, entity.animationClip, typeof(AnimationClip), true);
-                }else {
-                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-
-                    var gameObjectList = entity.GetReorderableList(target);
-                    gameObjectList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
-                }
+                var gameObjectList = entity.GetReorderableList(target);
+                gameObjectList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
             }
         }
 
@@ -807,166 +808,167 @@ namespace ABI.CCK.Scripts
             var propertyList = new Dictionary<string, string>();
             var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
 
-            if (!entity.isCollapsed) {
-                if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
-                    var meshRenderer = (MeshRenderer) targetGameObject.GetComponent(typeof(MeshRenderer));
-                    var skinnedMeshRenderer =
-                        (SkinnedMeshRenderer) targetGameObject.GetComponent(typeof(SkinnedMeshRenderer));
-                    var particleRenderer =
-                        (ParticleSystemRenderer) targetGameObject.GetComponent(typeof(ParticleSystemRenderer));
-                    var lineRenderer = (LineRenderer) targetGameObject.GetComponent(typeof(LineRenderer));
-                    var trailRenderer = (TrailRenderer) targetGameObject.GetComponent(typeof(TrailRenderer));
-                    var rendererFound = false;
+            // is Collapsed
+            if (entity.isCollapsed) return;
 
-                    if (meshRenderer != null) {
-                        for (var i = 0; i < meshRenderer.sharedMaterials.Length; i++) {
-                            var material = meshRenderer.sharedMaterials[i];
-                            if (material == null) continue;
-                            var shader = material.shader;
-                            for (var j = 0; j < shader.GetPropertyCount(); j++) {
-                                if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
-                                    var propertyKey = "MeshRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                    if (!propertyList.ContainsKey(propertyKey)) {
-                                        propertyList.Add(propertyKey, "MSR:" + shader.GetPropertyName(j));
-                                    }
+            if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
+                var meshRenderer = (MeshRenderer) targetGameObject.GetComponent(typeof(MeshRenderer));
+                var skinnedMeshRenderer =
+                    (SkinnedMeshRenderer) targetGameObject.GetComponent(typeof(SkinnedMeshRenderer));
+                var particleRenderer =
+                    (ParticleSystemRenderer) targetGameObject.GetComponent(typeof(ParticleSystemRenderer));
+                var lineRenderer = (LineRenderer) targetGameObject.GetComponent(typeof(LineRenderer));
+                var trailRenderer = (TrailRenderer) targetGameObject.GetComponent(typeof(TrailRenderer));
+                var rendererFound = false;
+
+                if (meshRenderer != null) {
+                    for (var i = 0; i < meshRenderer.sharedMaterials.Length; i++) {
+                        var material = meshRenderer.sharedMaterials[i];
+                        if (material == null) continue;
+                        var shader = material.shader;
+                        for (var j = 0; j < shader.GetPropertyCount(); j++) {
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
+                                var propertyKey = "MeshRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
+                                if (!propertyList.ContainsKey(propertyKey)) {
+                                    propertyList.Add(propertyKey, "MSR:" + shader.GetPropertyName(j));
                                 }
                             }
                         }
-
-                        rendererFound = true;
                     }
 
-                    if (skinnedMeshRenderer != null) {
-                        for (var i = 0; i < skinnedMeshRenderer.sharedMaterials.Length; i++) {
-                            var material = skinnedMeshRenderer.sharedMaterials[i];
-                            if (material == null) continue;
-                            var shader = material.shader;
-                            for (var j = 0; j < shader.GetPropertyCount(); j++) {
-                                if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
-                                    var propertyKey = "SkinnedMeshRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                    if (!propertyList.ContainsKey(propertyKey)) {
-                                        propertyList.Add(propertyKey, "SMR:" + shader.GetPropertyName(j));
-                                    }
+                    rendererFound = true;
+                }
+
+                if (skinnedMeshRenderer != null) {
+                    for (var i = 0; i < skinnedMeshRenderer.sharedMaterials.Length; i++) {
+                        var material = skinnedMeshRenderer.sharedMaterials[i];
+                        if (material == null) continue;
+                        var shader = material.shader;
+                        for (var j = 0; j < shader.GetPropertyCount(); j++) {
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
+                                var propertyKey = "SkinnedMeshRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
+                                if (!propertyList.ContainsKey(propertyKey)) {
+                                    propertyList.Add(propertyKey, "SMR:" + shader.GetPropertyName(j));
                                 }
                             }
                         }
-
-                        rendererFound = true;
                     }
 
-                    if (particleRenderer != null) {
-                        for (var i = 0; i < particleRenderer.sharedMaterials.Length; i++) {
-                            var material = particleRenderer.sharedMaterials[i];
-                            if (material == null) continue;
-                            var shader = material.shader;
-                            for (var j = 0; j < shader.GetPropertyCount(); j++) {
-                                if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
-                                    var propertyKey = "ParticleRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                    if (!propertyList.ContainsKey(propertyKey)) {
-                                        propertyList.Add(propertyKey, "PTR:" + shader.GetPropertyName(j));
-                                    }
+                    rendererFound = true;
+                }
+
+                if (particleRenderer != null) {
+                    for (var i = 0; i < particleRenderer.sharedMaterials.Length; i++) {
+                        var material = particleRenderer.sharedMaterials[i];
+                        if (material == null) continue;
+                        var shader = material.shader;
+                        for (var j = 0; j < shader.GetPropertyCount(); j++) {
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
+                                var propertyKey = "ParticleRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
+                                if (!propertyList.ContainsKey(propertyKey)) {
+                                    propertyList.Add(propertyKey, "PTR:" + shader.GetPropertyName(j));
                                 }
                             }
                         }
-
-                        rendererFound = true;
                     }
 
-                    if (lineRenderer != null) {
-                        for (var i = 0; i < lineRenderer.sharedMaterials.Length; i++) {
-                            var material = lineRenderer.sharedMaterials[i];
-                            if (material == null) continue;
-                            var shader = material.shader;
-                            for (var j = 0; j < shader.GetPropertyCount(); j++) {
-                                if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
-                                    var propertyKey = "LineRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                    if (!propertyList.ContainsKey(propertyKey)) {
-                                        propertyList.Add(propertyKey, "LNR:" + shader.GetPropertyName(j));
-                                    }
+                    rendererFound = true;
+                }
+
+                if (lineRenderer != null) {
+                    for (var i = 0; i < lineRenderer.sharedMaterials.Length; i++) {
+                        var material = lineRenderer.sharedMaterials[i];
+                        if (material == null) continue;
+                        var shader = material.shader;
+                        for (var j = 0; j < shader.GetPropertyCount(); j++) {
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
+                                var propertyKey = "LineRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
+                                if (!propertyList.ContainsKey(propertyKey)) {
+                                    propertyList.Add(propertyKey, "LNR:" + shader.GetPropertyName(j));
                                 }
                             }
                         }
-
-                        rendererFound = true;
                     }
 
-                    if (trailRenderer != null) {
-                        for (var i = 0; i < trailRenderer.sharedMaterials.Length; i++) {
-                            var material = trailRenderer.sharedMaterials[i];
-                            if (material == null) continue;
-                            var shader = material.shader;
-                            for (var j = 0; j < shader.GetPropertyCount(); j++) {
-                                if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
-                                    var propertyKey = "TrailRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                    if (!propertyList.ContainsKey(propertyKey)) {
-                                        propertyList.Add(propertyKey, "TLR:" + shader.GetPropertyName(j));
-                                    }
+                    rendererFound = true;
+                }
+
+                if (trailRenderer != null) {
+                    for (var i = 0; i < trailRenderer.sharedMaterials.Length; i++) {
+                        var material = trailRenderer.sharedMaterials[i];
+                        if (material == null) continue;
+                        var shader = material.shader;
+                        for (var j = 0; j < shader.GetPropertyCount(); j++) {
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
+                                var propertyKey = "TrailRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
+                                if (!propertyList.ContainsKey(propertyKey)) {
+                                    propertyList.Add(propertyKey, "TLR:" + shader.GetPropertyName(j));
                                 }
                             }
                         }
-
-                        rendererFound = true;
                     }
 
-                    if (rendererFound) {
-                        entity.gameObject = targetGameObject;
-                        entity.treePath = AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
-                    }
-                    else if (entity.gameObject != targetGameObject) {
-                        entity.gameObject = null;
-                        entity.treePath = "";
-                    }
+                    rendererFound = true;
+                }
+
+                if (rendererFound) {
+                    entity.gameObject = targetGameObject;
+                    entity.treePath = AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
                 }
                 else if (entity.gameObject != targetGameObject) {
                     entity.gameObject = null;
                     entity.treePath = "";
                 }
+            }
+            else if (entity.gameObject != targetGameObject) {
+                entity.gameObject = null;
+                entity.treePath = "";
+            }
 
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-                EditorGUI.LabelField(_rect, "Path");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                EditorGUI.LabelField(_rect, entity.treePath);
+            EditorGUI.LabelField(_rect, "Path");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            EditorGUI.LabelField(_rect, entity.treePath);
 
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-                var propertyNames = new string[propertyList.Count];
-                propertyList.Values.CopyTo(propertyNames, 0);
-                var propertyDescriptions = new string[propertyList.Count];
-                propertyList.Keys.CopyTo(propertyDescriptions, 0);
+            var propertyNames = new string[propertyList.Count];
+            propertyList.Values.CopyTo(propertyNames, 0);
+            var propertyDescriptions = new string[propertyList.Count];
+            propertyList.Keys.CopyTo(propertyDescriptions, 0);
 
-                EditorGUI.LabelField(_rect, "Property");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                var propertyIndex = EditorGUI.Popup(_rect, Array.IndexOf(propertyNames, entity.propertyTypeIdentifier + ":" + entity.propertyName),
-                                                    propertyDescriptions);
-                if (propertyIndex >= 0) {
-                    var property = propertyNames[propertyIndex];
-                    entity.propertyName = property.Substring(4);
-                    entity.propertyTypeIdentifier = property.Substring(0, 3);
-                    switch (entity.propertyTypeIdentifier) {
-                        case "SMR":
-                            entity.propertyType = typeof(SkinnedMeshRenderer);
-                            break;
-                        case "MSR":
-                            entity.propertyType = typeof(MeshRenderer);
-                            break;
-                        case "PTR":
-                            entity.propertyType = typeof(ParticleSystemRenderer);
-                            break;
-                        case "LNR":
-                            entity.propertyType = typeof(LineRenderer);
-                            break;
-                        case "TLR":
-                            entity.propertyType = typeof(TrailRenderer);
-                            break;
-                        default:
-                            entity.propertyType = typeof(SkinnedMeshRenderer);
-                            break;
-                    }
+            EditorGUI.LabelField(_rect, "Property");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            var propertyIndex = EditorGUI.Popup(_rect, Array.IndexOf(propertyNames, entity.propertyTypeIdentifier + ":" + entity.propertyName),
+                                                propertyDescriptions);
+            if (propertyIndex >= 0) {
+                var property = propertyNames[propertyIndex];
+                entity.propertyName = property.Substring(4);
+                entity.propertyTypeIdentifier = property.Substring(0, 3);
+                switch (entity.propertyTypeIdentifier) {
+                    case "SMR":
+                        entity.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                    case "MSR":
+                        entity.propertyType = typeof(MeshRenderer);
+                        break;
+                    case "PTR":
+                        entity.propertyType = typeof(ParticleSystemRenderer);
+                        break;
+                    case "LNR":
+                        entity.propertyType = typeof(LineRenderer);
+                        break;
+                    case "TLR":
+                        entity.propertyType = typeof(TrailRenderer);
+                        break;
+                    default:
+                        entity.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
                 }
             }
         }
@@ -1108,230 +1110,231 @@ namespace ABI.CCK.Scripts
             var propertyList = new Dictionary<string, string>();
             var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
 
-            if (!entity.isCollapsed) {
-                if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
+            // is Collapsed
+            if (entity.isCollapsed) return;
+            
+            if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
+            {
+                var meshRenderer = (MeshRenderer) targetGameObject.GetComponent(typeof(MeshRenderer));
+                var skinnedMeshRenderer = (SkinnedMeshRenderer) targetGameObject.GetComponent(typeof(SkinnedMeshRenderer));
+                var particleRenderer = (ParticleSystemRenderer) targetGameObject.GetComponent(typeof(ParticleSystemRenderer));
+                var lineRenderer = (LineRenderer) targetGameObject.GetComponent(typeof(LineRenderer));
+                var trailRenderer = (TrailRenderer) targetGameObject.GetComponent(typeof(TrailRenderer));
+                var rendererFound = false;
+
+                if (meshRenderer != null)
                 {
-                    var meshRenderer = (MeshRenderer) targetGameObject.GetComponent(typeof(MeshRenderer));
-                    var skinnedMeshRenderer = (SkinnedMeshRenderer) targetGameObject.GetComponent(typeof(SkinnedMeshRenderer));
-                    var particleRenderer = (ParticleSystemRenderer) targetGameObject.GetComponent(typeof(ParticleSystemRenderer));
-                    var lineRenderer = (LineRenderer) targetGameObject.GetComponent(typeof(LineRenderer));
-                    var trailRenderer = (TrailRenderer) targetGameObject.GetComponent(typeof(TrailRenderer));
-                    var rendererFound = false;
-
-                    if (meshRenderer != null)
+                    for (var i = 0; i < meshRenderer.sharedMaterials.Length; i++)
                     {
-                        for (var i = 0; i < meshRenderer.sharedMaterials.Length; i++)
+                        var material = meshRenderer.sharedMaterials[i];
+                        if (material == null) continue;
+                        var shader = material.shader;
+                        for (var j = 0; j < shader.GetPropertyCount(); j++)
                         {
-                            var material = meshRenderer.sharedMaterials[i];
-                            if (material == null) continue;
-                            var shader = material.shader;
-                            for (var j = 0; j < shader.GetPropertyCount(); j++)
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Float || shader.GetPropertyType(j) == ShaderPropertyType.Range)
                             {
-                                if (shader.GetPropertyType(j) == ShaderPropertyType.Float || shader.GetPropertyType(j) == ShaderPropertyType.Range)
+                                var propertyKey = "MeshRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
+                                if (!propertyList.ContainsKey(propertyKey))
                                 {
-                                    var propertyKey = "MeshRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                    if (!propertyList.ContainsKey(propertyKey))
-                                    {
-                                        propertyList.Add(
-                                            propertyKey,
-                                            "MSR:" + shader.GetPropertyName(j)
-                                        );
-                                    }
+                                    propertyList.Add(
+                                        propertyKey,
+                                        "MSR:" + shader.GetPropertyName(j)
+                                    );
                                 }
                             }
                         }
-
-                        rendererFound = true;
                     }
 
-                    if (skinnedMeshRenderer != null)
+                    rendererFound = true;
+                }
+
+                if (skinnedMeshRenderer != null)
+                {
+                    for (var i = 0; i < skinnedMeshRenderer.sharedMaterials.Length; i++)
                     {
-                        for (var i = 0; i < skinnedMeshRenderer.sharedMaterials.Length; i++)
+                        var material = skinnedMeshRenderer.sharedMaterials[i];
+                        if (material == null) continue;
+                        var shader = material.shader;
+                        for (var j = 0; j < shader.GetPropertyCount(); j++)
                         {
-                            var material = skinnedMeshRenderer.sharedMaterials[i];
-                            if (material == null) continue;
-                            var shader = material.shader;
-                            for (var j = 0; j < shader.GetPropertyCount(); j++)
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Float || shader.GetPropertyType(j) == ShaderPropertyType.Range)
                             {
-                                if (shader.GetPropertyType(j) == ShaderPropertyType.Float || shader.GetPropertyType(j) == ShaderPropertyType.Range)
+                                var propertyKey = "SkinnedMeshRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
+                                if (!propertyList.ContainsKey(propertyKey))
                                 {
-                                    var propertyKey = "SkinnedMeshRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                    if (!propertyList.ContainsKey(propertyKey))
-                                    {
-                                        propertyList.Add(
-                                            propertyKey,
-                                            "SMR:" + shader.GetPropertyName(j)
-                                        );
-                                    }
+                                    propertyList.Add(
+                                        propertyKey,
+                                        "SMR:" + shader.GetPropertyName(j)
+                                    );
                                 }
                             }
                         }
-
-                        rendererFound = true;
                     }
-                    
-                    if (particleRenderer != null)
+
+                    rendererFound = true;
+                }
+                
+                if (particleRenderer != null)
+                {
+                    for (var i = 0; i < particleRenderer.sharedMaterials.Length; i++)
                     {
-                        for (var i = 0; i < particleRenderer.sharedMaterials.Length; i++)
+                        var material = particleRenderer.sharedMaterials[i];
+                        if (material == null) continue;
+                        var shader = material.shader;
+                        for (var j = 0; j < shader.GetPropertyCount(); j++)
                         {
-                            var material = particleRenderer.sharedMaterials[i];
-                            if (material == null) continue;
-                            var shader = material.shader;
-                            for (var j = 0; j < shader.GetPropertyCount(); j++)
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Float || shader.GetPropertyType(j) == ShaderPropertyType.Range)
                             {
-                                if (shader.GetPropertyType(j) == ShaderPropertyType.Float || shader.GetPropertyType(j) == ShaderPropertyType.Range)
+                                var propertyKey = "ParticleRenderer: " + shader.GetPropertyDescription(j) + "(" +
+                                                  shader.GetPropertyName(j) + ")";
+                                if (!propertyList.ContainsKey(propertyKey))
                                 {
-                                    var propertyKey = "ParticleRenderer: " + shader.GetPropertyDescription(j) + "(" +
-                                                      shader.GetPropertyName(j) + ")";
-                                    if (!propertyList.ContainsKey(propertyKey))
-                                    {
-                                        propertyList.Add(
-                                            propertyKey,
-                                            "PTR:" + shader.GetPropertyName(j)
-                                        );
-                                    }
+                                    propertyList.Add(
+                                        propertyKey,
+                                        "PTR:" + shader.GetPropertyName(j)
+                                    );
                                 }
                             }
                         }
-
-                        rendererFound = true;
                     }
-                    
-                    if (lineRenderer != null)
+
+                    rendererFound = true;
+                }
+                
+                if (lineRenderer != null)
+                {
+                    for (var i = 0; i < lineRenderer.sharedMaterials.Length; i++)
                     {
-                        for (var i = 0; i < lineRenderer.sharedMaterials.Length; i++)
+                        var material = lineRenderer.sharedMaterials[i];
+                        if (material == null) continue;
+                        var shader = material.shader;
+                        for (var j = 0; j < shader.GetPropertyCount(); j++)
                         {
-                            var material = lineRenderer.sharedMaterials[i];
-                            if (material == null) continue;
-                            var shader = material.shader;
-                            for (var j = 0; j < shader.GetPropertyCount(); j++)
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Float || shader.GetPropertyType(j) == ShaderPropertyType.Range)
                             {
-                                if (shader.GetPropertyType(j) == ShaderPropertyType.Float || shader.GetPropertyType(j) == ShaderPropertyType.Range)
+                                var propertyKey = "LineRenderer: " + shader.GetPropertyDescription(j) + "(" +
+                                                  shader.GetPropertyName(j) + ")";
+                                if (!propertyList.ContainsKey(propertyKey))
                                 {
-                                    var propertyKey = "LineRenderer: " + shader.GetPropertyDescription(j) + "(" +
-                                                      shader.GetPropertyName(j) + ")";
-                                    if (!propertyList.ContainsKey(propertyKey))
-                                    {
-                                        propertyList.Add(
-                                            propertyKey,
-                                            "LNR:" + shader.GetPropertyName(j)
-                                        );
-                                    }
+                                    propertyList.Add(
+                                        propertyKey,
+                                        "LNR:" + shader.GetPropertyName(j)
+                                    );
                                 }
                             }
                         }
-
-                        rendererFound = true;
                     }
-                    
-                    if (trailRenderer != null)
+
+                    rendererFound = true;
+                }
+                
+                if (trailRenderer != null)
+                {
+                    for (var i = 0; i < trailRenderer.sharedMaterials.Length; i++)
                     {
-                        for (var i = 0; i < trailRenderer.sharedMaterials.Length; i++)
+                        var material = trailRenderer.sharedMaterials[i];
+                        if (material == null) continue;
+                        var shader = material.shader;
+                        for (var j = 0; j < shader.GetPropertyCount(); j++)
                         {
-                            var material = trailRenderer.sharedMaterials[i];
-                            if (material == null) continue;
-                            var shader = material.shader;
-                            for (var j = 0; j < shader.GetPropertyCount(); j++)
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Float || shader.GetPropertyType(j) == ShaderPropertyType.Range)
                             {
-                                if (shader.GetPropertyType(j) == ShaderPropertyType.Float || shader.GetPropertyType(j) == ShaderPropertyType.Range)
+                                var propertyKey = "TrailRenderer: " + shader.GetPropertyDescription(j) + "(" +
+                                                  shader.GetPropertyName(j) + ")";
+                                if (!propertyList.ContainsKey(propertyKey))
                                 {
-                                    var propertyKey = "TrailRenderer: " + shader.GetPropertyDescription(j) + "(" +
-                                                      shader.GetPropertyName(j) + ")";
-                                    if (!propertyList.ContainsKey(propertyKey))
-                                    {
-                                        propertyList.Add(
-                                            propertyKey,
-                                            "TLR:" + shader.GetPropertyName(j)
-                                        );
-                                    }
+                                    propertyList.Add(
+                                        propertyKey,
+                                        "TLR:" + shader.GetPropertyName(j)
+                                    );
                                 }
                             }
                         }
-
-                        rendererFound = true;
                     }
 
-                    if (rendererFound)
-                    {
-                        entity.gameObject = targetGameObject;
-                        entity.treePath = AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
-                    }
-                    else if (entity.gameObject != targetGameObject)
-                    {
-                        entity.gameObject = null;
-                        entity.treePath = "";
-                    }
+                    rendererFound = true;
+                }
+
+                if (rendererFound)
+                {
+                    entity.gameObject = targetGameObject;
+                    entity.treePath = AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
                 }
                 else if (entity.gameObject != targetGameObject)
                 {
                     entity.gameObject = null;
                     entity.treePath = "";
                 }
-
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                EditorGUI.LabelField(_rect, "Path");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                EditorGUI.LabelField(_rect, entity.treePath);
-                
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                var propertyNames = new string[propertyList.Count];
-                propertyList.Values.CopyTo(propertyNames, 0);
-                var propertyDescriptions = new string[propertyList.Count];
-                propertyList.Keys.CopyTo(propertyDescriptions, 0);
-                
-                EditorGUI.LabelField(_rect, "Property");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                var propertyIndex = EditorGUI.Popup(_rect, Array.IndexOf(propertyNames, entity.propertyTypeIdentifier + ":" + entity.propertyName), propertyDescriptions);
-                if (propertyIndex >= 0)
-                {
-                    var property = propertyNames[propertyIndex];
-                    entity.propertyName = property.Substring(4);
-                    entity.propertyTypeIdentifier = property.Substring(0, 3);
-                    switch (entity.propertyTypeIdentifier)
-                    {
-                        case "SMR":
-                            entity.propertyType = typeof(SkinnedMeshRenderer);
-                            break;
-                        case "MSR":
-                            entity.propertyType = typeof(MeshRenderer);
-                            break;
-                        case "PTR":
-                            entity.propertyType = typeof(ParticleSystemRenderer);
-                            break;
-                        case "LNR":
-                            entity.propertyType = typeof(LineRenderer);
-                            break;
-                        case "TLR":
-                            entity.propertyType = typeof(TrailRenderer);
-                            break;
-                        default:
-                            entity.propertyType = typeof(SkinnedMeshRenderer);
-                            break;
-                    }
-                }
-                
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-                
-                EditorGUI.LabelField(_rect, "Min Value");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                entity.minValue = EditorGUI.FloatField(_rect, entity.minValue);
-                
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-                
-                EditorGUI.LabelField(_rect, "Max Value");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                entity.maxValue = EditorGUI.FloatField(_rect, entity.maxValue);
             }
+            else if (entity.gameObject != targetGameObject)
+            {
+                entity.gameObject = null;
+                entity.treePath = "";
+            }
+
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+            EditorGUI.LabelField(_rect, "Path");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            EditorGUI.LabelField(_rect, entity.treePath);
+            
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+            var propertyNames = new string[propertyList.Count];
+            propertyList.Values.CopyTo(propertyNames, 0);
+            var propertyDescriptions = new string[propertyList.Count];
+            propertyList.Keys.CopyTo(propertyDescriptions, 0);
+            
+            EditorGUI.LabelField(_rect, "Property");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            var propertyIndex = EditorGUI.Popup(_rect, Array.IndexOf(propertyNames, entity.propertyTypeIdentifier + ":" + entity.propertyName), propertyDescriptions);
+            if (propertyIndex >= 0)
+            {
+                var property = propertyNames[propertyIndex];
+                entity.propertyName = property.Substring(4);
+                entity.propertyTypeIdentifier = property.Substring(0, 3);
+                switch (entity.propertyTypeIdentifier)
+                {
+                    case "SMR":
+                        entity.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                    case "MSR":
+                        entity.propertyType = typeof(MeshRenderer);
+                        break;
+                    case "PTR":
+                        entity.propertyType = typeof(ParticleSystemRenderer);
+                        break;
+                    case "LNR":
+                        entity.propertyType = typeof(LineRenderer);
+                        break;
+                    case "TLR":
+                        entity.propertyType = typeof(TrailRenderer);
+                        break;
+                    default:
+                        entity.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                }
+            }
+            
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            
+            EditorGUI.LabelField(_rect, "Min Value");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            entity.minValue = EditorGUI.FloatField(_rect, entity.minValue);
+            
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            
+            EditorGUI.LabelField(_rect, "Max Value");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            entity.maxValue = EditorGUI.FloatField(_rect, entity.maxValue);
         }
 
         private void OnDrawHeader(Rect rect)
@@ -1946,36 +1949,37 @@ namespace ABI.CCK.Scripts
             _rect.width = rect.width - 100;
             var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
 
-            if (!entity.isCollapsed) {
-                if (targetGameObject != null &&
-                    targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
-                    entity.gameObject = targetGameObject;
-                    entity.treePath =
-                        AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
-                }
-                else if (entity.gameObject != targetGameObject) {
-                    entity.gameObject = null;
-                    entity.treePath = "";
-                }
+            // is Collapsed
+            if (entity.isCollapsed) return;
 
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                EditorGUI.LabelField(_rect, "Path");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                EditorGUI.LabelField(_rect, entity.treePath);
-
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                EditorGUI.LabelField(_rect, new GUIContent("Set to",
-                                                           "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
-                                                           "will be deactivated when the toggle is pressed."));
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                entity.onState = EditorGUI.Toggle(_rect, entity.onState);
+            if (targetGameObject != null &&
+                targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
+                entity.gameObject = targetGameObject;
+                entity.treePath =
+                    AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
             }
+            else if (entity.gameObject != targetGameObject) {
+                entity.gameObject = null;
+                entity.treePath = "";
+            }
+
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+            EditorGUI.LabelField(_rect, "Path");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            EditorGUI.LabelField(_rect, entity.treePath);
+
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+            EditorGUI.LabelField(_rect, new GUIContent("Set to",
+                                                       "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
+                                                       "will be deactivated when the toggle is pressed."));
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            entity.onState = EditorGUI.Toggle(_rect, entity.onState);
         }
 
         private void OnDrawHeader(Rect rect)

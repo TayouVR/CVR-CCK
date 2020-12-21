@@ -271,95 +271,93 @@ namespace ABI.CCK.Scripts.Editor
             if (index > _avatar.avatarSettings.settings.Count) return EditorGUIUtility.singleLineHeight * 1f;
             entity = _avatar.avatarSettings.settings[index];
 
-            if (!entity.setting.isCollapsed) {
-                switch (entity.type) {
-                    case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle: {
-                        var gameObjectToggle = (CVRAdvancesAvatarSettingGameObjectToggle) entity.setting;
-                        if (gameObjectToggle == null || gameObjectToggle.gameObjectTargets == null)
-                            return EditorGUIUtility.singleLineHeight * 9f;
-                        float height = 9.25f;
-                        if (gameObjectToggle.useAnimationClip) {
-                            height -= 1.25f;
-                        } else {
-                            foreach (var target in gameObjectToggle.gameObjectTargets) {
-                                if (target.isCollapsed) {
-                                    height += 1.25f;
-                                } else {
-                                    height += 3.75f;
-                                }
-                            }
-                            if (gameObjectToggle.gameObjectTargets.Count == 0) {
-                                height += 1f;
-                            }
-                        }
-                        return EditorGUIUtility.singleLineHeight * height;
-                    }
-                    case CVRAdvancedSettingsEntry.SettingsType.GameObjectDropdown: {
-                        
-                        var gameObjectDropdown = (CVRAdvancesAvatarSettingGameObjectDropdown) entity.setting;
-                        if (gameObjectDropdown == null || gameObjectDropdown.options == null)
-                            return EditorGUIUtility.singleLineHeight * 8f;
-                        float height = 7;
-                        foreach (var option in gameObjectDropdown.options) {
-                            height += 1;
-                            if (!option.isCollapsed) {
-                                height += 4;
-                                if (option.useAnimationClip) {
-                                    height -= 1.5f;
-                                } else {
-                                    if (option.gameObjectTargets.Count != 0) {
-                                        foreach (var target in option.gameObjectTargets) {
-                                            if (target.isCollapsed) {
-                                                height += 1;
-                                            } else {
-                                                height += 3;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        return EditorGUIUtility.singleLineHeight * height * 1.25f;
-                    }
-                    case CVRAdvancedSettingsEntry.SettingsType.MaterialColor: {
-                        
-                        var materialColor = (CVRAdvancedAvatarSettingMaterialColor) entity.setting;
-                        if (materialColor == null || materialColor.materialColorTargets == null)
-                            return EditorGUIUtility.singleLineHeight * 8f;
-                        float height = 8f;
-                        foreach (var option in materialColor.materialColorTargets) {
-                            if (option.isCollapsed) {
+            // When collapsed only return one line height
+            if (entity.setting.isCollapsed) return EditorGUIUtility.singleLineHeight * 1.25f;
+            
+            switch (entity.type) {
+                case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle: {
+                    var gameObjectToggle = (CVRAdvancesAvatarSettingGameObjectToggle) entity.setting;
+                    if (gameObjectToggle == null || gameObjectToggle.gameObjectTargets == null)
+                        return EditorGUIUtility.singleLineHeight * 9f;
+                    float height = 9.25f;
+                    if (gameObjectToggle.useAnimationClip) {
+                        height -= 1.25f;
+                    } else {
+                        foreach (var target in gameObjectToggle.gameObjectTargets) {
+                            if (target.isCollapsed) {
                                 height += 1.25f;
                             } else {
                                 height += 3.75f;
                             }
                         }
-                        if (materialColor.materialColorTargets.Count == 0) {
+                        if (gameObjectToggle.gameObjectTargets.Count == 0) {
                             height += 1f;
                         }
-                        return EditorGUIUtility.singleLineHeight * height;
                     }
-                    case CVRAdvancedSettingsEntry.SettingsType.Slider: {
-                        var slider = (CVRAdvancesAvatarSettingSlider) entity.setting;
-                        if (slider == null || slider.materialPropertyTargets == null)
-                            return EditorGUIUtility.singleLineHeight * 8f;
-                        float height = 11.25f;
-                        foreach (var option in slider.materialPropertyTargets) {
-                            if (option.isCollapsed) {
-                                height += 1.25f;
+                    return EditorGUIUtility.singleLineHeight * height;
+                }
+                case CVRAdvancedSettingsEntry.SettingsType.GameObjectDropdown: {
+                    
+                    var gameObjectDropdown = (CVRAdvancesAvatarSettingGameObjectDropdown) entity.setting;
+                    if (gameObjectDropdown == null || gameObjectDropdown.options == null)
+                        return EditorGUIUtility.singleLineHeight * 8f;
+                    float height = 7;
+                    foreach (var option in gameObjectDropdown.options) {
+                        height += 1;
+                        if (!option.isCollapsed) {
+                            height += 4;
+                            if (option.useAnimationClip) {
+                                height -= 1.5f;
                             } else {
-                                height += 5 * 1.25f;
+                                if (option.gameObjectTargets.Count != 0) {
+                                    foreach (var target in option.gameObjectTargets) {
+                                        if (target.isCollapsed) {
+                                            height += 1;
+                                        } else {
+                                            height += 3;
+                                        }
+                                    }
+                                }
                             }
                         }
-                        if (slider.materialPropertyTargets.Count == 0) {
-                            height += 1.25f;
-                        }
-                        return EditorGUIUtility.singleLineHeight * height;
                     }
+                    return EditorGUIUtility.singleLineHeight * height * 1.25f;
                 }
-            }
-            else {
-                return EditorGUIUtility.singleLineHeight * 1.25f;
+                case CVRAdvancedSettingsEntry.SettingsType.MaterialColor: {
+                    
+                    var materialColor = (CVRAdvancedAvatarSettingMaterialColor) entity.setting;
+                    if (materialColor == null || materialColor.materialColorTargets == null)
+                        return EditorGUIUtility.singleLineHeight * 8f;
+                    float height = 8f;
+                    foreach (var option in materialColor.materialColorTargets) {
+                        if (option.isCollapsed) {
+                            height += 1.25f;
+                        } else {
+                            height += 3.75f;
+                        }
+                    }
+                    if (materialColor.materialColorTargets.Count == 0) {
+                        height += 1f;
+                    }
+                    return EditorGUIUtility.singleLineHeight * height;
+                }
+                case CVRAdvancedSettingsEntry.SettingsType.Slider: {
+                    var slider = (CVRAdvancesAvatarSettingSlider) entity.setting;
+                    if (slider == null || slider.materialPropertyTargets == null)
+                        return EditorGUIUtility.singleLineHeight * 8f;
+                    float height = 11.25f;
+                    foreach (var option in slider.materialPropertyTargets) {
+                        if (option.isCollapsed) {
+                            height += 1.25f;
+                        } else {
+                            height += 5 * 1.25f;
+                        }
+                    }
+                    if (slider.materialPropertyTargets.Count == 0) {
+                        height += 1.25f;
+                    }
+                    return EditorGUIUtility.singleLineHeight * height;
+                }
             }
 
             return EditorGUIUtility.singleLineHeight * 8.75f;
@@ -384,59 +382,60 @@ namespace ABI.CCK.Scripts.Editor
             _rect.width = rect.width - 100;
             entity.name = EditorGUI.TextField(_rect, entity.name);
 
-            if (!entity.setting.isCollapsed) {
-                if (entity.name != null) {
-                    entity.machineName = Regex.Replace(entity.name, "[^a-zA-Z0-9#]", "");
-                }
+            // check if collapsed
+            if (entity.setting.isCollapsed) return;
 
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            if (entity.name != null) {
+                entity.machineName = Regex.Replace(entity.name, "[^a-zA-Z0-9#]", "");
+            }
 
-                EditorGUI.LabelField(_rect, "Parameter");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                EditorGUI.LabelField(_rect, entity.machineName);
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            EditorGUI.LabelField(_rect, "Parameter");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            EditorGUI.LabelField(_rect, entity.machineName);
 
-                EditorGUI.LabelField(_rect, "Type");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                var type = (CVRAdvancedSettingsEntry.SettingsType) EditorGUI.EnumPopup(_rect, entity.type);
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-                if (type != entity.type) {
-                    entity.type = type;
+            EditorGUI.LabelField(_rect, "Type");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            var type = (CVRAdvancedSettingsEntry.SettingsType) EditorGUI.EnumPopup(_rect, entity.type);
 
-                    switch (type) {
-                        case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle:
-                            entity.setting = new CVRAdvancesAvatarSettingGameObjectToggle();
-                            break;
-                        case CVRAdvancedSettingsEntry.SettingsType.GameObjectDropdown:
-                            entity.setting = new CVRAdvancesAvatarSettingGameObjectDropdown();
-                            break;
-                        case CVRAdvancedSettingsEntry.SettingsType.MaterialColor:
-                            entity.setting = new CVRAdvancedAvatarSettingMaterialColor();
-                            break;
-                        case CVRAdvancedSettingsEntry.SettingsType.Slider:
-                            entity.setting = new CVRAdvancesAvatarSettingSlider();
-                            break;
-                        case CVRAdvancedSettingsEntry.SettingsType.Joystick2D:
-                            entity.setting = new CVRAdvancesAvatarSettingJoystick2D();
-                            break;
-                        case CVRAdvancedSettingsEntry.SettingsType.Joystick3D:
-                            entity.setting = new CVRAdvancesAvatarSettingJoystick3D();
-                            break;
-                        case CVRAdvancedSettingsEntry.SettingsType.InputSingle:
-                            entity.setting = new CVRAdvancesAvatarSettingInputSingle();
-                            break;
-                        case CVRAdvancedSettingsEntry.SettingsType.InputVector2:
-                            entity.setting = new CVRAdvancesAvatarSettingInputVector2();
-                            break;
-                        case CVRAdvancedSettingsEntry.SettingsType.InputVector3:
-                            entity.setting = new CVRAdvancesAvatarSettingInputVector3();
-                            break;
-                    }
+            if (type != entity.type) {
+                entity.type = type;
+
+                switch (type) {
+                    case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle:
+                        entity.setting = new CVRAdvancesAvatarSettingGameObjectToggle();
+                        break;
+                    case CVRAdvancedSettingsEntry.SettingsType.GameObjectDropdown:
+                        entity.setting = new CVRAdvancesAvatarSettingGameObjectDropdown();
+                        break;
+                    case CVRAdvancedSettingsEntry.SettingsType.MaterialColor:
+                        entity.setting = new CVRAdvancedAvatarSettingMaterialColor();
+                        break;
+                    case CVRAdvancedSettingsEntry.SettingsType.Slider:
+                        entity.setting = new CVRAdvancesAvatarSettingSlider();
+                        break;
+                    case CVRAdvancedSettingsEntry.SettingsType.Joystick2D:
+                        entity.setting = new CVRAdvancesAvatarSettingJoystick2D();
+                        break;
+                    case CVRAdvancedSettingsEntry.SettingsType.Joystick3D:
+                        entity.setting = new CVRAdvancesAvatarSettingJoystick3D();
+                        break;
+                    case CVRAdvancedSettingsEntry.SettingsType.InputSingle:
+                        entity.setting = new CVRAdvancesAvatarSettingInputSingle();
+                        break;
+                    case CVRAdvancedSettingsEntry.SettingsType.InputVector2:
+                        entity.setting = new CVRAdvancesAvatarSettingInputVector2();
+                        break;
+                    case CVRAdvancedSettingsEntry.SettingsType.InputVector3:
+                        entity.setting = new CVRAdvancesAvatarSettingInputVector3();
+                        break;
                 }
 
                 rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
