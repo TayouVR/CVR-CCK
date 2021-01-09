@@ -18,8 +18,8 @@ namespace ABI.CCK.Scripts.Editor
     [InitializeOnLoad]
     public class CCK_BuildManagerWindow : EditorWindow
     {
-        public static string Version = "2.1 RELEASE";
-        private const string CCKVersion = "2.1 RELEASE (Build 59)";
+        public static string Version = "2.2 RELEASE";
+        private const string CCKVersion = "2.2 RELEASE (Build 62)";
         private const string supportedUnity = "2019.3.1f1";
         private const string supportedUnityLts = "2019.4.13f1";
         
@@ -97,9 +97,12 @@ namespace ABI.CCK.Scripts.Editor
                 EditorPrefs.SetBool("m_ABI_isBuilding", false);
                 EditorPrefs.SetString("m_ABI_TempVersion", Version);
                 if (File.Exists(Application.dataPath + "/ABI.CCK/Resources/Cache/_CVRAvatar.prefab")) File.Delete(Application.dataPath + "/ABI.CCK/Resources/Cache/_CVRAvatar.prefab");
+                if (File.Exists(Application.dataPath + "/ABI.CCK/Resources/Cache/_CVRSpawnable.prefab")) File.Delete(Application.dataPath + "/ABI.CCK/Resources/Cache/_CVRSpawnable.prefab");
                 if (File.Exists(Application.dataPath + "/ABI.CCK/Resources/Cache/_CVRWorld.prefab")) File.Delete(Application.dataPath + "/ABI.CCK/Resources/Cache/_CVRWorld.prefab");
                 if (File.Exists(Application.persistentDataPath + "/bundle.cvravatar")) File.Delete(Application.persistentDataPath + "/bundle.cvravatar");
                 if (File.Exists(Application.persistentDataPath + "/bundle.cvravatar.manifest")) File.Delete(Application.persistentDataPath + "/bundle.cvravatar.manifest");
+                if (File.Exists(Application.persistentDataPath + "/bundle.cvrprop")) File.Delete(Application.persistentDataPath + "/bundle.cvrprop");
+                if (File.Exists(Application.persistentDataPath + "/bundle.cvrprop.manifest")) File.Delete(Application.persistentDataPath + "/bundle.cvrprop.manifest");
                 if (File.Exists(Application.persistentDataPath + "/bundle.cvrworld")) File.Delete(Application.persistentDataPath + "/bundle.cvrworld");
                 if (File.Exists(Application.persistentDataPath + "/bundle.cvrworld.manifest")) File.Delete(Application.persistentDataPath + "/bundle.cvrworld.manifest");
                 if (File.Exists(Application.persistentDataPath + "/bundle.png")) File.Delete(Application.persistentDataPath + "/bundle.png");
@@ -116,6 +119,7 @@ namespace ABI.CCK.Scripts.Editor
                 var ui = Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/ABI.CCK/GUIAssets/CCK_UploaderHead.prefab"));
                 OnGuiUpdater up = ui.GetComponentInChildren<OnGuiUpdater>();
                 if (File.Exists(Application.dataPath + "/ABI.CCK/Resources/Cache/_CVRAvatar.prefab"))up.asset = Resources.Load<GameObject>("Cache/_CVRAvatar").GetComponent<CVRAssetInfo>();
+                if (File.Exists(Application.dataPath + "/ABI.CCK/Resources/Cache/_CVRSpawnable.prefab"))up.asset = Resources.Load<GameObject>("Cache/_CVRSpawnable").GetComponent<CVRAssetInfo>();
                 if (File.Exists(Application.dataPath + "/ABI.CCK/Resources/Cache/_CVRWorld.prefab"))up.asset = Resources.Load<GameObject>("Cache/_CVRWorld").GetComponent<CVRAssetInfo>();
             }
         }
@@ -199,11 +203,17 @@ namespace ABI.CCK.Scripts.Editor
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Found content", EditorStyles.boldLabel);
             List<CVRAvatar> avatars = new List<CVRAvatar>();
+            List<CVRSpawnable> spawnables = new List<CVRSpawnable>();
             List<CVRWorld> worlds = new List<CVRWorld>();
             
             foreach (CVRWorld w in Resources.FindObjectsOfTypeAll<CVRWorld>())
             {
                 if (w.gameObject.activeInHierarchy) worlds.Add(w);
+            }
+            
+            foreach (CVRSpawnable s in Resources.FindObjectsOfTypeAll<CVRSpawnable>())
+            {
+                if (s.gameObject.activeInHierarchy) spawnables.Add(s);
             }
 
             foreach (CVRAvatar a in Resources.FindObjectsOfTypeAll<CVRAvatar>())
@@ -213,7 +223,7 @@ namespace ABI.CCK.Scripts.Editor
 
             if (worlds.Count <= 0 && avatars.Count > 0 && (Application.unityVersion == supportedUnity || Application.unityVersion == supportedUnityLts))
             {
-                if (avatars.Count <= 0) EditorGUILayout.LabelField("No content to upload found in scene.");
+                if (avatars.Count <= 0) EditorGUILayout.LabelField("No configured avatars found in scene - CVRAvatar added?");
                 else
                 {
                     if (avatars.Count > 0)
@@ -227,6 +237,28 @@ namespace ABI.CCK.Scripts.Editor
                             EditorGUILayout.Space();
                             GUILayout.Label("Avatar Object #" + counter);
                             OnGUIAvatar(a);
+                        }
+
+                        EditorGUILayout.EndScrollView();
+                    }
+                }
+            }
+            if (worlds.Count <= 0 && spawnables.Count > 0 && (Application.unityVersion == supportedUnity || Application.unityVersion == supportedUnityLts))
+            {
+                if (spawnables.Count <= 0) EditorGUILayout.LabelField("No configured avatars found in scene - CVRSpawnable added?");
+                else
+                {
+                    if (spawnables.Count > 0)
+                    {
+                        var counter = 0;
+                        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+                        foreach (CVRSpawnable s in spawnables)
+                        {
+                            counter++;
+                            EditorGUI.BeginChangeCheck();
+                            EditorGUILayout.Space();
+                            GUILayout.Label("Spawnable Object #" + counter);
+                            OnGUISpawnable(s);
                         }
 
                         EditorGUILayout.EndScrollView();
@@ -380,6 +412,55 @@ namespace ABI.CCK.Scripts.Editor
             if (errors <= 0) if (GUILayout.Button("Upload Avatar")) CCK_BuildUtility.BuildAndUploadAvatar(avatarObject);
             if (overallMissingScripts > 0) if (GUILayout.Button("Remove all missing scripts")) CCK_Tools.CleanMissingScripts(CCK_Tools.SearchType.Selection ,true,avatarObject);
 
+        }
+        
+        void OnGUISpawnable(CVRSpawnable s)
+        {
+            GameObject spawnableObject = s.gameObject;
+            GUI.enabled = true;
+            EditorGUILayout.InspectorTitlebar(spawnableObject.activeInHierarchy, spawnableObject);
+            int errors = 0;
+            int overallPolygonsCount = 0;
+            int overallSkinnedMeshRenderer = 0;
+            int overallUniqueMaterials = 0;
+            int overallMissingScripts = 0;
+            foreach (MeshFilter filter in s.gameObject.GetComponentsInChildren<MeshFilter>())
+            {
+                if (filter.sharedMesh != null) overallPolygonsCount = overallPolygonsCount + filter.sharedMesh.triangles.Length / 3;
+            }
+            foreach (SkinnedMeshRenderer renderer in s.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                overallSkinnedMeshRenderer++;
+                if (renderer.sharedMaterials != null) overallUniqueMaterials = overallUniqueMaterials + renderer.sharedMaterials.Length;
+            }
+            overallMissingScripts = CCK_Tools.CleanMissingScripts(CCK_Tools.SearchType.Selection ,false, spawnableObject);
+            if (overallMissingScripts > 0) errors++;
+
+            //Errors
+            if (overallMissingScripts > 0) EditorGUILayout.HelpBox("Spawnable Objects or its children contains missing scripts. The upload will fail like this. Remove all missing script references before uploading or click Remove all missing scripts to automatically have this done for you.", MessageType.Error);
+            
+            //Warnings
+            if (overallPolygonsCount > 100000) EditorGUILayout.HelpBox("Warning: This spawnable object has more than 100k (" + overallPolygonsCount + ") polygons in total. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Warning);
+            if (overallSkinnedMeshRenderer > 10) EditorGUILayout.HelpBox("Warning: This spawnable object contains more than 10 (" + overallSkinnedMeshRenderer + ") SkinnedMeshRenderer components. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Warning);
+            if (overallUniqueMaterials > 20) EditorGUILayout.HelpBox("Warning: This spawnable object utilizes more than 20 (" + overallUniqueMaterials + ") material slots. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Warning);
+
+            var avatarMeshes = getAllAssetMeshesInAvatar(spawnableObject);
+            if (CheckForLegacyBlendShapeNormals(avatarMeshes))
+            {
+                EditorGUILayout.HelpBox("Warning: This spawnable object has none legacy blend shape normals. This will lead to an increased filesize and lighting errors", MessageType.Warning);
+                if(GUILayout.Button("Fix import settings"))
+                {
+                    FixLegacyBlendShapeNormals(avatarMeshes);
+                }
+            }
+            
+            //Info
+            if (overallPolygonsCount >= 50000 && overallPolygonsCount <= 100000) EditorGUILayout.HelpBox("Info: This spawnable object has more than 50k (" + overallPolygonsCount + ") polygons in total. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Info);
+            if (overallSkinnedMeshRenderer >= 5 && overallSkinnedMeshRenderer <= 10) EditorGUILayout.HelpBox("Info: This spawnable object contains more than 5 (" + overallSkinnedMeshRenderer + ") SkinnedMeshRenderer components. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Info);
+            if (overallUniqueMaterials >= 10 && overallUniqueMaterials <= 20) EditorGUILayout.HelpBox("Info: This spawnable object utilizes more than 10 (" + overallUniqueMaterials + ") material slots. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Info);
+
+            if (errors <= 0 && overallMissingScripts <= 0) if (GUILayout.Button("Upload Spawnable Object (Prop)")) CCK_BuildUtility.BuildAndUploadSpawnable(spawnableObject);
+            if (overallMissingScripts > 0) if (GUILayout.Button("Remove all missing scripts")) CCK_Tools.CleanMissingScripts(CCK_Tools.SearchType.Selection ,true, spawnableObject);
         }
 
         private List<String> getAllAssetMeshesInAvatar(GameObject avatar)

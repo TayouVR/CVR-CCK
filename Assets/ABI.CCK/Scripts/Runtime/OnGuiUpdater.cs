@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using ABI.CCK.Components;
 using UnityEditor;
@@ -43,6 +43,15 @@ namespace ABI.CCK.Scripts.Runtime
         public Toggle wrldGore;
         public Toggle wrldWeaponSystem;
         public Toggle wrldMinigame;
+        //Props
+        public Toggle propLoudAudio;
+        public Toggle propLongRangeAudio;
+        public Toggle propScreenFx;
+        public Toggle propFlashingColors;
+        public Toggle propFlashingLights;
+        public Toggle propParticleSystems;
+        public Toggle propViolence;
+        public Toggle propGore;
 
         public Toggle dontOverridePicture;
         
@@ -55,6 +64,7 @@ namespace ABI.CCK.Scripts.Runtime
 
         [Space] [Header("UIHelper objects")] [Space]
         public GameObject wrldSafety;
+        public GameObject propSafety;
         public GameObject avtrSafety;
         public GameObject camObj;
         public RenderTexture tex;
@@ -99,6 +109,7 @@ namespace ABI.CCK.Scripts.Runtime
             CVRAssetInfo.AssetType type = asset.GetComponent<CVRAssetInfo>().type;
             
             if (type == CVRAssetInfo.AssetType.Avatar) avtrSafety.SetActive(true);
+            if (type == CVRAssetInfo.AssetType.Spawnable) propSafety.SetActive(true);
             if (type == CVRAssetInfo.AssetType.World)
             {
                 wrldSafety.SetActive(true);
@@ -126,6 +137,9 @@ namespace ABI.CCK.Scripts.Runtime
             string handle;
             if (type == CVRAssetInfo.AssetType.Avatar) fileSizeText.text = "Asset Bundle File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvravatar").Length)
                                                                                                  + "\nAsset Bundle Manifest File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvravatar.manifest").Length)
+                                                                                                 + "\nThumbnail File: creation pending";
+            if (type == CVRAssetInfo.AssetType.Spawnable) fileSizeText.text = "Asset Bundle File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvrprop").Length)
+                                                                                                 + "\nAsset Bundle Manifest File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvrprop.manifest").Length)
                                                                                                  + "\nThumbnail File: creation pending";
             
             if (type == CVRAssetInfo.AssetType.World) fileSizeText.text = "Asset Bundle File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvrworld").Length) 

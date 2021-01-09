@@ -20,9 +20,42 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d4744b1-dc45-4a35-8750-e0fb96fcd2f3" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRHapticZone.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRHapticZone.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRPointer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRPointer.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRSpawnable.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRSpawnable.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAdvancedAvatarSettingsTriggerEditor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAdvancedAvatarSettingsTriggerEditor.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRHapticZoneEditor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRHapticZoneEditor.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRSpawnableEditor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRSpawnableEditor.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRToggleStateTriggerEditor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRToggleStateTriggerEditor.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CVR-CCK/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Animations/AvatarAnimator.controller" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Animations/AvatarAnimator.controller" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Animations/LocIdle.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Animations/LocIdle.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRAdvancedAvatarSettingsPointer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRAdvancedAvatarSettingsPointer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRAdvancedAvatarSettingsTrigger.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRAdvancedAvatarSettingsTrigger.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRAssetInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRAssetInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRInteractableAction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRInteractableAction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRToggleStatePointer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRToggleStatePointer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRVideoPlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRVideoPlayer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/GUIAssets/CCK_UploaderHead.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/GUIAssets/CCK_UploaderHead.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_BuildManagerWindow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_BuildManagerWindow.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_BuildUtility.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_BuildUtility.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRInteractableEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRInteractableEditor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVR_VideoPlayerEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVR_VideoPlayerEditor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_Tools.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_Tools.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Runtime/CCK_RuntimeUploaderMaster.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Runtime/CCK_RuntimeUploaderMaster.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Runtime/CCK_RuntimeVariableStream.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Runtime/CCK_RuntimeVariableStream.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Runtime/OnGuiUpdater.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Runtime/OnGuiUpdater.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ABI.CCK/Shaders/ABI_Mirror.shader" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ABI.CCK/Shaders/ABI_Mirror.shader" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -39,8 +72,8 @@
       <option value="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRGIMaterialUpdater.cs" />
       <option value="$PROJECT_DIR$/Assets/ABI.CCK/Components/CVRVariableBuffer.cs" />
       <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CVRHapticAreaChestEditor.cs" />
-      <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" />
       <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/CVRAdvancedAvatarSettings.cs" />
+      <option value="$PROJECT_DIR$/Assets/ABI.CCK/Scripts/Editor/CCK_CVRAvatarEditor.cs" />
     </changedPaths>
   </component>
   <component name="ProjectId" id="1lhfHODGUQkvvecF98t41bBUPzk" />
@@ -93,7 +126,8 @@
       <workItem from="1608198882788" duration="5789000" />
       <workItem from="1608229673040" duration="608000" />
       <workItem from="1608543633135" duration="4506000" />
-      <workItem from="1608563294819" duration="3137000" />
+      <workItem from="1608563294819" duration="3356000" />
+      <workItem from="1610203674712" duration="1538000" />
     </task>
     <servers />
   </component>

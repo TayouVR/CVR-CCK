@@ -21,6 +21,7 @@ namespace ABI.CCK.Scripts
         public bool initialized = false;
         
         public RuntimeAnimatorController baseController;
+        public RuntimeAnimatorController baseOverrideController;
         
         #if UNITY_EDITOR
         public AnimatorController animator;
@@ -137,7 +138,7 @@ namespace ABI.CCK.Scripts
     {
         #if UNITY_EDITOR
 
-        public bool isCollapsed;
+        public bool isCollapsed = true;
         public virtual void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             
@@ -146,7 +147,7 @@ namespace ABI.CCK.Scripts
     }
 
     [System.Serializable]
-    public class CVRAdvancesAvatarSettingGameObjectToggle : CVRAdvancesAvatarSettingBase
+    public class CVRAdvancesAvatarSettingGameObjectToggle : CVRAdvancesAvatarSettingBase 
     {
         public bool defaultValue;
 
@@ -157,7 +158,7 @@ namespace ABI.CCK.Scripts
         
         public List<CVRAdvancedSettingsTargetEntryGameObject> gameObjectTargets =
             new List<CVRAdvancedSettingsTargetEntryGameObject>();
-
+        
         private ReorderableList gameObjectList;
         private CVRAvatar target;
         
@@ -209,13 +210,13 @@ namespace ABI.CCK.Scripts
             keyframe = new Keyframe(1f / 60f, 0);
             keyframe.outTangent = Mathf.Infinity;
             animationCurveOff.AddKey(keyframe);
-            
+
             foreach (var target in gameObjectTargets)
             {
                 if(target.gameObject == null || target.treePath == null) continue;
-            
+                
                 onClip.SetCurve(target.treePath, typeof(GameObject), "m_IsActive", target.onState ? animationCurveOn : animationCurveOff);
-            
+                
                 offClip.SetCurve(target.treePath, typeof(GameObject), "m_IsActive", !target.onState ? animationCurveOn : animationCurveOff);
             }
             
@@ -236,7 +237,7 @@ namespace ABI.CCK.Scripts
             AssetDatabase.AddObjectToAsset(blendTree, AssetDatabase.GetAssetPath(controller));
             blendTree.hideFlags = HideFlags.HideInHierarchy;
         }
-        
+
         private void generateReorderableList()
         {
             gameObjectList = new ReorderableList(gameObjectTargets, typeof(CVRAdvancedSettingsTargetEntryGameObject), 
@@ -248,7 +249,8 @@ namespace ABI.CCK.Scripts
             gameObjectList.onChangedCallback = OnChanged;
         }
         
-        public ReorderableList GetReorderableList(CVRAvatar avatar) {
+        public ReorderableList GetReorderableList(CVRAvatar avatar)
+        {
             target = avatar;
             
             if (gameObjectList == null) generateReorderableList();
@@ -270,9 +272,12 @@ namespace ABI.CCK.Scripts
         {
             CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
             float height = 0;
-            if (entity.isCollapsed) {
+            if (!entity.isCollapsed)
+            {
                 height += 1;
-            } else {
+            } 
+            else 
+            {
                 height += 3f;
             }
             return EditorGUIUtility.singleLineHeight * height * 1.25f;
@@ -288,24 +293,25 @@ namespace ABI.CCK.Scripts
             rect.width -= 12;
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            entity.isCollapsed = !EditorGUI.Foldout(_rect, !entity.isCollapsed, "Name", true);
+            entity.isCollapsed = EditorGUI.Foldout(_rect, entity.isCollapsed, "Name", true);
             _rect.x += 100;
             _rect.width = rect.width - 100;
             var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
 
-            // is Collapsed
-            if (entity.isCollapsed) return;
-
-            if (targetGameObject != null &&
-                targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
+            if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
+            {
                 entity.gameObject = targetGameObject;
                 entity.treePath =
                     AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
             }
-            else if (entity.gameObject != targetGameObject) {
+            else if (entity.gameObject != targetGameObject)
+            {
                 entity.gameObject = null;
                 entity.treePath = "";
             }
+            
+            // is Collapsed
+            if (!entity.isCollapsed) return;
 
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
@@ -314,7 +320,7 @@ namespace ABI.CCK.Scripts
             _rect.x += 100;
             _rect.width = rect.width - 100;
             EditorGUI.LabelField(_rect, entity.treePath);
-
+            
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
@@ -416,23 +422,55 @@ namespace ABI.CCK.Scripts
             {
                 animation = new AnimationClip();
                 var j = 0;
-                if (option.useAnimationClip && option.animationClip != null) {
+                if (option.useAnimationClip && option.animationClip != null) 
+                {
                     animation = option.animationClip;
-                } else {
+                } 
+                else
+                {
+                    var activeGameobjects = new List<CVRAdvancedSettingsTargetEntryGameObject>();
+                    var inActiveGameobjects = new List<CVRAdvancedSettingsTargetEntryGameObject>();
+                    
                     foreach (var activeOption in options)
                     {
                         foreach (var gameObjectTarget in activeOption.gameObjectTargets)
                         {
                             if (gameObjectTarget == null || gameObjectTarget.gameObject == null || gameObjectTarget.treePath == null) continue;
-                            animation.SetCurve(
-                                               gameObjectTarget.treePath, 
-                                               typeof(GameObject), 
-                                               "m_IsActive", 
-                                               i == j ? (gameObjectTarget.onState ? animationCurveOn : animationCurveOff) : (gameObjectTarget.onState ? animationCurveOff : animationCurveOn)
-                                              );
+
+                            if (i == j && gameObjectTarget.onState)
+                            {
+                                activeGameobjects.Add(gameObjectTarget);
+                            }
+                            else
+                            {
+                                inActiveGameobjects.Add(gameObjectTarget);
+                            }
                         }
                         j++;
                     }
+
+                    foreach (var gameObjectTarget in activeGameobjects)
+                    {
+                        animation.SetCurve(
+                            gameObjectTarget.treePath, 
+                            typeof(GameObject), 
+                            "m_IsActive", 
+                            animationCurveOn
+                        );
+                    }
+                    
+                    foreach (var gameObjectTarget in inActiveGameobjects)
+                    {
+                        if(activeGameobjects.Find(match => match.treePath == gameObjectTarget.treePath) != null) continue;
+                        
+                        animation.SetCurve(
+                            gameObjectTarget.treePath, 
+                            typeof(GameObject), 
+                            "m_IsActive", 
+                            animationCurveOff
+                        );
+                    }
+                    
                     AssetDatabase.CreateAsset(animation, folderPath + "/Anim_" + machineName + "_Dropdown_" + i + ".anim");
                 }
                 blendTree.AddChild(animation, i);
@@ -478,22 +516,33 @@ namespace ABI.CCK.Scripts
         private float OnHeightElement(int index)
         {
             CVRAdvancedSettingsDropDownEntry entity = options[index];
-            if (entity.isCollapsed) {
+            if (!entity.isCollapsed) 
+            {
                 return EditorGUIUtility.singleLineHeight * 1.25f;
-            } else {
+            } 
+            else 
+            {
                 if (index > options.Count) return 0f;
                 float height = 2.5f;
-                if (entity.useAnimationClip) {
+                if (entity.useAnimationClip) 
+                {
                     height += 1;
-                } else {
-                    if (entity.gameObjectTargets.Count == 0) {
+                } 
+                else 
+                {
+                    if (entity.gameObjectTargets.Count == 0) 
+                    {
                         height += 0.5f;
                     }
                     height += 2.25f;
-                    foreach (var target in entity.gameObjectTargets) {
-                        if (target.isCollapsed) {
+                    foreach (var target in entity.gameObjectTargets) 
+                    {
+                        if (!target.isCollapsed) 
+                        {
                             height += 1;
-                        } else {
+                        } 
+                        else 
+                        {
                             height += 3f;
                         }
                     }
@@ -512,13 +561,13 @@ namespace ABI.CCK.Scripts
             rect.width -= 12;
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            entity.isCollapsed = !EditorGUI.Foldout(_rect, !entity.isCollapsed, "Name", true);
+            entity.isCollapsed = EditorGUI.Foldout(_rect, entity.isCollapsed, "Name", true);
             _rect.x += 100;
             _rect.width = rect.width - 100;
             entity.name = EditorGUI.TextField(_rect, entity.name);
 
             // is Collapsed
-            if (entity.isCollapsed) return;
+            if (!entity.isCollapsed) return;
 
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
@@ -529,7 +578,8 @@ namespace ABI.CCK.Scripts
             _rect.width = rect.width - 100;
             entity.useAnimationClip = EditorGUI.Toggle(_rect, entity.useAnimationClip);
 
-            if (entity.useAnimationClip) {
+            if (entity.useAnimationClip) 
+            {
                 rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
                 _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
@@ -538,7 +588,9 @@ namespace ABI.CCK.Scripts
                 _rect.x += 100;
                 _rect.width = rect.width - 100;
                 entity.animationClip = (AnimationClip)EditorGUI.ObjectField(_rect, entity.animationClip, typeof(AnimationClip), true);
-            }else {
+            }
+            else 
+            {
                 rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
 
                 var gameObjectList = entity.GetReorderableList(target);
@@ -784,9 +836,12 @@ namespace ABI.CCK.Scripts
 
         private float OnHeightElement(int index)
         {
-            if (materialColorTargets[index].isCollapsed) {
+            if (!materialColorTargets[index].isCollapsed)
+            {
                 return EditorGUIUtility.singleLineHeight * 1.25f;
-            } else {
+            }
+            else
+            {
                 return EditorGUIUtility.singleLineHeight * 3.75f;
             }
         }
@@ -808,10 +863,8 @@ namespace ABI.CCK.Scripts
             var propertyList = new Dictionary<string, string>();
             var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
 
-            // is Collapsed
-            if (entity.isCollapsed) return;
-
-            if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
+            if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
+            {
                 var meshRenderer = (MeshRenderer) targetGameObject.GetComponent(typeof(MeshRenderer));
                 var skinnedMeshRenderer =
                     (SkinnedMeshRenderer) targetGameObject.GetComponent(typeof(SkinnedMeshRenderer));
@@ -821,15 +874,20 @@ namespace ABI.CCK.Scripts
                 var trailRenderer = (TrailRenderer) targetGameObject.GetComponent(typeof(TrailRenderer));
                 var rendererFound = false;
 
-                if (meshRenderer != null) {
-                    for (var i = 0; i < meshRenderer.sharedMaterials.Length; i++) {
+                if (meshRenderer != null)
+                {
+                    for (var i = 0; i < meshRenderer.sharedMaterials.Length; i++)
+                    {
                         var material = meshRenderer.sharedMaterials[i];
                         if (material == null) continue;
                         var shader = material.shader;
-                        for (var j = 0; j < shader.GetPropertyCount(); j++) {
-                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
+                        for (var j = 0; j < shader.GetPropertyCount(); j++)
+                        {
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color)
+                            {
                                 var propertyKey = "MeshRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                if (!propertyList.ContainsKey(propertyKey)) {
+                                if (!propertyList.ContainsKey(propertyKey))
+                                {
                                     propertyList.Add(propertyKey, "MSR:" + shader.GetPropertyName(j));
                                 }
                             }
@@ -839,15 +897,20 @@ namespace ABI.CCK.Scripts
                     rendererFound = true;
                 }
 
-                if (skinnedMeshRenderer != null) {
-                    for (var i = 0; i < skinnedMeshRenderer.sharedMaterials.Length; i++) {
+                if (skinnedMeshRenderer != null)
+                {
+                    for (var i = 0; i < skinnedMeshRenderer.sharedMaterials.Length; i++)
+                    {
                         var material = skinnedMeshRenderer.sharedMaterials[i];
                         if (material == null) continue;
                         var shader = material.shader;
-                        for (var j = 0; j < shader.GetPropertyCount(); j++) {
-                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
+                        for (var j = 0; j < shader.GetPropertyCount(); j++)
+                        {
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color)
+                            {
                                 var propertyKey = "SkinnedMeshRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                if (!propertyList.ContainsKey(propertyKey)) {
+                                if (!propertyList.ContainsKey(propertyKey))
+                                {
                                     propertyList.Add(propertyKey, "SMR:" + shader.GetPropertyName(j));
                                 }
                             }
@@ -857,15 +920,20 @@ namespace ABI.CCK.Scripts
                     rendererFound = true;
                 }
 
-                if (particleRenderer != null) {
-                    for (var i = 0; i < particleRenderer.sharedMaterials.Length; i++) {
+                if (particleRenderer != null)
+                {
+                    for (var i = 0; i < particleRenderer.sharedMaterials.Length; i++)
+                    {
                         var material = particleRenderer.sharedMaterials[i];
                         if (material == null) continue;
                         var shader = material.shader;
-                        for (var j = 0; j < shader.GetPropertyCount(); j++) {
-                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
+                        for (var j = 0; j < shader.GetPropertyCount(); j++)
+                        {
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color)
+                            {
                                 var propertyKey = "ParticleRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                if (!propertyList.ContainsKey(propertyKey)) {
+                                if (!propertyList.ContainsKey(propertyKey))
+                                {
                                     propertyList.Add(propertyKey, "PTR:" + shader.GetPropertyName(j));
                                 }
                             }
@@ -875,15 +943,20 @@ namespace ABI.CCK.Scripts
                     rendererFound = true;
                 }
 
-                if (lineRenderer != null) {
-                    for (var i = 0; i < lineRenderer.sharedMaterials.Length; i++) {
+                if (lineRenderer != null)
+                {
+                    for (var i = 0; i < lineRenderer.sharedMaterials.Length; i++)
+                    {
                         var material = lineRenderer.sharedMaterials[i];
                         if (material == null) continue;
                         var shader = material.shader;
-                        for (var j = 0; j < shader.GetPropertyCount(); j++) {
-                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
+                        for (var j = 0; j < shader.GetPropertyCount(); j++)
+                        {
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color)
+                            {
                                 var propertyKey = "LineRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                if (!propertyList.ContainsKey(propertyKey)) {
+                                if (!propertyList.ContainsKey(propertyKey))
+                                {
                                     propertyList.Add(propertyKey, "LNR:" + shader.GetPropertyName(j));
                                 }
                             }
@@ -893,15 +966,20 @@ namespace ABI.CCK.Scripts
                     rendererFound = true;
                 }
 
-                if (trailRenderer != null) {
-                    for (var i = 0; i < trailRenderer.sharedMaterials.Length; i++) {
+                if (trailRenderer != null)
+                {
+                    for (var i = 0; i < trailRenderer.sharedMaterials.Length; i++)
+                    {
                         var material = trailRenderer.sharedMaterials[i];
                         if (material == null) continue;
                         var shader = material.shader;
-                        for (var j = 0; j < shader.GetPropertyCount(); j++) {
-                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color) {
+                        for (var j = 0; j < shader.GetPropertyCount(); j++)
+                        {
+                            if (shader.GetPropertyType(j) == ShaderPropertyType.Color)
+                            {
                                 var propertyKey = "TrailRenderer: " + shader.GetPropertyDescription(j) + "(" + shader.GetPropertyName(j) + ")";
-                                if (!propertyList.ContainsKey(propertyKey)) {
+                                if (!propertyList.ContainsKey(propertyKey))
+                                {
                                     propertyList.Add(propertyKey, "TLR:" + shader.GetPropertyName(j));
                                 }
                             }
@@ -911,20 +989,26 @@ namespace ABI.CCK.Scripts
                     rendererFound = true;
                 }
 
-                if (rendererFound) {
+                if (rendererFound)
+                {
                     entity.gameObject = targetGameObject;
                     entity.treePath = AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
                 }
-                else if (entity.gameObject != targetGameObject) {
+                else if (entity.gameObject != targetGameObject)
+                {
                     entity.gameObject = null;
                     entity.treePath = "";
                 }
             }
-            else if (entity.gameObject != targetGameObject) {
+            else if (entity.gameObject != targetGameObject)
+            {
                 entity.gameObject = null;
                 entity.treePath = "";
             }
 
+            // is Collapsed
+            if (!entity.isCollapsed) return;
+            
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
@@ -946,11 +1030,13 @@ namespace ABI.CCK.Scripts
             _rect.width = rect.width - 100;
             var propertyIndex = EditorGUI.Popup(_rect, Array.IndexOf(propertyNames, entity.propertyTypeIdentifier + ":" + entity.propertyName),
                                                 propertyDescriptions);
-            if (propertyIndex >= 0) {
+            if (propertyIndex >= 0)
+            {
                 var property = propertyNames[propertyIndex];
                 entity.propertyName = property.Substring(4);
                 entity.propertyTypeIdentifier = property.Substring(0, 3);
-                switch (entity.propertyTypeIdentifier) {
+                switch (entity.propertyTypeIdentifier)
+                {
                     case "SMR":
                         entity.propertyType = typeof(SkinnedMeshRenderer);
                         break;
@@ -1027,17 +1113,17 @@ namespace ABI.CCK.Scripts
 
             var minClip = new AnimationClip();
             var maxClip = new AnimationClip();
-            
-            AnimationCurve animationCurve0 = new AnimationCurve();
-            animationCurve0.AddKey(0, 0);
-            animationCurve0.AddKey(1f/60, 0);
-            AnimationCurve animationCurve1 = new AnimationCurve();
-            animationCurve1.AddKey(0, 1);
-            animationCurve1.AddKey(1f/60, 1);
-            
+
             foreach (var target in materialPropertyTargets)
             {
                 if(target.gameObject == null || target.propertyName == "" || target.treePath == null) continue;
+                
+                AnimationCurve animationCurve0 = new AnimationCurve();
+                animationCurve0.AddKey(0, target.minValue);
+                animationCurve0.AddKey(1f/60, target.minValue);
+                AnimationCurve animationCurve1 = new AnimationCurve();
+                animationCurve1.AddKey(0, target.maxValue);
+                animationCurve1.AddKey(1f/60, target.maxValue);
                 
                 minClip.SetCurve(target.treePath, target.propertyType, "material." + target.propertyName, animationCurve0);
                 maxClip.SetCurve(target.treePath, target.propertyType, "material." + target.propertyName, animationCurve1);
@@ -1086,9 +1172,12 @@ namespace ABI.CCK.Scripts
 
         private float OnHeightElement(int index)
         {
-            if (materialPropertyTargets[index].isCollapsed) {
+            if (!materialPropertyTargets[index].isCollapsed)
+            {
                 return EditorGUIUtility.singleLineHeight * 1.25f;
-            } else {
+            }
+            else
+            {
                 return EditorGUIUtility.singleLineHeight * 5 * 1.25f;
             }
         }
@@ -1110,9 +1199,6 @@ namespace ABI.CCK.Scripts
             var propertyList = new Dictionary<string, string>();
             var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
 
-            // is Collapsed
-            if (entity.isCollapsed) return;
-            
             if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
             {
                 var meshRenderer = (MeshRenderer) targetGameObject.GetComponent(typeof(MeshRenderer));
@@ -1272,6 +1358,9 @@ namespace ABI.CCK.Scripts
                 entity.treePath = "";
             }
 
+            // is Collapsed
+            if (!entity.isCollapsed) return;
+            
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
@@ -1350,6 +1439,8 @@ namespace ABI.CCK.Scripts
     public class CVRAdvancesAvatarSettingJoystick2D : CVRAdvancesAvatarSettingBase 
     {
         public Vector2 defaultValue = Vector2.zero;
+        public Vector2 rangeMin = new Vector2(0, 0);
+        public Vector2 rangeMax = new Vector2(1, 1);
 
         #if UNITY_EDITOR
         
@@ -1403,22 +1494,22 @@ namespace ABI.CCK.Scripts
             blendTreeXMax.blendParameter = machineName + "-y";
             blendTreeXMax.useAutomaticThresholds = false;
             
-            blendTree.AddChild(blendTreeXMin, 0f);
-            blendTree.AddChild(blendTreeXMax, 1f);
+            blendTree.AddChild(blendTreeXMin, rangeMin.x);
+            blendTree.AddChild(blendTreeXMax, rangeMax.x);
 
             var X0Y0Clip = new AnimationClip();
             var X0Y1Clip = new AnimationClip();
             var X1Y0Clip = new AnimationClip();
             var X1Y1Clip = new AnimationClip();
 
-            blendTreeXMin.AddChild(X0Y0Clip, 0f);
+            blendTreeXMin.AddChild(X0Y0Clip, rangeMin.y);
             AssetDatabase.CreateAsset(X0Y0Clip, folderPath + "/Anim_" + machineName + "_Joystick2D_X0Y0.anim");
-            blendTreeXMin.AddChild(X0Y1Clip, 1f);
+            blendTreeXMin.AddChild(X0Y1Clip, rangeMax.y);
             AssetDatabase.CreateAsset(X0Y1Clip, folderPath + "/Anim_" + machineName + "_Joystick2D_X0Y1.anim");
             
-            blendTreeXMax.AddChild(X1Y0Clip, 0f);
+            blendTreeXMax.AddChild(X1Y0Clip, rangeMin.y);
             AssetDatabase.CreateAsset(X1Y0Clip, folderPath + "/Anim_" + machineName + "_Joystick2D_X1Y0.anim");
-            blendTreeXMax.AddChild(X1Y1Clip, 1f);
+            blendTreeXMax.AddChild(X1Y1Clip, rangeMax.y);
             AssetDatabase.CreateAsset(X1Y1Clip, folderPath + "/Anim_" + machineName + "_Joystick2D_X1Y1.anim");
 
             animatorState.motion = blendTree;
@@ -1438,6 +1529,8 @@ namespace ABI.CCK.Scripts
     public class CVRAdvancesAvatarSettingJoystick3D : CVRAdvancesAvatarSettingBase
     {
         public Vector3 defaultValue = Vector3.zero;
+        public Vector2 rangeMin = new Vector2(0, 0);
+        public Vector2 rangeMax = new Vector2(1, 1);
 
         #if UNITY_EDITOR
         
@@ -1500,8 +1593,8 @@ namespace ABI.CCK.Scripts
             blendTreeXMax.blendParameter = machineName + "-y";
             blendTreeXMax.useAutomaticThresholds = false;
             
-            blendTreeX.AddChild(blendTreeXMin, 0f);
-            blendTreeX.AddChild(blendTreeXMax, 1f);
+            blendTreeX.AddChild(blendTreeXMin, rangeMin.x);
+            blendTreeX.AddChild(blendTreeXMax, rangeMax.x);
 
             var blendTreeXMinYMin = new BlendTree();
             blendTreeXMinYMin.name = machineName + " Blend Tree X Min Y Min";
@@ -1513,8 +1606,8 @@ namespace ABI.CCK.Scripts
             blendTreeXMinYMax.blendParameter = machineName + "-z";
             blendTreeXMinYMax.useAutomaticThresholds = false;
             
-            blendTreeXMin.AddChild(blendTreeXMinYMin, 0f);
-            blendTreeXMin.AddChild(blendTreeXMinYMax, 1f);
+            blendTreeXMin.AddChild(blendTreeXMinYMin, rangeMin.y);
+            blendTreeXMin.AddChild(blendTreeXMinYMax, rangeMax.y);
             
             var blendTreeXMaxYMin = new BlendTree();
             blendTreeXMaxYMin.name = machineName + " Blend Tree X Max Y Min";
@@ -1526,8 +1619,8 @@ namespace ABI.CCK.Scripts
             blendTreeXMaxYMax.blendParameter = machineName + "-z";
             blendTreeXMaxYMax.useAutomaticThresholds = false;
             
-            blendTreeXMax.AddChild(blendTreeXMaxYMin, 0f);
-            blendTreeXMax.AddChild(blendTreeXMaxYMax, 1f);
+            blendTreeXMax.AddChild(blendTreeXMaxYMin, rangeMin.y);
+            blendTreeXMax.AddChild(blendTreeXMaxYMax, rangeMax.y);
 
             var clipX0Y0Z0 = new AnimationClip();
             var clipX0Y0Z1 = new AnimationClip();
@@ -1906,7 +1999,8 @@ namespace ABI.CCK.Scripts
             gameObjectList.onChangedCallback = OnChanged;
         }
         
-        public ReorderableList GetReorderableList(CVRAvatar avatar) {
+        public ReorderableList GetReorderableList(CVRAvatar avatar)
+        {
             target = avatar;
             
             if (gameObjectList == null) generateReorderableList();
@@ -1927,9 +2021,12 @@ namespace ABI.CCK.Scripts
         private float OnHeightElement(int index)
         {
             CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
-            if (entity.isCollapsed) {
+            if (!entity.isCollapsed)
+            {
                 return EditorGUIUtility.singleLineHeight * 1.25f;
-            } else {
+            }
+            else
+            {
                 return EditorGUIUtility.singleLineHeight * 3 * 1.25f;
             }
         }
@@ -1944,25 +2041,27 @@ namespace ABI.CCK.Scripts
             rect.width -= 12;
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            entity.isCollapsed = !EditorGUI.Foldout(_rect, !entity.isCollapsed, "Name", true);
+            entity.isCollapsed = EditorGUI.Foldout(_rect, entity.isCollapsed, "Name", true);
             _rect.x += 100;
             _rect.width = rect.width - 100;
             var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
 
-            // is Collapsed
-            if (entity.isCollapsed) return;
-
             if (targetGameObject != null &&
-                targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target) {
+                targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
+            {
                 entity.gameObject = targetGameObject;
                 entity.treePath =
                     AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
             }
-            else if (entity.gameObject != targetGameObject) {
+            else if (entity.gameObject != targetGameObject)
+            {
                 entity.gameObject = null;
                 entity.treePath = "";
             }
 
+            // is Collapsed
+            if (!entity.isCollapsed) return;
+            
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
@@ -2018,5 +2117,4 @@ namespace ABI.CCK.Scripts
         public float minValue;
         public float maxValue;
     }
-    
 }

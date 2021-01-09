@@ -8,6 +8,7 @@ using System.Xml.XPath;
 using ABI.CCK.Components;
 using UnityEditor;
 using UnityEditor.Animations;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -58,6 +59,12 @@ namespace ABI.CCK.Scripts.Editor
                     scriptCount += count;
                     goCount++;
                 }
+            }
+
+            if (remove)
+            {
+                EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+                EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
             }
 
             if (remove) Debug.Log($"[CCK:Tools] Found and removed {scriptCount} missing scripts from {goCount} GameObjects");

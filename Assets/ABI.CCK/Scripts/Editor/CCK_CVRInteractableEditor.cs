@@ -94,6 +94,16 @@ namespace ABI.CCK.Scripts.Editor
                         }
                     }
                 }
+
+                if (trigger.actionType == CVRInteractableAction.ActionRegister.OnCron)
+                {
+                    trigger.stringVal = EditorGUILayout.TextField("Cron String", trigger.stringVal);
+                }
+                
+                if (trigger.actionType == CVRInteractableAction.ActionRegister.OnWorldTrigger)
+                {
+                    trigger.floatVal = EditorGUILayout.IntField("Index", (int) trigger.floatVal);
+                }
                 
                 trigger.delay = EditorGUILayout.FloatField("Delay (Seconds):", trigger.delay);
                 

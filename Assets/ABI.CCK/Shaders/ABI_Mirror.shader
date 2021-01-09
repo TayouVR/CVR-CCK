@@ -61,8 +61,10 @@
                 
                 fixed4 tex = tex2D(_MainTex, i.uv);
                 fixed4 refl;
-                if (unity_StereoEyeIndex == 0) refl = tex2Dproj(_ReflectionTexLeft, UNITY_PROJ_COORD(i.refl));
-                else refl = tex2Dproj(_ReflectionTexRight, UNITY_PROJ_COORD(i.refl));
+                float4 projCoord = UNITY_PROJ_COORD(i.refl);
+                float2 proj2 = float2(1 - projCoord.x / projCoord.w, projCoord.y / projCoord.w);
+                if (unity_StereoEyeIndex == 0) refl = tex2D(_ReflectionTexLeft, proj2);
+                else refl = tex2D(_ReflectionTexRight, proj2);
                 return tex * refl;
             }
             ENDCG

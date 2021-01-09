@@ -1,18 +1,10 @@
-﻿﻿using System;
+﻿using System;
  using UnityEngine;
 
 namespace ABI.CCK.Components
 {
-    public class CVRToggleStatePointer : MonoBehaviour
+    public class CVRToggleStatePointer : CVRPointer
     {
-        private void Start()
-        {
-            var sphereCollider = gameObject.AddComponent<SphereCollider>();
-
-            sphereCollider.isTrigger = true;
-            sphereCollider.radius = 0.00125f;
-        }
-
         private void OnDrawGizmos()
         {
             if (isActiveAndEnabled)

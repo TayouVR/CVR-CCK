@@ -270,7 +270,7 @@ MonoBehaviour:
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
       dropDownSettings:
-        isCollapsed: 1
+        isCollapsed: 0
         defaultValue: 0
         options:
         - name: 1
@@ -341,7 +341,7 @@ MonoBehaviour:
         defaultValue: {r: 1, g: 1, b: 1, a: 1}
         materialColorTargets: []
       dropDownSettings:
-        isCollapsed: 0
+        isCollapsed: 1
         defaultValue: 0
         options:
         - name: Outfit
@@ -390,7 +390,7 @@ MonoBehaviour:
       machineName: Outfits
     - type: 0
       toggleSettings:
-        isCollapsed: 1
+        isCollapsed: 0
         defaultValue: 1
         useAnimationClip: 0
         animationClip: {fileID: 0}
@@ -434,7 +434,7 @@ MonoBehaviour:
       machineName: Top
     - type: 0
       toggleSettings:
-        isCollapsed: 1
+        isCollapsed: 0
         defaultValue: 0
         useAnimationClip: 0
         animationClip: {fileID: 0}

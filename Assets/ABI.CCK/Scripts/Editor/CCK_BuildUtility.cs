@@ -65,6 +65,61 @@ namespace ABI.CCK.Scripts.Editor
             EditorPrefs.SetBool("m_ABI_isBuilding", true);
             EditorApplication.isPlaying = true;
         }
+        
+        public static void BuildAndUploadSpawnable(GameObject s)
+        {
+            GameObject sCopy = null;
+            var origInfo = s.GetComponent<CVRAssetInfo>();
+            
+            try
+            {
+                sCopy = GameObject.Instantiate(s);
+                PrefabUtility.UnpackPrefabInstance(sCopy, PrefabUnpackMode.Completely, InteractionMode.UserAction);
+                Debug.Log("[CCK:BuildUtility] To prevent problems, the prefab has been unpacked. Your game object is no longer linked to the prefab instance.");
+            }
+            catch
+            {
+                Debug.Log("[CCK:BuildUtility] Object is not a prefab. No need to unpack.");
+            }
+
+            CVRAssetInfo info = sCopy.GetComponent<CVRAssetInfo>();
+            if (string.IsNullOrEmpty(info.guid))
+            {
+                info.guid = Guid.NewGuid().ToString();
+                origInfo.guid = info.guid;
+                try
+                {
+                    PrefabUtility.ApplyPrefabInstance(s, InteractionMode.UserAction);
+                }
+                catch
+                {
+                    Debug.Log("[CCK:BuildUtility] Object is not a prefab. No need to Apply To Instance.");
+                }
+            }
+            
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+            
+            EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+            
+            PrefabUtility.SaveAsPrefabAsset(sCopy, "Assets/ABI.CCK/Resources/Cache/_CVRSpawnable.prefab");
+            GameObject.DestroyImmediate(sCopy);
+            
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+            
+            EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+
+            AssetBundleBuild assetBundleBuild = new AssetBundleBuild();
+            assetBundleBuild.assetNames = new[] {"Assets/ABI.CCK/Resources/Cache/_CVRSpawnable.prefab"};
+            assetBundleBuild.assetBundleName = "bundle.cvrprop";
+
+            BuildPipeline.BuildAssetBundles(Application.persistentDataPath, new[] {assetBundleBuild},
+                BuildAssetBundleOptions.None, EditorUserBuildSettings.activeBuildTarget);
+            
+            AssetDatabase.Refresh();
+            
+            EditorPrefs.SetBool("m_ABI_isBuilding", true);
+            EditorApplication.isPlaying = true;
+        }
 
         public static void BuildAndUploadMapAsset(Scene scene, GameObject descriptor)
         {

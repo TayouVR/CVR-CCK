@@ -16,6 +16,7 @@
             <e p="CVRAvatar.cs" t="Include" />
             <e p="CVRGIMaterialUpdater.cs" t="Include" />
             <e p="CVRHapticAreaChest.cs" t="Include" />
+            <e p="CVRHapticZone.cs" t="Include" />
             <e p="CVRInteractable.cs" t="Include" />
             <e p="CVRInteractableAction.cs" t="Include" />
             <e p="CVRInteractableActionOperation.cs" t="Include" />
@@ -23,7 +24,9 @@
             <e p="CVRObjectSync.cs" t="Include" />
             <e p="CVRObjectSyncTask.cs" t="Include" />
             <e p="CVRPickupObject.cs" t="Include" />
+            <e p="CVRPointer.cs" t="Include" />
             <e p="CVRPortalMarker.cs" t="Include" />
+            <e p="CVRSpawnable.cs" t="Include" />
             <e p="CVRTimelineSync.cs" t="Include" />
             <e p="CVRToggleStatePointer.cs" t="Include" />
             <e p="CVRToggleStateTrigger.cs" t="Include" />
@@ -44,9 +47,13 @@
               <e p="CCK_CVR_ActionEditor.cs" t="Include" />
               <e p="CCK_CVR_TimelineSyncEditor.cs" t="Include" />
               <e p="CCK_CVR_VideoPlayerEditor.cs" t="Include" />
+              <e p="CCK_CVRAdvancedAvatarSettingsTriggerEditor.cs" t="Include" />
               <e p="CCK_CVRAssetInfoEditor.cs" t="Include" />
               <e p="CCK_CVRAvatarEditor.cs" t="Include" />
+              <e p="CCK_CVRHapticZoneEditor.cs" t="Include" />
               <e p="CCK_CVRInteractableEditor.cs" t="Include" />
+              <e p="CCK_CVRSpawnableEditor.cs" t="Include" />
+              <e p="CCK_CVRToggleStateTriggerEditor.cs" t="Include" />
               <e p="CCK_CVRVideoPlayerEditor.cs" t="Include" />
               <e p="CCK_Init.cs" t="Include" />
               <e p="CCK_ObjectSyncEditor.cs" t="Include" />

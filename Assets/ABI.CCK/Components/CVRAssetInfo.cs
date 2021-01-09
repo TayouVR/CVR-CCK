@@ -10,7 +10,8 @@ namespace ABI.CCK.Components
         public enum AssetType
         {
             Avatar = 1,
-            World = 2
+            World = 2,
+            Spawnable = 3
         }
 
         

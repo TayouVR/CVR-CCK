@@ -70,7 +70,6 @@ namespace ABI.CCK.Scripts.Runtime
                     //Avatar
                     if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarLoudAudio") == "YES") updater.avtrLoudAudio.isOn = true;
                     if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarLongRangeAudio") == "YES") updater.avtrLongRangeAudio.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarSpawnAudio") == "YES") updater.avtrSpawnAudio.isOn = true;
                     if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarScreenEffects") == "YES") updater.avtrScreenFx.isOn = true;
                     if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarFlashingColors") == "YES") updater.avtrFlashingColors.isOn = true;
                     if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarFlashingLights") == "YES") updater.avtrFlashingLights.isOn = true;
@@ -89,6 +88,15 @@ namespace ABI.CCK.Scripts.Runtime
                     if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldGore") == "YES") updater.wrldGore.isOn = true;
                     if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldWeaponSystem") == "YES") updater.wrldWeaponSystem.isOn = true;
                     if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldMinigames") == "YES") updater.wrldMinigame.isOn = true;
+                    //Spawnable
+                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableLoudAudio") == "YES") updater.propLoudAudio.isOn = true;
+                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableLongRangeAudio") == "YES") updater.propLongRangeAudio.isOn = true;
+                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableScreenEffects") == "YES") updater.propScreenFx.isOn = true;
+                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableFlashingColors") == "YES") updater.propFlashingColors.isOn = true;
+                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableFlashingLights") == "YES") updater.propFlashingLights.isOn = true;
+                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableParticleSystems") == "YES") updater.propParticleSystems.isOn = true;
+                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableViolence") == "YES") updater.propViolence.isOn = true;
+                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableGore") == "YES") updater.propGore.isOn = true;
                 }
                 catch
                 {

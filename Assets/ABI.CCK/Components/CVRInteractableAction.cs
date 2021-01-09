@@ -23,6 +23,9 @@ namespace ABI.CCK.Components
             OnParticleHit = 12,
             OnVariableBufferUpdate = 13,
             OnVariableBufferComparision = 14,
+            OnCron = 15,
+            OnPointerEnter = 16,
+            OnWorldTrigger = 17
         }
 
         public enum ExecutionType
@@ -47,6 +50,7 @@ namespace ABI.CCK.Components
         public bool boolVal;
         public CVRVariableBuffer varBufferVal;
         public CVRVariableBuffer varBufferVal2;
+        public string stringVal = "";
 
         [HideInInspector]
         public string guid = "";

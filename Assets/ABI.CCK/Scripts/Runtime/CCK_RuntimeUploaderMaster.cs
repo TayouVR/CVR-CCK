@@ -77,6 +77,13 @@ namespace ABI.CCK.Scripts.Runtime
                 path[3] = Application.persistentDataPath + "/bundle_pano_1024.png";
                 path[4] = Application.persistentDataPath + "/bundle_pano_4096.png";
             }
+            if (type == "Spawnable")
+            {
+                path = new string[3];
+                path[0] = Application.persistentDataPath + "/bundle.cvrprop";
+                path[1] = Application.persistentDataPath + "/bundle.cvrprop.manifest";
+                path[2] = Application.persistentDataPath + "/bundle.png";
+            }
 
             UnityWebRequest[] files = new UnityWebRequest[path.Length];
             WWWForm form = new WWWForm();
@@ -112,6 +119,14 @@ namespace ABI.CCK.Scripts.Runtime
             form.AddField("wrldGore", updater.wrldGore.isOn.ToString());
             form.AddField("wrldWeaponSystem", updater.wrldWeaponSystem.isOn.ToString());
             form.AddField("wrldMinigame", updater.wrldMinigame.isOn.ToString());
+            form.AddField("propLoudAudio", updater.propLoudAudio.isOn.ToString());
+            form.AddField("propLongRangeAudio", updater.propLongRangeAudio.isOn.ToString());
+            form.AddField("propScreenFx", updater.propScreenFx.isOn.ToString());
+            form.AddField("propFlashingColors", updater.propFlashingColors.isOn.ToString());
+            form.AddField("propFlashingLights", updater.propFlashingLights.isOn.ToString());
+            form.AddField("propParticleSystems", updater.propParticleSystems.isOn.ToString());
+            form.AddField("propViolence", updater.propViolence.isOn.ToString());
+            form.AddField("propGore", updater.propGore.isOn.ToString());
 
             for (int i = 0; i < files.Length; i++)
             {
@@ -181,8 +196,9 @@ namespace ABI.CCK.Scripts.Runtime
                 #if UNITY_EDITOR
                 //EditorUtility.DisplayCancelableProgressBar("Alpha Blend Interactive CCK", "Now uploading your content to the Alpha Blend Interactive cloud.", req.uploadProgress);
                 updater.uploadProgress.fillAmount = req.uploadProgress;
-                updater.uploadProgressText.text = (req.uploadProgress * 100f) + "%";
-                #endif
+                updater.uploadProgressText.text = (req.uploadProgress * 100f).ToString("F2") + "%";
+                if (req.uploadProgress * 100f > 99.9f) updater.uploadProgressText.text = "Now Encrypting File";
+#endif
             }
         }
         
