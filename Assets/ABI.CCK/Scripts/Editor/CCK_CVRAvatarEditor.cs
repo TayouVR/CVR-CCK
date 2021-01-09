@@ -118,7 +118,7 @@ namespace ABI.CCK.Scripts.Editor
                     CreateAvatarSettings(_avatar);
                 }
 
-                _avatar.avatarSettings.baseController = (RuntimeAnimatorController) EditorGUILayout.ObjectField("Base Animator", _avatar.avatarSettings.baseController, typeof(RuntimeAnimatorController));
+                _avatar.avatarSettings.baseController = (RuntimeAnimatorController) EditorGUILayout.ObjectField("Base Animator", _avatar.avatarSettings.baseController, typeof(RuntimeAnimatorController), true);
                 if (_avatar.avatarSettings.baseController is AnimatorOverrideController)
                     _avatar.avatarSettings.baseController = null;
                 
@@ -126,7 +126,7 @@ namespace ABI.CCK.Scripts.Editor
                                         "If you do not want to extend a specific Animator Controller, make sure that the Default Avatar Animator "+
                                         "From the Directory \"ABI.CCK/Animations\" is used here.", MessageType.Info);
                 
-                _avatar.avatarSettings.baseOverrideController = (RuntimeAnimatorController) EditorGUILayout.ObjectField("Override Controller", _avatar.avatarSettings.baseOverrideController, typeof(RuntimeAnimatorController));
+                _avatar.avatarSettings.baseOverrideController = (RuntimeAnimatorController) EditorGUILayout.ObjectField("Override Controller", _avatar.avatarSettings.baseOverrideController, typeof(RuntimeAnimatorController), true);
                 if (_avatar.avatarSettings.baseOverrideController is AnimatorController)
                     _avatar.avatarSettings.baseOverrideController = null;
                 
@@ -181,8 +181,7 @@ namespace ABI.CCK.Scripts.Editor
             }
 
             foreach (var entry in _avatar.avatarSettings.settings) {
-                if (entry == null) continue;
-                if (entry.name == null) continue;
+	            if (entry?.name == null) continue;
                 if (entry.name.Length == 0) continue;
                 if (entry.name.Substring(0, 1) == "#") continue;
 
@@ -273,9 +272,9 @@ namespace ABI.CCK.Scripts.Editor
                     } 
                     else 
                     {
-                        foreach (var target in gameObjectToggle.gameObjectTargets) 
+                        foreach (var target1 in gameObjectToggle.gameObjectTargets) 
                         {
-                            if (!target.isCollapsed) 
+                            if (!target1.isCollapsed) 
                             {
                                 height += 1.25f;
                             } 
@@ -375,7 +374,6 @@ namespace ABI.CCK.Scripts.Editor
                 case CVRAdvancedSettingsEntry.SettingsType.Joystick2D:
                 case CVRAdvancedSettingsEntry.SettingsType.Joystick3D:
                     return EditorGUIUtility.singleLineHeight * 11.25f;
-                    break;
             }
 			
             return EditorGUIUtility.singleLineHeight * 8.75f;
@@ -613,8 +611,8 @@ namespace ABI.CCK.Scripts.Editor
                     var materialPropertyList = slider.GetReorderableList(_avatar);
                     materialPropertyList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
                     
-                    foreach (var target in slider.materialPropertyTargets) {
-                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f * (!target.isCollapsed ? 1 : 5);
+                    foreach (var target1 in slider.materialPropertyTargets) {
+                        rect.y += EditorGUIUtility.singleLineHeight * 1.25f * (!target1.isCollapsed ? 1 : 5);
                     }
                     rect.y += EditorGUIUtility.singleLineHeight * (3f + (slider.materialPropertyTargets.Count == 0 ? 1.25f : 0));
                     _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight * 3);

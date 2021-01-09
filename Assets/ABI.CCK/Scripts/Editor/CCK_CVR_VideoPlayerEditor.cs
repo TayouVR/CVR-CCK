@@ -11,7 +11,9 @@ public class CCK_CVR_VideoPlayerEditor : UnityEditor.Editor
     
     private ReorderableList reorderableList;
     private CVRVideoPlayer _player;
+#pragma warning disable 414
     private CVRVideoPlayerPlaylist entity = null;
+#pragma warning restore 414
     
     private const string TypeLabel = "Playlists";
 
@@ -107,7 +109,7 @@ public class CCK_CVR_VideoPlayerEditor : UnityEditor.Editor
         _player.localPlaybackSpeed = EditorGUILayout.Slider("Playback Speed", _player.localPlaybackSpeed, 0.5f, 2.0f);
         EditorGUILayout.Space();
 
-        _player.ProjectionTexture = (RenderTexture) EditorGUILayout.ObjectField("Projection Texture", _player.ProjectionTexture, typeof(RenderTexture));
+        _player.ProjectionTexture = (RenderTexture) EditorGUILayout.ObjectField("Projection Texture", _player.ProjectionTexture, typeof(RenderTexture), true);
         EditorGUILayout.Space();
         if (_player.ProjectionTexture == null)
         {
