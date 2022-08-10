@@ -575,7 +575,7 @@ namespace ABI.CCK.Scripts.Editor
 
             if (entity.name != null)
             {
-                entity.machineName = Regex.Replace(entity.name, "[^a-zA-Z0-9#]", "");
+                entity.machineName = EditorPrefs.GetBool("ABI_CCKSanitizeParameters") ? Regex.Replace(entity.name, "[^a-zA-Z0-9#]", "") : entity.name;
             }
 
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;

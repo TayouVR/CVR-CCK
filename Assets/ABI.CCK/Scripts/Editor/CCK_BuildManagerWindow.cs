@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -362,6 +362,24 @@ namespace ABI.CCK.Scripts.Editor
             
             EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_HINT_CCK_LANGUAGE"), MessageType.Info);
             
+            EditorGUILayout.Space();
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_CCK_SANITIZE_PARAMETERS"));
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.BeginVertical();
+            bool sanitizeParameters = EditorPrefs.GetBool("ABI_CCKSanitizeParameters", true);
+            sanitizeParameters = EditorGUILayout.Toggle(sanitizeParameters);
+            EditorPrefs.SetBool("ABI_CCKSanitizeParameters", sanitizeParameters);
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_HINT_CCK_SANITIZE_PARAMETERS"), MessageType.Info);
+
             EditorGUILayout.Space();
         }
         
