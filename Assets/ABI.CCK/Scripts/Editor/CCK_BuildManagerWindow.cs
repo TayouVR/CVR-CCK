@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using ABI.CCK.Components;
 using ABI.CCK.Scripts.Runtime;
+using Abi.Newtonsoft.Json;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
@@ -18,10 +23,19 @@ namespace ABI.CCK.Scripts.Editor
     [InitializeOnLoad]
     public class CCK_BuildManagerWindow : EditorWindow
     {
-        public static string Version = "2.2 RELEASE";
-        private const string CCKVersion = "2.2 RELEASE (Build 62)";
-        private const string supportedUnity = "2019.3.1f1";
-        private const string supportedUnityLts = "2019.4.13f1";
+        public static string Version = "3.4 RELEASE";
+        public static int BuildID = 90;
+        private const string CCKVersion = "3.4 RELEASE (Build 92)";
+
+        private string[] SupportedUnityVersions = new[]
+        {
+            "2019.4.0f1", "2019.4.1f1", "2019.4.2f1", "2019.4.3f1", "2019.4.4f1", "2019.4.5f1", "2019.4.6f1", 
+            "2019.4.7f1", "2019.4.8f1", "2019.4.9f1", "2019.4.10f1", "2019.4.11f1", "2019.4.12f1", 
+            "2019.4.13f1", "2019.4.14f1", "2019.4.15f1", "2019.4.16f1", "2019.4.17f1", "2019.4.18f1", 
+            "2019.4.19f1", "2019.4.20f1", "2019.4.21f1", "2019.4.22f1", "2019.4.23f1", "2019.4.24f1", 
+            "2019.4.25f1", "2019.4.26f1", "2019.4.27f1", "2019.4.28f1", "2019.4.29f1", "2019.4.30f1", 
+            "2019.4.31f1"
+        };
         
         string _username;
         string _key;
@@ -33,8 +47,9 @@ namespace ABI.CCK.Scripts.Editor
         private bool _allowedToUpload;
         private string _apiUserRank;
         private string _apiCreatorRank;
-        Vector2 scrollPos;
-        UnityWebRequest _webRequest;
+        Vector2 scrollPosAvatar;
+        Vector2 scrollPosSpawnable;
+        Vector2 scrollPosWorld;
         
         private int _tab;
         private Vector2 _scroll;
@@ -59,14 +74,11 @@ namespace ABI.CCK.Scripts.Editor
                 return _legacyBlendShapeImporter;
             }
         }
-
-        [MenuItem("Alpha Blend Interactive/====================")]
-        static void Spacer1() {}
         
-        [MenuItem("Alpha Blend Interactive/Control Panel (Builder and Settings)")]
+        [MenuItem("Alpha Blend Interactive/Control Panel (Builder and Settings)", false, 200)]
         static void Init()
         {
-            CCK_BuildManagerWindow window = (CCK_BuildManagerWindow)GetWindow(typeof(CCK_BuildManagerWindow), false, "CCK :: Control Panel");
+            CCK_BuildManagerWindow window = (CCK_BuildManagerWindow)GetWindow(typeof(CCK_BuildManagerWindow), false, $"CCK :: Control Panel");
             window.Show();
         }
 
@@ -132,7 +144,7 @@ namespace ABI.CCK.Scripts.Editor
             GUILayout.Label(abiLogo, centeredStyle);
             EditorGUILayout.BeginVertical();
             
-            _tab = GUILayout.Toolbar (_tab, new string[] {"Content Builder", "Settings & Options"});
+            _tab = GUILayout.Toolbar (_tab, new string[] {CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_HEADING_BUILDER"), CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_HEADING_SETTINGS")});
 
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
             
@@ -161,47 +173,48 @@ namespace ABI.CCK.Scripts.Editor
 
         private void Tab_LogIn()
         {
-            EditorGUILayout.LabelField("AlphaLink Access", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("Please authenticate using your CCK credentials.");
-            EditorGUILayout.LabelField("You can find those on hub.abinteractive.net.");
-            EditorGUILayout.LabelField("Please generate a CCK Key in the key manager.");
+            EditorGUILayout.LabelField("ABI Community Hub Access", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_INFOTEXT_SIGNIN1"));
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_INFOTEXT_SIGNIN2"));
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_INFOTEXT_SIGNIN3"));
             EditorGUILayout.Space();
-            _username = EditorGUILayout.TextField("Username", _username);
-            _key = EditorGUILayout.PasswordField("Key", _key);
+            _username = EditorGUILayout.TextField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_LOGIN_TEXT_USERNAME"), _username);
+            _key = EditorGUILayout.PasswordField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_LOGIN_TEXT_ACCESSKEY"), _key);
 
-            if (GUILayout.Button("Authenticate"))
+            if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_LOGIN_BUTTON")))
             {
                 Login();
             }
 
             if (_hasAttemptedToLogin && !_loggedIn)
             {
-                GUILayout.Label("Incorrect User details provided");
+                GUILayout.Label(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_LOGIN_CREDENTIALS_INCORRECT"));
             }
         }
 
         private void Tab_LoggedIn()
         {
-            EditorGUILayout.LabelField("Account Information", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_HEADING_ACCOUNT_INFO"), EditorStyles.boldLabel);
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Authenticated as    ", _username);
-            EditorGUILayout.LabelField("Api User Rank    ", _apiUserRank);
-            EditorGUILayout.LabelField("Api Creator Rank    ", _apiCreatorRank);
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_INFOTEXT_AUTHENTICATED_AS"), _username);
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_INFOTEXT_USER_RANK"), _apiUserRank);
             EditorGUILayout.LabelField("CCK version    ", CCKVersion);
             EditorGUILayout.Space();
-            if (GUILayout.Button("Logout")){ 
-                bool logout = EditorUtility.DisplayDialog("Remove local credentials for CCK",
-                "This will remove the locally stored credentials. You will have to re-authenticate. Do you want to continue?",
-                "Yes!", "No!");
+            if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_LOGOUT_BUTTON"))){ 
+                bool logout = EditorUtility.DisplayDialog(
+                    CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_LOGOUT_DIALOG_TITLE"),
+                    CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_LOGOUT_DIALOG_BODY"),
+                    CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_LOGOUT_DIALOG_ACCEPT"), 
+                    CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_LOGOUT_DIALOG_DECLINE"));
                 if (logout) Logout();
             }
-            EditorGUILayout.HelpBox("Use our documentation to find out more about how to create content for our games. You will also find some handy tutorials on how to utilize most of the core engine features and core game features there.", MessageType.Info);
-            if (GUILayout.Button("View our documentation")) Application.OpenURL("https://docs.abinteractive.net");
-            EditorGUILayout.HelpBox("Want to request a feature? Found a bug? Post on our feedback platform!", MessageType.Info);
-            if (GUILayout.Button("Post on our feedback platform")) Application.OpenURL("https://hub.abinteractive.net/feedback");
-            EditorGUILayout.HelpBox("Please do not move the folder location of the CCK or CCK Mods folder. This will render the CCK unusable.", MessageType.Warning);
+            EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_INFOTEXT_DOCUMENTATION"), MessageType.Info);
+            if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_HEADING_DOCUMENTATION"))) Application.OpenURL("https://docs.abinteractive.net");
+            EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WARNING_FEEDBACK"), MessageType.Info);
+            if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_HEADING_FEEDBACK"))) Application.OpenURL("https://hub.abinteractive.net/feedback");
+            EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WARNING_FOLDERPATH"), MessageType.Warning);
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Found content", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_HEADING_FOUNDCONTENT"), EditorStyles.boldLabel);
             List<CVRAvatar> avatars = new List<CVRAvatar>();
             List<CVRSpawnable> spawnables = new List<CVRSpawnable>();
             List<CVRWorld> worlds = new List<CVRWorld>();
@@ -221,15 +234,15 @@ namespace ABI.CCK.Scripts.Editor
                 if (a.gameObject.activeInHierarchy) avatars.Add(a);
             }
 
-            if (worlds.Count <= 0 && avatars.Count > 0 && (Application.unityVersion == supportedUnity || Application.unityVersion == supportedUnityLts))
+            if (worlds.Count <= 0 && avatars.Count > 0 && SupportedUnityVersions.Contains(Application.unityVersion))
             {
-                if (avatars.Count <= 0) EditorGUILayout.LabelField("No configured avatars found in scene - CVRAvatar added?");
+                if (avatars.Count <= 0) EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_UPLOADER_NO_AVATARS_FOUND"));
                 else
                 {
                     if (avatars.Count > 0)
                     {
                         var counter = 0;
-                        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+                        scrollPosAvatar = EditorGUILayout.BeginScrollView(scrollPosAvatar);
                         foreach (CVRAvatar a in avatars)
                         {
                             counter++;
@@ -243,15 +256,15 @@ namespace ABI.CCK.Scripts.Editor
                     }
                 }
             }
-            if (worlds.Count <= 0 && spawnables.Count > 0 && (Application.unityVersion == supportedUnity || Application.unityVersion == supportedUnityLts))
+            if (worlds.Count <= 0 && spawnables.Count > 0 && SupportedUnityVersions.Contains(Application.unityVersion))
             {
-                if (spawnables.Count <= 0) EditorGUILayout.LabelField("No configured avatars found in scene - CVRSpawnable added?");
+                if (spawnables.Count <= 0) EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_UPLOADER_NO_SPAWNABLES_FOUND"));
                 else
                 {
                     if (spawnables.Count > 0)
                     {
                         var counter = 0;
-                        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+                        scrollPosSpawnable = EditorGUILayout.BeginScrollView(scrollPosSpawnable);
                         foreach (CVRSpawnable s in spawnables)
                         {
                             counter++;
@@ -265,7 +278,7 @@ namespace ABI.CCK.Scripts.Editor
                     }
                 }
             }
-            if (avatars.Count <= 0 && worlds.Count == 1 && (Application.unityVersion == supportedUnity || Application.unityVersion == supportedUnityLts))
+            if (avatars.Count <= 0 && worlds.Count == 1 && SupportedUnityVersions.Contains(Application.unityVersion))
             {
                 int errors = 0;
                 int overallMissingScripts = 0;
@@ -273,78 +286,81 @@ namespace ABI.CCK.Scripts.Editor
                 overallMissingScripts = CCK_Tools.CleanMissingScripts(CCK_Tools.SearchType.Scene , false, null);
                 if (overallMissingScripts > 0) errors++;
                 
-                EditorGUILayout.HelpBox("A ChilloutVR World object has been found in the scene. Avatars can not be uploaded until the world object has been removed. Avatar objects will be part of the world and visible in-world unless they are disabled or removed.", MessageType.Info);
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_INFOTEXT_WORLDS_NO_AVATARS"), MessageType.Info);
 
                 //Error
-                if (overallMissingScripts > 0) EditorGUILayout.HelpBox("Scene contains missing scripts. The upload will fail like this. Remove all missing script references before uploading or click Remove all missing scripts to automatically have this done for you.", MessageType.Error);
+                if (overallMissingScripts > 0) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_ERROR_WORLD_MISSING_SCRIPTS"), MessageType.Error);
                 
                 //Warning
-                if (worlds[0].spawns.Length == 0) EditorGUILayout.HelpBox("Your world does not have any spawn points assigned. Please add one or multiple spawn points in the CVRWorld component or the location of the CVRWorld holder object will be used. ", MessageType.Warning);
-                
+                if (worlds[0].spawns.Length == 0) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WORLDS_WARNING_SPAWNPOINT"), MessageType.Warning);
+
                 //Info
-                if (worlds[0].referenceCamera == null) EditorGUILayout.HelpBox("You do not have a reference camera assigned to your world. Default camera settings will be used. ", MessageType.Info);
-                if (worlds[0].respawnHeightY <= -500) EditorGUILayout.HelpBox("The respawn height is under -500. It will take a long time to respawn when falling out of the map. This is probably not what you want. ", MessageType.Info);
+                if (worlds[0].referenceCamera == null) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WORLDS_INFO_REFERENCE_CAMERA"), MessageType.Info);
+                if (worlds[0].respawnHeightY <= -500) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WORLDS_INFO_RESPAWN_HEIGHT"), MessageType.Info);
                 
-                if (GUILayout.Button("Upload world") && errors <= 0)
+                if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_UPLOAD_WORLD_BUTTON")) && errors <= 0)
                 {
                     CCK_BuildUtility.BuildAndUploadMapAsset(EditorSceneManager.GetActiveScene(), worlds[0].gameObject);
                 }
-                if (overallMissingScripts > 0) if (GUILayout.Button("Remove all missing scripts")) CCK_Tools.CleanMissingScripts(CCK_Tools.SearchType.Scene , true, null);
+                if (overallMissingScripts > 0) if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_UTIL_REMOVE_MISSING_SCRIPTS_BUTTON"))) CCK_Tools.CleanMissingScripts(CCK_Tools.SearchType.Scene , true, null);
             }
-            if (avatars.Count <= 0 && worlds.Count > 1 && (Application.unityVersion == supportedUnity || Application.unityVersion == supportedUnityLts))
+            if (avatars.Count <= 0 && worlds.Count > 1 && SupportedUnityVersions.Contains(Application.unityVersion))
             {
-                EditorGUILayout.HelpBox("Multiple CVR World objects are present in the scene. This will break the world. Please ensure that there is only one CVR World object in the scene or use our CVRWorld prefab.", MessageType.Error);
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WORLDS_ERROR_MULTIPLE_CVR_WORLD"), MessageType.Error);
             }
-            if (avatars.Count > 0 && worlds.Count > 0 && (Application.unityVersion == supportedUnity || Application.unityVersion == supportedUnityLts))
+            if (avatars.Count > 0 && worlds.Count > 0 && SupportedUnityVersions.Contains(Application.unityVersion))
             {
-                EditorGUILayout.HelpBox("Loaded scenes should never contain both avatar and world descriptor objects. Please setup your scenes accordingly.", MessageType.Error);
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WORLDS_ERROR_WORLD_CONTAINS_AVATAR"), MessageType.Error);
             }
-            if (avatars.Count <= 0 && worlds.Count <= 0 && (Application.unityVersion == supportedUnity || Application.unityVersion == supportedUnityLts))
+            if (avatars.Count <= 0 && worlds.Count <= 0 && SupportedUnityVersions.Contains(Application.unityVersion))
             {
-                EditorGUILayout.HelpBox("No content found in present scene. Did you forget to add a descriptor component to a game object?", MessageType.Info);
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WORLDS_ERROR_NO_CONTENT"), MessageType.Info);
             }
-            if ((Application.unityVersion != supportedUnity && Application.unityVersion != supportedUnityLts))
+            if (!SupportedUnityVersions.Contains(Application.unityVersion))
             {
-                EditorGUILayout.HelpBox("You are using a unity version that is not supported. Please use Unity 2019.3.1f1 (using Unity Hub makes version management easier).", MessageType.Error);
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WORLDS_ERROR_UNITY_UNSUPPORTED"), MessageType.Error);
             }
         }
 
         void Tab_Settings()
         {
-            EditorGUILayout.LabelField("Upload Settings", EditorStyles.boldLabel);
-            EditorGUILayout.Space();
-
-
-            EditorGUILayout.BeginHorizontal();
-            
-            EditorGUILayout.BeginVertical();
-            EditorGUILayout.LabelField("Switch Connection Encryption:");
-            EditorGUILayout.EndVertical();
-            
-            EditorGUILayout.BeginVertical();
-            var ssl = EditorGUILayout.Popup(EditorPrefs.GetBool("m_ABI_SSL", true) ? 1 : 0, new []{"http", "https"}) == 1;
-            EditorPrefs.SetBool("m_ABI_SSL", ssl);
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.HelpBox("If you have Problems uploading try switching to http.", MessageType.Info);
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_HEADER"), EditorStyles.boldLabel);
             EditorGUILayout.Space();
             
             EditorGUILayout.BeginHorizontal();
             
             EditorGUILayout.BeginVertical();
-            EditorGUILayout.LabelField("Upload Region:");
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_CONTENT_REGION"));
             EditorGUILayout.EndVertical();
             
             EditorGUILayout.BeginVertical();
-            var region = EditorGUILayout.Popup(EditorPrefs.GetString("m_ABI_HOST", "EU") == "EU" ? 0 : 1, new []{"Europe", "USA"}) == 0 ? "EU" : "US";
-            EditorPrefs.SetString("m_ABI_HOST", region);
+            var region = EditorGUILayout.Popup(EditorPrefs.GetInt("ABI_PREF_UPLOAD_REGION", 0), new []{"Europe", "United States", "Asia"});
+            EditorPrefs.SetInt("ABI_PREF_UPLOAD_REGION", region);
             EditorGUILayout.EndVertical();
             
             EditorGUILayout.EndHorizontal();
             
-            EditorGUILayout.HelpBox("You can switch the Upload Region to increase your upload speed. Your content will still be available worldwide.", MessageType.Info);
+            EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_HINT_CONTENT_REGION"), MessageType.Info);
+            
+            EditorGUILayout.Space();
+            
+            EditorGUILayout.BeginHorizontal();
+            
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_CCK_LANGUAGE"));
+            EditorGUILayout.EndVertical();
+            
+            EditorGUILayout.BeginVertical();
+            string selectedLanguage = EditorPrefs.GetString("ABI_CCKLocals", "English");
+            int selectedIndex = CCKLocalizationProvider.GetKnownLanguages().FindIndex(match => match == selectedLanguage);
+            if (selectedIndex < 0) selectedIndex = 0;
+            selectedIndex = EditorGUILayout.Popup(selectedIndex, CCKLocalizationProvider.GetKnownLanguages().ToArray());
+            EditorPrefs.SetString("ABI_CCKLocals", CCKLocalizationProvider.GetKnownLanguages()[selectedIndex]);
+            EditorGUILayout.EndVertical();
+            
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_HINT_CCK_LANGUAGE"), MessageType.Info);
             
             EditorGUILayout.Space();
         }
@@ -372,45 +388,45 @@ namespace ABI.CCK.Scripts.Editor
             if (overallMissingScripts > 0) errors++;
 
             //Errors
-            if (overallMissingScripts > 0) EditorGUILayout.HelpBox("Avatar or its children contains missing scripts. The upload will fail like this. Remove all missing script references before uploading or click Remove all missing scripts to automatically have this done for you.", MessageType.Error);
+            if (overallMissingScripts > 0) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_ERROR_AVATAR_MISSING_SCRIPTS"), MessageType.Error);
             var animator = avatar.GetComponent<Animator>();
             if (animator == null)
             {
                 errors++;
-                EditorGUILayout.HelpBox("No Animator was detected for this Avatar. Make sure, that an Animator is present on the same GameObject as the CVRAvatar Component.", MessageType.Error);
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_ERROR_ANIMATOR"), MessageType.Error);
             }
             if (animator != null && animator.avatar == null)
             {
-                errors++;
-                EditorGUILayout.HelpBox("The Avatar Slot in your Avatar is not filled. Please fill this field in with the correct avatar definition.", MessageType.Error);
+                //errors++;
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_WARNING_GENERIC"), MessageType.Warning);
             }
             
             //Warnings
-            if (overallPolygonsCount > 100000) EditorGUILayout.HelpBox("Warning: This avatar has more than 100k (" + overallPolygonsCount + ") polygons in total. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Warning);
-            if (overallSkinnedMeshRenderer > 10) EditorGUILayout.HelpBox("Warning: This avatar contains more than 10 (" + overallSkinnedMeshRenderer + ") SkinnedMeshRenderer components. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Warning);
-            if (overallUniqueMaterials > 20) EditorGUILayout.HelpBox("Warning: This avatar utilizes more than 20 (" + overallUniqueMaterials + ") material slots. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Warning);
-            if (avatar.viewPosition == Vector3.zero) EditorGUILayout.HelpBox("Warning: The view position of this avatar defaults to X=0,Y=0,Z=0. This means your view position is on the ground. This is probably not what you want.", MessageType.Warning);
-            if (animator != null && animator.avatar != null && !animator.avatar.isHuman) EditorGUILayout.HelpBox("Warning: Your Avatar is not setup as Humanoid.", MessageType.Warning);
+            if (overallPolygonsCount > 100000) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_WARNING_POLYGONS").Replace("{X}", overallPolygonsCount.ToString()), MessageType.Warning);
+            if (overallSkinnedMeshRenderer > 10) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_WARNING_SKINNED_MESH_RENDERERS").Replace("{X}", overallSkinnedMeshRenderer.ToString()), MessageType.Warning);
+            if (overallUniqueMaterials > 20) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_WARNING_MATERIALS").Replace("{X}", overallUniqueMaterials.ToString()), MessageType.Warning);
+            if (avatar.viewPosition == Vector3.zero) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_WARNING_VIEWPOINT"), MessageType.Warning);
+            if (animator != null && animator.avatar != null && !animator.avatar.isHuman) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_WARNING_NON_HUMANOID"), MessageType.Warning);
             
             var avatarMeshes = getAllAssetMeshesInAvatar(avatarObject);
             if (CheckForLegacyBlendShapeNormals(avatarMeshes))
             {
-                EditorGUILayout.HelpBox("Warning: This Avatar has none legacy blend shape normals. This will lead to an increased filesize and lighting errors", MessageType.Warning);
-                if(GUILayout.Button("Fix import settings"))
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_WARNING_LEGACY_BLENDSHAPES"), MessageType.Warning);
+                if(GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_FIX_IMPORT_SETTINGS")))
                 {
                     FixLegacyBlendShapeNormals(avatarMeshes);
                 }
             }
-            
-            //Info
-            if (overallPolygonsCount >= 50000 && overallPolygonsCount <= 100000) EditorGUILayout.HelpBox("Info: This avatar has more than 50k (" + overallPolygonsCount + ") polygons in total. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Info);
-            if (overallSkinnedMeshRenderer >= 5 && overallSkinnedMeshRenderer <= 10) EditorGUILayout.HelpBox("Info: This avatar contains more than 5 (" + overallSkinnedMeshRenderer + ") SkinnedMeshRenderer components. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Info);
-            if (overallUniqueMaterials >= 10 && overallUniqueMaterials <= 20) EditorGUILayout.HelpBox("Info: This avatar utilizes more than 10 (" + overallUniqueMaterials + ") material slots. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Info);
-            if (avatar.viewPosition.y <= 0.5f) EditorGUILayout.HelpBox("Info: The view position of this avatar is under 0.5 in height. This avatar is considered excessively small.", MessageType.Info);
-            if (avatar.viewPosition.y > 3f) EditorGUILayout.HelpBox("Info: The view position of this avatar is under 0.5 in height. This avatar is considered excessively huge.", MessageType.Info);
 
-            if (errors <= 0) if (GUILayout.Button("Upload Avatar")) CCK_BuildUtility.BuildAndUploadAvatar(avatarObject);
-            if (overallMissingScripts > 0) if (GUILayout.Button("Remove all missing scripts")) CCK_Tools.CleanMissingScripts(CCK_Tools.SearchType.Selection ,true,avatarObject);
+            //Info
+            if (overallPolygonsCount >= 50000 && overallPolygonsCount <= 100000) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_INFO_POLYGONS").Replace("{X}", overallPolygonsCount.ToString()), MessageType.Info);
+            if (overallSkinnedMeshRenderer >= 5 && overallSkinnedMeshRenderer <= 10) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_INFO_SKINNED_MESH_RENDERERS").Replace("{X}", overallSkinnedMeshRenderer.ToString()), MessageType.Info);
+            if (overallUniqueMaterials >= 10 && overallUniqueMaterials <= 20) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_INFO_MATERIALS").Replace("{X}", overallUniqueMaterials.ToString()), MessageType.Info);
+            if (avatar.viewPosition.y <= 0.5f) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_INFO_SMALL"), MessageType.Info);
+            if (avatar.viewPosition.y > 3f) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_INFO_HUGE"), MessageType.Info);
+
+            if (errors <= 0) if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_AVATAR_UPLOAD_BUTTON"))) CCK_BuildUtility.BuildAndUploadAvatar(avatarObject);
+            if (overallMissingScripts > 0) if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_UTIL_REMOVE_MISSING_SCRIPTS_BUTTON"))) CCK_Tools.CleanMissingScripts(CCK_Tools.SearchType.Selection ,true,avatarObject);
 
         }
         
@@ -437,30 +453,30 @@ namespace ABI.CCK.Scripts.Editor
             if (overallMissingScripts > 0) errors++;
 
             //Errors
-            if (overallMissingScripts > 0) EditorGUILayout.HelpBox("Spawnable Objects or its children contains missing scripts. The upload will fail like this. Remove all missing script references before uploading or click Remove all missing scripts to automatically have this done for you.", MessageType.Error);
+            if (overallMissingScripts > 0) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_PROPS_ERROR_MISSING_SCRIPT"), MessageType.Error);
             
             //Warnings
-            if (overallPolygonsCount > 100000) EditorGUILayout.HelpBox("Warning: This spawnable object has more than 100k (" + overallPolygonsCount + ") polygons in total. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Warning);
-            if (overallSkinnedMeshRenderer > 10) EditorGUILayout.HelpBox("Warning: This spawnable object contains more than 10 (" + overallSkinnedMeshRenderer + ") SkinnedMeshRenderer components. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Warning);
-            if (overallUniqueMaterials > 20) EditorGUILayout.HelpBox("Warning: This spawnable object utilizes more than 20 (" + overallUniqueMaterials + ") material slots. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Warning);
+            if (overallPolygonsCount > 100000) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_PROPS_WARNING_POLYGONS").Replace("{X}", overallPolygonsCount.ToString()), MessageType.Warning);
+            if (overallSkinnedMeshRenderer > 10) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_PROPS_WARNING_SKINNED_MESH_RENDERERS").Replace("{X}", overallSkinnedMeshRenderer.ToString()), MessageType.Warning);
+            if (overallUniqueMaterials > 20) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_PROPS_WARNING_MATERIALS").Replace("{X}", overallUniqueMaterials.ToString()), MessageType.Warning);
 
-            var avatarMeshes = getAllAssetMeshesInAvatar(spawnableObject);
-            if (CheckForLegacyBlendShapeNormals(avatarMeshes))
+            var spawnableMeshes = getAllAssetMeshesInAvatar(spawnableObject);
+            if (CheckForLegacyBlendShapeNormals(spawnableMeshes))
             {
-                EditorGUILayout.HelpBox("Warning: This spawnable object has none legacy blend shape normals. This will lead to an increased filesize and lighting errors", MessageType.Warning);
-                if(GUILayout.Button("Fix import settings"))
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_PROPS_WARNING_LEGACY_BLENDSHAPES"), MessageType.Warning);
+                if(GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_FIX_IMPORT_SETTINGS")))
                 {
-                    FixLegacyBlendShapeNormals(avatarMeshes);
+                    FixLegacyBlendShapeNormals(spawnableMeshes);
                 }
             }
-            
-            //Info
-            if (overallPolygonsCount >= 50000 && overallPolygonsCount <= 100000) EditorGUILayout.HelpBox("Info: This spawnable object has more than 50k (" + overallPolygonsCount + ") polygons in total. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Info);
-            if (overallSkinnedMeshRenderer >= 5 && overallSkinnedMeshRenderer <= 10) EditorGUILayout.HelpBox("Info: This spawnable object contains more than 5 (" + overallSkinnedMeshRenderer + ") SkinnedMeshRenderer components. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Info);
-            if (overallUniqueMaterials >= 10 && overallUniqueMaterials <= 20) EditorGUILayout.HelpBox("Info: This spawnable object utilizes more than 10 (" + overallUniqueMaterials + ") material slots. This can cause performance problems in game. This does not prevent you from uploading. ", MessageType.Info);
 
-            if (errors <= 0 && overallMissingScripts <= 0) if (GUILayout.Button("Upload Spawnable Object (Prop)")) CCK_BuildUtility.BuildAndUploadSpawnable(spawnableObject);
-            if (overallMissingScripts > 0) if (GUILayout.Button("Remove all missing scripts")) CCK_Tools.CleanMissingScripts(CCK_Tools.SearchType.Selection ,true, spawnableObject);
+            //Info
+            if (overallPolygonsCount >= 50000 && overallPolygonsCount <= 100000) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_PROPS_INFO_POLYGONS").Replace("{X}", overallPolygonsCount.ToString()), MessageType.Info);
+            if (overallSkinnedMeshRenderer >= 5 && overallSkinnedMeshRenderer <= 10) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_PROPS_INFO_SKINNED_MESH_RENDERERS").Replace("{X}", overallSkinnedMeshRenderer.ToString()), MessageType.Info);
+            if (overallUniqueMaterials >= 10 && overallUniqueMaterials <= 20) EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_PROPS_INFO_MATERIALS").Replace("{X}", overallUniqueMaterials.ToString()), MessageType.Info);
+
+            if (errors <= 0 && overallMissingScripts <= 0) if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_PROPS_UPLOAD_BUTTON"))) CCK_BuildUtility.BuildAndUploadSpawnable(spawnableObject);
+            if (overallMissingScripts > 0) if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_UTIL_REMOVE_MISSING_SCRIPTS_BUTTON"))) CCK_Tools.CleanMissingScripts(CCK_Tools.SearchType.Selection ,true, spawnableObject);
         }
 
         private List<String> getAllAssetMeshesInAvatar(GameObject avatar)
@@ -478,7 +494,7 @@ namespace ABI.CCK.Scripts.Editor
                 
                 if(currentMesh == null)
                 {
-                    Debug.LogWarning("MeshFilter with missing Mesh detected: " + sMeshRenderer.transform.name);
+                    Debug.LogWarning(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WARNING_MESH_FILTER_MESH_EMPTY") + $": {sMeshRenderer.transform.name}");
                     continue;
                 }
                 
@@ -512,7 +528,7 @@ namespace ABI.CCK.Scripts.Editor
                 
                 if(currentMesh == null)
                 {
-                    Debug.LogWarning("MeshFilter with missing Mesh detected: " + meshFilter.transform.name);
+                    Debug.LogWarning(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WARNING_MESH_FILTER_MESH_EMPTY") + $": {meshFilter.transform.name}");
                     continue;
                 }
                 
@@ -549,7 +565,7 @@ namespace ABI.CCK.Scripts.Editor
                 {
                     if(particleMesh == null)
                     {
-                        Debug.LogWarning("MeshFilter with missing Mesh detected: " + pRenderer.transform.name);
+                        Debug.LogWarning(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_WARNING_MESH_FILTER_MESH_EMPTY") + $": {pRenderer.transform.name}");
                         continue;
                     }
                     
@@ -625,7 +641,7 @@ namespace ABI.CCK.Scripts.Editor
         
         private void EditorUpdate()
         {
-            if (!_attemptingToLogin || !_webRequest.isDone) return;
+            /*if (!_attemptingToLogin || _webRequest is null || !_webRequest.isDone) return;
 
             if (_webRequest.isNetworkError || _webRequest.isHttpError)
             {
@@ -636,17 +652,12 @@ namespace ABI.CCK.Scripts.Editor
             var result = _webRequest.downloadHandler.text;
             if (string.IsNullOrEmpty(result)) return;
 
-            var apiValidateProfile = XDocument.Parse(result);
-            var responseCode = apiValidateProfile.XPathSelectElement("IContentCreation/ValidateKey/Status");
-            var message = apiValidateProfile.XPathSelectElement("IContentCreation/ValidateKey/Message");
-
-            var isValidProfile = (int)responseCode;
-            var apiMessage = (string)message;
-
-            if (isValidProfile == 1)
+            LoginResponse usr = Abi.Newtonsoft.Json.JsonConvert.DeserializeObject<LoginResponse>(result);
+            if (usr == null) return;
+            
+            if (usr.IsValidCredential)
             {
-                _apiCreatorRank = (string) apiValidateProfile.XPathSelectElement("IContentCreation/ValidateKey/Meta/CreatorRank");
-                _apiUserRank = (string) apiValidateProfile.XPathSelectElement("IContentCreation/ValidateKey/Meta/UserRank");
+                _apiUserRank = usr.UserRank;
                 Debug.Log("[ABI:CCK] Successfully authenticated as " + _username + " using AlphaLink Public API.");
                 EditorPrefs.SetString("m_ABI_Username", _username);
                 EditorPrefs.SetString("m_ABI_Key", _key);
@@ -655,14 +666,14 @@ namespace ABI.CCK.Scripts.Editor
             }
             else
             {
-                Debug.Log("[ABI:CCK] Unable to authenticate using provided credentials. API responded with: " + apiMessage + ".");
+                Debug.Log("[ABI:CCK] Unable to authenticate using provided credentials. API responded with: " + usr.ApiMessage + ".");
                 _loggedIn = false;
                 _hasAttemptedToLogin = true;
                 _username = _key = string.Empty;
             }
 
             _webRequest = null;
-            _attemptingToLogin = false;
+            _attemptingToLogin = false;*/
         }
         
         private void Logout()
@@ -673,14 +684,77 @@ namespace ABI.CCK.Scripts.Editor
             EditorPrefs.SetString("m_ABI_Key", _key);
         }
 
-        public void Login()
+        public async Task Login()
         {
-            if (_attemptingToLogin || string.IsNullOrEmpty(_username) || string.IsNullOrEmpty(_key)) return;
-            var values = new Dictionary<string, string> {{"user", _username}, {"accesskey", _key}};
-            _webRequest = UnityWebRequest.Post("https://api.alphablend.cloud/IContentCreation/ValidateKey", values);
-            _webRequest.SendWebRequest();
-            _attemptingToLogin = true;
+            if (!_attemptingToLogin)
+            {
+                _attemptingToLogin = true;
+
+                using (HttpClient httpclient = new HttpClient())
+                {
+                    HttpResponseMessage response;
+                    response = await httpclient.PostAsync(
+                        "https://api.abinteractive.net/1/cck/validateKey",
+                        new StringContent(JsonConvert.SerializeObject(new {Username = _username, AccessKey = _key}),
+                            Encoding.UTF8, "application/json")
+                    );
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string result = await response.Content.ReadAsStringAsync();
+                        BaseResponse<LoginResponse> usr = Abi.Newtonsoft.Json.JsonConvert.DeserializeObject<BaseResponse<LoginResponse>>(result);
+                        
+                        if (usr == null || usr.Data == null) return;
+                        
+                        if (usr.Data.isValidCredentials)
+                        {
+                            _apiUserRank = usr.Data.userRank;
+                            Debug.Log("[ABI:CCK] Successfully authenticated as " + _username + " using AlphaLink Public API.");
+                            EditorPrefs.SetString("m_ABI_Username", _username);
+                            EditorPrefs.SetString("m_ABI_Key", _key);
+                            _loggedIn = true;
+                            _hasAttemptedToLogin = false;
+                        }
+                        else
+                        {
+                            Debug.Log("[ABI:CCK] Unable to authenticate using provided credentials. API responded with: " + usr.Message + ".");
+                            _loggedIn = false;
+                            _hasAttemptedToLogin = true;
+                            _username = _key = string.Empty;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("[ABI:CCK] Web Request Error while trying to authenticate.");
+                    }
+                }
+                _attemptingToLogin = false;
+            }
+        }
+    }
+    
+    public class LoginResponse
+    {
+        public bool isValidCredentials { get; set; }
+        public bool isAccountUnlocked { get; set; }
+        public string userId { get; set; }
+        public string userRank { get; set; }
+    }
+
+    public class BaseResponse<T>
+    {
+        public string Message { get; set; }
+        public T Data { get; set; }
+
+        public BaseResponse(string message = null, T data = default)
+        {
+            Message = message;
+            Data = data;
         }
 
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 }

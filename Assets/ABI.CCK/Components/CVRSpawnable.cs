@@ -1,22 +1,97 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using ABI.CCK.Components;
 using UnityEngine;
 
 namespace ABI.CCK.Components
 {
-    [RequireComponent(typeof(CVRAssetInfo))]
-    [ExecuteInEditMode]
     public class CVRSpawnable : MonoBehaviour
     {
+        public float spawnHeight = 0f;
+        
         public bool useAdditionalValues;
         
         public List<CVRSpawnableValue> syncValues = new List<CVRSpawnableValue>();
-        
-        private void OnEnable()
+
+        public enum PropPrivacy
         {
-            CVRAssetInfo info = gameObject.GetComponent<CVRAssetInfo>();
-            info.type = CVRAssetInfo.AssetType.Spawnable;
+            everyone = 1,
+            owner = 2
+        }
+
+        public PropPrivacy propPrivacy = PropPrivacy.everyone;
+        
+        public List<CVRSpawnableSubSync> subSyncs = new List<CVRSpawnableSubSync>();
+
+        public enum SpawnableType
+        {
+            StandaloneSpawnable = 0,
+            WorldSpawnable = 1
+        }
+
+        [HideInInspector]
+        public SpawnableType spawnableType = SpawnableType.StandaloneSpawnable;
+
+        [HideInInspector]
+        public string preGeneratedInstanceId = "";
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.white;
+
+            Gizmos.DrawLine(transform.position, transform.position - new Vector3(0, spawnHeight, 0));
+            Gizmos.matrix = Matrix4x4.TRS(transform.position - new Vector3(0, spawnHeight, 0), Quaternion.identity,
+                new Vector3(1f, 0f, 1f));
+            Gizmos.DrawWireSphere(Vector3.zero, 0.25f);
+            Gizmos.DrawLine(new Vector3(0, 0, 0.35f), new Vector3(0.177f, 0, 0.177f));
+            Gizmos.DrawLine(new Vector3(0, 0, 0.35f), new Vector3(0, 0, 0.25f));
+            Gizmos.DrawLine(new Vector3(0, 0, 0.35f), new Vector3(-0.177f, 0, 0.177f));
+            
+            Gizmos.matrix = Matrix4x4.identity;
+            
+            //SubSyncGizmos
+            foreach (var subSync in subSyncs)
+            {
+                if (subSync.precision == CVRSpawnableSubSync.SyncPrecision.Full) continue;
+                if (subSync.transform == null) continue;
+                
+                Gizmos.matrix = Matrix4x4.TRS(subSync.transform.parent.position, Quaternion.identity, subSync.transform.parent.lossyScale);
+                
+                if (Mathf.Abs(subSync.transform.localPosition.x) > subSync.syncBoundary ||
+                    Mathf.Abs(subSync.transform.localPosition.y) > subSync.syncBoundary ||
+                    Mathf.Abs(subSync.transform.localPosition.z) > subSync.syncBoundary)
+                {
+                    Gizmos.color = Color.red;
+                }
+                else
+                {
+                    Gizmos.color = Color.blue;
+                }
+                
+                Gizmos.DrawWireCube(Vector3.zero, Vector3.one * subSync.syncBoundary * 2f);
+            }
+        }
+
+        private void DestroyProp()
+        {
+            
+        }
+        
+        private void Reset()
+        {
+            if (GetComponent<CVRBuilderSpawnable>() != null)
+            {
+                Invoke("DestroyThis", 0);
+            }
+            else if (GetComponent<CVRAssetInfo>() == null)
+            {
+                CVRAssetInfo info = gameObject.AddComponent<CVRAssetInfo>();
+                info.type = CVRAssetInfo.AssetType.Spawnable;
+            }
+        }
+        void DestroyThis() {
+            DestroyImmediate(this);
         }
     }
 
@@ -53,7 +128,9 @@ namespace ABI.CCK.Components
             OwnerLeftTrigger = 22,
             OwnerRightTrigger = 23,
             OwnerCurrentGrip = 24,
-            OwnerCurrentTrigger = 25
+            OwnerCurrentTrigger = 25,
+            OwnerOppositeGrip = 26,
+            OwnerOppositeTrigger = 27
         }
 
         public UpdatedBy updatedBy = UpdatedBy.None;
@@ -74,5 +151,35 @@ namespace ABI.CCK.Components
         public Animator animator;
 
         public string animatorParameterName;
+    }
+    
+    [System.Serializable]
+    public class CVRSpawnableSubSync
+    {
+        public Transform transform;
+
+        [Flags]
+        public enum SyncFlags
+        {
+            TransformX = 1 << 1,
+            TransformY = 1 << 2,
+            TransformZ = 1 << 3,
+            RotationX = 1 << 4,
+            RotationY = 1 << 5,
+            RotationZ = 1 << 6
+        }
+
+        public SyncFlags syncedValues;
+
+        public enum SyncPrecision
+        {
+            Quarter = 1,
+            Half = 2,
+            Full = 4
+        }
+
+        public SyncPrecision precision = SyncPrecision.Full;
+
+        public float syncBoundary = 0.5f;
     }
 }

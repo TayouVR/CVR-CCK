@@ -1,31 +1,22 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
-
-#pragma warning disable
 
 namespace ABI.CCK.Components
 {
+    [RequireComponent(typeof(Renderer))]
     public class CVRGIMaterialUpdater : MonoBehaviour
     {
         [SerializeField] bool updateEveryFrame;
-        private static Renderer m_Renderer { get; set; }
+        private Renderer _renderer;
 
-        private Renderer Renderer
+        private void Start()
         {
-            get
-            {
-                if (!m_Renderer)
-                {
-                    m_Renderer = GetComponent<Renderer>();
-                }
-                return m_Renderer;
-            }
+            _renderer = GetComponent<Renderer>();
         }
 
         private void Update()
         {
-            if (Renderer == null || !updateEveryFrame) return;
-            Renderer.UpdateGIMaterials();
+            if (_renderer == null || !updateEveryFrame) return;
+            _renderer.UpdateGIMaterials();
         }
     
     }

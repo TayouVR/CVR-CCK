@@ -22,6 +22,7 @@ namespace ABI.CCK.Scripts.Editor
             
             var cameraObject = new GameObject("WorldPreviewCamera");
             Camera cam = cameraObject.AddComponent<Camera>();
+            cam.useOcclusionCulling = false;
             
             cameraObject.transform.position = position.position + new Vector3(0, height, 0);
 

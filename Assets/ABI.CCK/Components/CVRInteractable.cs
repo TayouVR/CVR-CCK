@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 namespace ABI.CCK.Components
@@ -12,6 +13,14 @@ namespace ABI.CCK.Components
         public string tooltip;
         public List<CVRInteractableAction> actions = new List<CVRInteractableAction>();
 
+        public UnityEvent onEnterSeat;
+        public UnityEvent onExitSeat;
+
+        public void CustomTrigger()
+        {
+            
+        }
+        
         private void OnDrawGizmos()
         {
             foreach (var action in actions)

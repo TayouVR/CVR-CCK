@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Analytics;
 
 #pragma warning disable
 
@@ -34,9 +35,14 @@ namespace ABI.CCK.Components
 
         private void RemoveOrphans()
         {
+            var interactablesToRemove = new List<CVRInteractable>();
+            
             foreach (var interactable in affectedInteractables)
             {
                 var included = false;
+                
+                if (interactable == null) continue;
+                
                 foreach (var action in interactable.actions)
                 {
                     if (action.varBufferVal == this) included = true;
@@ -49,8 +55,15 @@ namespace ABI.CCK.Components
                     }
                 }
 
-                if (!included) affectedInteractables.Remove(interactable);
+                if (!included) interactablesToRemove.Add(interactable);
+            }
+
+            foreach (var interactable in interactablesToRemove)
+            {
+                affectedInteractables.Remove(interactable);
             }
         }
+        
+        public void SetValue(float _value){}
     }
 }

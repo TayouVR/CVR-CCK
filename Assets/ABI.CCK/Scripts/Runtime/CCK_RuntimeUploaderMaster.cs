@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using ABI.CCK.Components;
 using ABI.CCK.Scripts;
+using Abi.Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -19,11 +20,11 @@ namespace ABI.CCK.Scripts.Runtime
         private UnityWebRequest req;
 
         public bool isUploading;
+        private bool _stateTransfer = false;
         public float progress = 0f;
 
         public string encryption;
-
-
+        
         public void StartUpload()
         {
             //Build string
@@ -31,161 +32,138 @@ namespace ABI.CCK.Scripts.Runtime
             var sfwLevel = string.Empty;
             var overwritePic = string.Empty;
             
-            if (updater.dontOverridePicture.isOn) overwritePic = "yes";
-            else overwritePic = "no";
-
-            #if UNITY_EDITOR
-            if (EditorPrefs.GetBool("m_ABI_SSL", true) == false) encryption = "http";
-            else encryption = "https";
-            #endif
-
-            if (updater.sfw.isOn) sfwLevel = "true";
-            else sfwLevel = "false";
-            
-            if (updater.contentOwnership.isOn && updater.tagsCorrect.isOn && !string.IsNullOrEmpty(updater.assetName.text) && !string.IsNullOrEmpty(updater.assetDesc.text))
-            {
-                Debug.Log("[CCK:RuntimeUploader] Uploader parameters OK. Proceeding with upload.");
-                gameObject.GetComponent<CCK_TexImageCreation>().SaveTexture(updater.camObj.GetComponent<Camera>(), updater.tex);
-                StartCoroutine(UploadAssetAndSendInformation(updater.asset.GetComponent<CVRAssetInfo>().guid, type.ToString(), sfwLevel, updater.assetName.text, updater.assetDesc.text, overwritePic));
-            }
-            else
-            {
-                #if UNITY_EDITOR
-                UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK", "Please make sure, that all necessary fields are filled before uploading. Necessary fields are: Name, Description, Regulatory boxes", "Okay");
-                #endif
-                Debug.LogError("[CCK:RuntimeUploader] Some necessary fields are not filled. Please fill all fields and accept the regulatory notes before uploading content to our cloud.");
-            }
-
+            if (!File.Exists($"{Application.persistentDataPath}/bundle.png")) gameObject.GetComponent<CCK_TexImageCreation>().SaveTexture(updater.camObj.GetComponent<Camera>(), updater.tex);
+            StartCoroutine(UploadAssetAndSendInformation(updater.asset.GetComponent<CVRAssetInfo>().objectId, type.ToString(), sfwLevel, updater.assetName.text, updater.assetDesc.text, updater.dontOverridePicture.isOn));
         }
 
-        private IEnumerator UploadAssetAndSendInformation(string guid, string type, string sfwLevel, string assetName, string assetDesc, string overwritePic)
+        private IEnumerator UploadAssetAndSendInformation(string contentId, string type, string sfwLevel, string assetName, string assetDesc, bool overwritePic)
         {
             string[] path = null;
             if (type == "Avatar")
             {
                 path = new string[3];
-                path[0] = Application.persistentDataPath + "/bundle.cvravatar";
-                path[1] = Application.persistentDataPath + "/bundle.cvravatar.manifest";
-                path[2] = Application.persistentDataPath + "/bundle.png";
+                path[0] = $"file://{Application.persistentDataPath}/bundle.cvravatar";
+                path[1] = $"file://{Application.persistentDataPath}/bundle.cvravatar.manifest";
+                path[2] = $"file://{Application.persistentDataPath}/bundle.png";
             }
             if (type == "World")
             {
                 path = new string[5];
-                path[0] = Application.persistentDataPath + "/bundle.cvrworld";
-                path[1] = Application.persistentDataPath + "/bundle.cvrworld.manifest";
-                path[2] = Application.persistentDataPath + "/bundle.png";
-                path[3] = Application.persistentDataPath + "/bundle_pano_1024.png";
-                path[4] = Application.persistentDataPath + "/bundle_pano_4096.png";
+                path[0] = $"file://{Application.persistentDataPath}/bundle.cvrworld";
+                path[1] = $"file://{Application.persistentDataPath}/bundle.cvrworld.manifest";
+                path[2] = $"file://{Application.persistentDataPath}/bundle.png";
+                path[3] = $"file://{Application.persistentDataPath}/bundle_pano_1024.png";
+                path[4] = $"file://{Application.persistentDataPath}/bundle_pano_4096.png";
             }
             if (type == "Spawnable")
             {
                 path = new string[3];
-                path[0] = Application.persistentDataPath + "/bundle.cvrprop";
-                path[1] = Application.persistentDataPath + "/bundle.cvrprop.manifest";
-                path[2] = Application.persistentDataPath + "/bundle.png";
+                path[0] = $"file://{Application.persistentDataPath}/bundle.cvrprop";
+                path[1] = $"file://{Application.persistentDataPath}/bundle.cvrprop.manifest";
+                path[2] = $"file://{Application.persistentDataPath}/bundle.png";
             }
 
             UnityWebRequest[] files = new UnityWebRequest[path.Length];
             WWWForm form = new WWWForm();
-            #if UNITY_EDITOR
-            form.AddField("user", EditorPrefs.GetString("m_ABI_Username"));
-            form.AddField("accesskey", EditorPrefs.GetString("m_ABI_Key"));
-            #endif
-            form.AddField("guid", guid);
-            form.AddField("assetname", assetName);
-            form.AddField("assetdesc", assetDesc);
-            form.AddField("sfwlevel", sfwLevel);
-            form.AddField("type", type);
-            form.AddField("cckbuild", "59");
-            form.AddField("updatepic", overwritePic);
-            form.AddField("flagSuggestive", updater.nsfwSubSuggestive.isOn.ToString());
-            form.AddField("flagNudity", updater.nsfwSubNudity.isOn.ToString());
-            form.AddField("avtrLoudAudio", updater.avtrLoudAudio.isOn.ToString());
-            form.AddField("avtrLongRangeAudio", updater.avtrLongRangeAudio.isOn.ToString());
-            form.AddField("avtrSpawnAudio", updater.avtrSpawnAudio.isOn.ToString());
-            form.AddField("avtrScreenFx", updater.avtrScreenFx.isOn.ToString());
-            form.AddField("avtrFlashingColors", updater.avtrFlashingColors.isOn.ToString());
-            form.AddField("avtrFlashingLights", updater.avtrFlashingLights.isOn.ToString());
-            form.AddField("avtrParticleSystems", updater.avtrParticleSystems.isOn.ToString());
-            form.AddField("avtrViolence", updater.avtrViolence.isOn.ToString());
-            form.AddField("avtrGore", updater.avtrGore.isOn.ToString());
-            form.AddField("avtrExcessivelyHuge", updater.avtrExcessivelyHuge.isOn.ToString());
-            form.AddField("avtrExcessivelySmall", updater.avtrExcessivelySmall.isOn.ToString());
-            form.AddField("wrldScreenFx", updater.wrldScreenFx.isOn.ToString());
-            form.AddField("wrldFlashingColors", updater.wrldFlashingColors.isOn.ToString());
-            form.AddField("wrldFlashingLights", updater.wrldFlashingLights.isOn.ToString());
-            form.AddField("wrldParticleSystems", updater.wrldParticleSystems.isOn.ToString());
-            form.AddField("wrldViolence", updater.wrldViolence.isOn.ToString());
-            form.AddField("wrldGore", updater.wrldGore.isOn.ToString());
-            form.AddField("wrldWeaponSystem", updater.wrldWeaponSystem.isOn.ToString());
-            form.AddField("wrldMinigame", updater.wrldMinigame.isOn.ToString());
-            form.AddField("propLoudAudio", updater.propLoudAudio.isOn.ToString());
-            form.AddField("propLongRangeAudio", updater.propLongRangeAudio.isOn.ToString());
-            form.AddField("propScreenFx", updater.propScreenFx.isOn.ToString());
-            form.AddField("propFlashingColors", updater.propFlashingColors.isOn.ToString());
-            form.AddField("propFlashingLights", updater.propFlashingLights.isOn.ToString());
-            form.AddField("propParticleSystems", updater.propParticleSystems.isOn.ToString());
-            form.AddField("propViolence", updater.propViolence.isOn.ToString());
-            form.AddField("propGore", updater.propGore.isOn.ToString());
+            
+#if UNITY_EDITOR
+            form.AddField("Username", EditorPrefs.GetString("m_ABI_Username"));
+            form.AddField("AccessKey", EditorPrefs.GetString("m_ABI_Key"));
+#endif
+            form.AddField("ContentId", contentId);
+            form.AddField("ContentType", type);
+            
+            form.AddField("ContentName", assetName);
+            form.AddField("ContentDescription", assetDesc);
+            form.AddField("ContentChangelog", updater.assetChangelog.text);
+            
+            if (updater.LoudAudio.isOn) form.AddField("Tag_LoudAudio", 1);
+            if (updater.LongRangeAudio.isOn) form.AddField("Tag_LongRangeAudio", 1);
+            if (updater.ContainsMusic.isOn) form.AddField("Tag_ContainsMusic", 1);
+            if (updater.SpawnAudio.isOn) form.AddField("Tag_SpawnAudio", 1);
+            
+            if (updater.FlashingColors.isOn) form.AddField("Tag_FlashingColors", 1);
+            if (updater.FlashingLights.isOn) form.AddField("Tag_FlashingLights", 1);
+            if (updater.ExtremelyBright.isOn) form.AddField("Tag_ExtremelyBright", 1);
+            if (updater.ScreenEffects.isOn) form.AddField("Tag_ScreenEffects", 1);
+            if (updater.ParticleSystems.isOn) form.AddField("Tag_ParticleSystems", 1);
+            
+            if (updater.Violence.isOn) form.AddField("Tag_Violence", 1);
+            if (updater.Gore.isOn) form.AddField("Tag_Gore", 1);
+            if (updater.Horror.isOn) form.AddField("Tag_Horror", 1);
+            if (updater.Jumpscare.isOn) form.AddField("Tag_Jumpscare", 1);
+            
+            if (updater.ExcessivelyHuge.isOn) form.AddField("Tag_ExcessivelyHuge", 1);
+            if (updater.ExcessivelySmall.isOn) form.AddField("Tag_ExcessivelySmall", 1);
+            
+            if (updater.Suggestive.isOn) form.AddField("Tag_Suggestive", 1);
+            if (updater.Nudity.isOn) form.AddField("Tag_Nudity", 1);
+            
+            if (updater.SetAsActive.isOn) form.AddField("Flag_SetFileAsActive", 1);
+            if (overwritePic) form.AddField("Flag_OverwritePicture", 1);
 
             for (int i = 0; i < files.Length; i++)
             {
                 string fieldName = string.Empty;
                 switch (i)
                 {
-                    case 0: fieldName = "asset"; break;
-                    case 1: fieldName = "assetmanifest"; break;
-                    case 2: fieldName = "screenshot"; break;
-                    case 3: fieldName = "pano1024"; break;
-                    case 4: fieldName = "pano4096"; break;
+                    case 0: fieldName = "AssetFile"; break;
+                    case 1: fieldName = "AssetManifestFile"; break;
+                    case 2: fieldName = "AssetThumbnail"; break;
+                    case 3: fieldName = "AssetPano1K"; break;
+                    case 4: fieldName = "AssetPano4K"; break;
                 }
                 files[i] = UnityWebRequest.Get(path[i]);
                 yield return files[i].SendWebRequest();
                 form.AddBinaryData(fieldName, files[i].downloadHandler.data, Path.GetFileName(path[i]));
             }
             #if UNITY_EDITOR
-            req = UnityWebRequest.Post($"{encryption}://push.{EditorPrefs.GetString("m_ABI_HOST", "EU")}.abidata.io", form);
+            req = UnityWebRequest.Post($"https://{updater.UploadLocation}/v1/upload-file", form);
             #endif
             isUploading = true;
             yield return req.SendWebRequest();
             
             if (req.isHttpError || req.isNetworkError)
                 Debug.LogError(req.error);
-            else
+        }
+
+        private IEnumerator WriteState()
+        {
+            _stateTransfer = true;
+            yield return new WaitForSeconds(0.15f);
+            float percent = 0f;
+            while (99f > percent)
             {
-                var response = req.downloadHandler.text;
-                try
+                var values = new Dictionary<string, string>
                 {
-                    var doc = XDocument.Parse(response);
+                    {"ContentType", updater.asset.type.ToString()},
+                    {"ContentId", updater.asset.objectId}
+                };
 
-                    var code = doc.XPathSelectElement("IContentCreation/UploadAsset/Status");
-
-                    if ((string) code == "OK")
-                    {
-                        Debug.Log("[CCK:RuntimeUploader] Api responded with:" + (string) doc.XPathSelectElement("IContentCreation/UploadAsset/Message"));
-                        UploadCompleteDialog();
-                    }
-
-                    if ((string) code == "LIMIT_REACHED")
-                    {
-                        Debug.Log("[CCK:RuntimeUploader] Api responded with:" + (string) doc.XPathSelectElement("IContentCreation/UploadAsset/Message"));
-                        AccountLimitReached();
-                    }
-                    
-                    if ((string) code == "SCHEDULED_SECURITY_CHECK")
-                    {
-                        Debug.Log("[CCK:RuntimeUploader] Api responded with:" + (string) doc.XPathSelectElement("IContentCreation/UploadAsset/Message"));
-                        SecurityCheckRequested();
-                    }
-
-                    if ((string) code != "OK" && (string) code != "LIMIT_REACHED" && (string) code != "SCHEDULED_SECURITY_CHECK") UploadFailedDialog((string) doc.XPathSelectElement("IContentCreation/UploadAsset/Message"));
-                }
-                catch (Exception e)
+                using (UnityWebRequest uwr =
+                    UnityWebRequest.Post($"https://{updater.UploadLocation}/v1/progress-for-file", values))
                 {
-                    UploadFailedApiError(e.Message);
-                    Debug.Log(e);
-                    Debug.Log(response);
+                    yield return uwr.SendWebRequest();
+
+                    if (uwr.isNetworkError || uwr.isHttpError)
+                    {
+                        Debug.Log(
+                            "[CCK:RuntimeUploader] Unable to connect to the edge we are uploading to. There might be a network issue.");
+                        yield break;
+                    }
+
+                    UploadProgressStatus s =
+                        JsonConvert.DeserializeObject<UploadProgressStatus>(uwr.downloadHandler.text);
+                    if (s != null)
+                    {
+                        updater.processingProgress.fillAmount = s.Percent / 100;
+                        if (!string.IsNullOrEmpty(s.CurrentStep)) updater.processingProgressText.text = CCKLocalizationProvider.GetLocalizedText(s.CurrentStep);
+                        if (s.Percent > 99f) ShowResponseDialog(s.CurrentStep);
+                        percent = s.Percent;
+                    }
                 }
+
+                yield return new WaitForSeconds(0.25f);
             }
         }
 
@@ -193,70 +171,35 @@ namespace ABI.CCK.Scripts.Runtime
         {
             if (isUploading)
             {
-                #if UNITY_EDITOR
-                //EditorUtility.DisplayCancelableProgressBar("Alpha Blend Interactive CCK", "Now uploading your content to the Alpha Blend Interactive cloud.", req.uploadProgress);
+#if UNITY_EDITOR
                 updater.uploadProgress.fillAmount = req.uploadProgress;
                 updater.uploadProgressText.text = (req.uploadProgress * 100f).ToString("F2") + "%";
-                if (req.uploadProgress * 100f > 99.9f) updater.uploadProgressText.text = "Now Encrypting File";
+                if (req.uploadProgress * 100f > 99.9f)
+                {
+                    updater.uploadProgressText.text = "100%";
+                    if (!_stateTransfer) StartCoroutine(WriteState());
+                }
 #endif
             }
         }
         
-        private void UploadCompleteDialog()
+        private void ShowResponseDialog(string text)
         {
             isUploading = false;
             #if UNITY_EDITOR
             EditorUtility.ClearProgressBar();
-            if (UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK","Upload finished. You can manage your uploaded content using our website or launch ChilloutVR to see it in-game.","Okay"))
+            if (UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK",$"Message from server: {CCKLocalizationProvider.GetLocalizedText(text)}","Okay"))
             {
                 EditorApplication.isPlaying = false;
             }
             #endif
         }
-        private void SecurityCheckRequested()
-        {
-            isUploading = false;
-            #if UNITY_EDITOR
-            EditorUtility.ClearProgressBar();
-            if (UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK","Upload finished. Your upload is now being scanned by our security system and will be available in-game shortly.","Okay"))
-            {
-                EditorApplication.isPlaying = false;
-            }
-            #endif
-        }
-        private void UploadFailedDialog(string apiMessage)
-        {
-            isUploading = false;
-            #if UNITY_EDITOR
-            EditorUtility.ClearProgressBar();
-            if (UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK","Upload failed. Response from API: " + apiMessage,"Okay"))
-            {
-                EditorApplication.isPlaying = false;
-            }
-            #endif
-        }
-        private void UploadFailedApiError(string e)
-        {
-            isUploading = false;
-            #if UNITY_EDITOR
-            EditorUtility.ClearProgressBar();
-            if (UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK","Upload failed. Error: " + e,"Okay"))
-            {
-                EditorApplication.isPlaying = false;
-            }
-            #endif
-        }
-        private void AccountLimitReached()
-        {
-            isUploading = false;
-            #if UNITY_EDITOR
-            EditorUtility.ClearProgressBar();
-            if (UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK","Upload rejected. Your account has reached its free limits. You can not upload any more content, unless you delete some of your uploaded content. You can also consider buying our one-time account unlock to have this limit removed.","Okay"))
-            {
-                EditorApplication.isPlaying = false;
-            }
-            #endif
-        }
+    }
 
+    [Serializable]
+    public class UploadProgressStatus
+    {
+        public string CurrentStep { get; set; }
+        public float Percent { get; set; }
     }
 }

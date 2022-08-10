@@ -16,8 +16,10 @@ namespace ABI.CCK.Scripts.Editor
         private AnimatorController animator;
         private CVRAdvancedAvatarSettingsTriggerTask enterEntity;
         private CVRAdvancedAvatarSettingsTriggerTask exitEntity;
+        private CVRAdvancedAvatarSettingsTriggerTaskStay stayEntity;
         private ReorderableList _onEnterList;
         private ReorderableList _onExitList;
+        private ReorderableList _onStayList;
         private List<string> animatorParameters;
         
         public override void OnInspectorGUI()
@@ -28,12 +30,15 @@ namespace ABI.CCK.Scripts.Editor
             animatorParameters = new List<string>();
             animatorParameters.Add("-none-");
 
-            if (avatar.overrides != null)
+            if (avatar != null && avatar.overrides != null && avatar.overrides.runtimeAnimatorController != null)
             {
                 animator = (AnimatorController) avatar.overrides.runtimeAnimatorController;
                 foreach (var parameter in animator.parameters)
                 {
-                    if (parameter.type == AnimatorControllerParameterType.Float && parameter.name.Length > 0 &&
+                    if ((parameter.type == AnimatorControllerParameterType.Float ||
+                         parameter.type == AnimatorControllerParameterType.Bool ||
+                         parameter.type == AnimatorControllerParameterType.Int) 
+                        && parameter.name.Length > 0 &&
                         !CCK_CVRAvatarEditor.coreParameters.Contains(parameter.name) && parameter.name.Substring(0, 1) != "#")
                     {
                         animatorParameters.Add(parameter.name);
@@ -45,7 +50,7 @@ namespace ABI.CCK.Scripts.Editor
 
             if (triggers.Length > 1)
             {
-                EditorGUILayout.HelpBox("Having multiple Triggers on the same GameObject will lead to unpredictable behavior!", MessageType.Error);
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ADVAVTR_TRIGGER_MULTIPLE_TRIGGER_HELPBOX"), MessageType.Error);
             }
 
             trigger.areaSize = EditorGUILayout.Vector3Field("Area Size", trigger.areaSize);
@@ -79,10 +84,20 @@ namespace ABI.CCK.Scripts.Editor
                 EditorGUILayout.PropertyField(list, new GUIContent("Allowed Pointers"), true);
                 serializedObject.ApplyModifiedProperties();
                 
-                EditorGUILayout.HelpBox("Adding Pointers to the \"Allowed Pointers\" List will Ignore all other Pointers that are not contained in it.", MessageType.Info);
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ADVAVTR_TRIGGER_ALLOWED_POINTERS_HELPBOX"), MessageType.Info);
 
                 trigger.isNetworkInteractable = EditorGUILayout.Toggle("Network Interactable", trigger.isNetworkInteractable);
+                
+                list = serializedObject.FindProperty("allowedTypes");
+                EditorGUILayout.PropertyField(list, new GUIContent("Allowed Types"), true);
+                serializedObject.ApplyModifiedProperties();
+                
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ADVAVTR_TRIGGER_ALLOWED_TYPES_HELPBOX"), MessageType.Info);
 
+                trigger.allowParticleInteraction = EditorGUILayout.Toggle("Enabled Particle Interaction", trigger.allowParticleInteraction);
+                
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ADVAVTR_TRIGGER_PARTICLE_HELPBOX"), MessageType.Info);
+                
                 if (_onEnterList == null)
                 {
                     _onEnterList = new ReorderableList(trigger.enterTasks, typeof(CVRAdvancedAvatarSettingsTriggerTask),
@@ -108,6 +123,25 @@ namespace ABI.CCK.Scripts.Editor
                 }
                 
                 _onExitList.DoLayoutList();
+
+                if (_onStayList == null)
+                {
+                    _onStayList = new ReorderableList(trigger.stayTasks, typeof(CVRAdvancedAvatarSettingsTriggerTaskStay),
+                        false, true, true, true);
+                    _onStayList.drawHeaderCallback = OnDrawHeaderStay;
+                    _onStayList.drawElementCallback = OnDrawElementStay;
+                    _onStayList.elementHeightCallback = OnHeightElementStay;
+                    _onStayList.onAddCallback = OnAddStay;
+                    _onStayList.onChangedCallback = OnChangedStay; 
+                }
+                
+                _onStayList.DoLayoutList();
+
+                if (trigger.stayTasks.Count > 0)
+                {
+                    trigger.sampleDirection = (CVRAdvancedAvatarSettingsTrigger.SampleDirection) 
+                        EditorGUILayout.EnumPopup("Sample Direction", trigger.sampleDirection);
+                }
             }
         }
 
@@ -161,6 +195,14 @@ namespace ABI.CCK.Scripts.Editor
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
             
+            EditorGUI.LabelField(_rect, "Hold Time");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            enterEntity.holdTime = EditorGUI.FloatField(_rect, enterEntity.holdTime);
+            
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            
             EditorGUI.LabelField(_rect, "Update Method");
             _rect.x += 100;
             _rect.width = rect.width - 100;
@@ -169,7 +211,7 @@ namespace ABI.CCK.Scripts.Editor
 
         private float OnHeightElementEnter(int index)
         {
-            return EditorGUIUtility.singleLineHeight * 5f;
+            return EditorGUIUtility.singleLineHeight * 6.25f;
         }
 
         private void OnAddEnter(ReorderableList list)
@@ -251,6 +293,101 @@ namespace ABI.CCK.Scripts.Editor
         }
 
         private void OnChangedExit(ReorderableList list)
+        {
+            //EditorUtility.SetDirty(target);
+        }
+        
+        private void OnDrawHeaderStay(Rect rect)
+        {
+            Rect _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
+
+            GUI.Label(_rect, "On Stay Trigger");
+        }
+
+        private void OnDrawElementStay(Rect rect, int index, bool isactive, bool isfocused)
+        {
+            if (index > trigger.stayTasks.Count) return;
+            stayEntity = trigger.stayTasks[index];
+            
+            Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+            EditorGUI.LabelField(_rect, "Setting Name");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            
+            if (animator == null)
+            {
+                stayEntity.settingName = EditorGUI.TextField(_rect, stayEntity.settingName);
+            }
+            else
+            {
+                _rect.y += 1;
+                var animatorParams = animatorParameters.ToArray();
+                var selected = animatorParameters.FindIndex(match => match == stayEntity.settingName);
+                selected = Mathf.Max(EditorGUI.Popup(_rect, selected, animatorParams), 0);
+                stayEntity.settingName = animatorParams[selected];
+            }
+            
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+            EditorGUI.LabelField(_rect, "Update Method");
+            _rect.x += 100;
+            _rect.width = rect.width - 100;
+            
+            stayEntity.updateMethod = (CVRAdvancedAvatarSettingsTriggerTaskStay.UpdateMethod) EditorGUI.EnumPopup(_rect, stayEntity.updateMethod);
+            
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+            if (stayEntity.updateMethod == CVRAdvancedAvatarSettingsTriggerTaskStay.UpdateMethod.SetFromPosition)
+            {
+                EditorGUI.LabelField(_rect, "Min Value");
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                stayEntity.minValue = EditorGUI.FloatField(_rect, stayEntity.minValue);
+
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                EditorGUI.LabelField(_rect, "Max Value");
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                stayEntity.maxValue = EditorGUI.FloatField(_rect, stayEntity.maxValue);
+
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            }
+            else
+            {
+                EditorGUI.LabelField(_rect, "Change per sec");
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                stayEntity.minValue = EditorGUI.FloatField(_rect, stayEntity.minValue);
+
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+            }
+        }
+
+        private float OnHeightElementStay(int index)
+        {
+            if (index > trigger.stayTasks.Count) return EditorGUIUtility.singleLineHeight * 3.75f;
+            stayEntity = trigger.stayTasks[index];
+            
+            if (stayEntity.updateMethod == CVRAdvancedAvatarSettingsTriggerTaskStay.UpdateMethod.SetFromPosition)
+                return EditorGUIUtility.singleLineHeight * 5f;
+            
+            return EditorGUIUtility.singleLineHeight * 3.75f;
+        }
+
+        private void OnAddStay(ReorderableList list)
+        {
+            trigger.stayTasks.Add(new CVRAdvancedAvatarSettingsTriggerTaskStay());
+            Repaint();
+        }
+
+        private void OnChangedStay(ReorderableList list)
         {
             //EditorUtility.SetDirty(target);
         }

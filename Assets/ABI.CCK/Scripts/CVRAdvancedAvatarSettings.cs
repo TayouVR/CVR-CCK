@@ -131,11 +131,35 @@ namespace ABI.CCK.Scripts
         
         public string name;
         public string machineName;
+        
+#if UNITY_EDITOR       
+        public void RunCollapsedSetup()
+        {
+            switch (type)
+            {
+                case SettingsType.MaterialColor:
+                    materialColorSettings.RunCollapsedSetup();
+                    break;
+                case SettingsType.Slider:
+                    sliderSettings.RunCollapsedSetup();
+                    break;
+            }
+        }
+#endif        
     }
 
     [System.Serializable]
     public class CVRAdvancesAvatarSettingBase
     {
+        public enum ParameterType
+        {
+            GenerateFloat = 1,
+            GenerateInt = 2,
+            GenerateBool = 3
+        }
+
+        public ParameterType usedType = ParameterType.GenerateFloat;
+
         #if UNITY_EDITOR
 
         public bool isCollapsed = true;
@@ -177,20 +201,30 @@ namespace ABI.CCK.Scripts
             
             controller.AddLayer(animatorLayer);
 
-            var animatorParameter = new AnimatorControllerParameter
+            AnimatorControllerParameter animatorParameter = new AnimatorControllerParameter
             {
                 name = machineName,
-                type = AnimatorControllerParameterType.Float,
-                defaultFloat = defaultValue ? 1f : 0f
+                type = AnimatorControllerParameterType.Bool,
+                defaultBool = defaultValue
             };
+            
+            if (usedType == ParameterType.GenerateFloat)
+                animatorParameter = new AnimatorControllerParameter
+                {
+                    name = machineName,
+                    type = AnimatorControllerParameterType.Float,
+                    defaultFloat = defaultValue ? 1f : 0f
+                };
+            
+            if (usedType == ParameterType.GenerateInt)
+                animatorParameter = new AnimatorControllerParameter
+                {
+                    name = machineName,
+                    type = AnimatorControllerParameterType.Int,
+                    defaultInt = defaultValue ? 1 : 0
+                };
 
             controller.AddParameter(animatorParameter);
-
-            var animatorState = animatorLayer.stateMachine.AddState(machineName + " Blend Tree");
-            
-            var blendTree = new BlendTree();
-            blendTree.name = machineName + " Blend Tree";
-            blendTree.blendParameter = machineName;
 
             AnimationClip onClip = new AnimationClip();
             AnimationClip offClip = new AnimationClip();
@@ -229,13 +263,67 @@ namespace ABI.CCK.Scripts
                 AssetDatabase.CreateAsset(onClip, folderPath + "/Anim_" + machineName + "_Toggle_On.anim");
             }
             
-            blendTree.AddChild(offClip, 0f);
-            blendTree.AddChild(onClip, 1f);
+            if (usedType == ParameterType.GenerateBool)
+            {
+                var offState = animatorLayer.stateMachine.AddState(machineName + " OFF");
+                var onState = animatorLayer.stateMachine.AddState(machineName + " ON");
 
-            animatorState.motion = blendTree;
+                offState.motion = offClip;
+                onState.motion = onClip;
+
+                animatorLayer.stateMachine.AddAnyStateTransition(onState);
+                animatorLayer.stateMachine.anyStateTransitions[0].destinationState = onState;
+                animatorLayer.stateMachine.anyStateTransitions[0].duration = 0f;
+                animatorLayer.stateMachine.anyStateTransitions[0].hasExitTime = false;
+                animatorLayer.stateMachine.anyStateTransitions[0].canTransitionToSelf = false;
+                animatorLayer.stateMachine.anyStateTransitions[0].AddCondition(AnimatorConditionMode.If, 0f, machineName);
+                animatorLayer.stateMachine.AddAnyStateTransition(offState);
+                animatorLayer.stateMachine.anyStateTransitions[1].destinationState = offState;
+                animatorLayer.stateMachine.anyStateTransitions[1].duration = 0f;
+                animatorLayer.stateMachine.anyStateTransitions[1].hasExitTime = false;
+                animatorLayer.stateMachine.anyStateTransitions[1].canTransitionToSelf = false;
+                animatorLayer.stateMachine.anyStateTransitions[1].AddCondition(AnimatorConditionMode.IfNot, 0f, machineName);
+            }
             
-            AssetDatabase.AddObjectToAsset(blendTree, AssetDatabase.GetAssetPath(controller));
-            blendTree.hideFlags = HideFlags.HideInHierarchy;
+            if (usedType == ParameterType.GenerateInt)
+            {
+                var offState = animatorLayer.stateMachine.AddState(machineName + " OFF");
+                var onState = animatorLayer.stateMachine.AddState(machineName + " ON");
+
+                offState.motion = offClip;
+                onState.motion = onClip;
+
+                animatorLayer.stateMachine.AddAnyStateTransition(onState);
+                animatorLayer.stateMachine.anyStateTransitions[0].destinationState = onState;
+                animatorLayer.stateMachine.anyStateTransitions[0].duration = 0f;
+                animatorLayer.stateMachine.anyStateTransitions[0].hasExitTime = false;
+                animatorLayer.stateMachine.anyStateTransitions[0].canTransitionToSelf = false;
+                animatorLayer.stateMachine.anyStateTransitions[0].AddCondition(AnimatorConditionMode.Equals, 1f, machineName);
+                animatorLayer.stateMachine.AddAnyStateTransition(offState);
+                animatorLayer.stateMachine.anyStateTransitions[1].destinationState = offState;
+                animatorLayer.stateMachine.anyStateTransitions[1].duration = 0f;
+                animatorLayer.stateMachine.anyStateTransitions[1].hasExitTime = false;
+                animatorLayer.stateMachine.anyStateTransitions[1].canTransitionToSelf = false;
+                animatorLayer.stateMachine.anyStateTransitions[1].AddCondition(AnimatorConditionMode.Equals, 0f, machineName);
+            }
+            
+            if (usedType == ParameterType.GenerateFloat)
+            {
+                var animatorState = animatorLayer.stateMachine.AddState(machineName + " Blend Tree");
+
+                var blendTree = new BlendTree();
+                blendTree.name = machineName + " Blend Tree";
+                blendTree.blendParameter = machineName;
+                
+                blendTree.AddChild(offClip, 0f);
+                blendTree.AddChild(onClip, 1f);
+
+                animatorState.motion = blendTree;
+            
+                AssetDatabase.AddObjectToAsset(blendTree, AssetDatabase.GetAssetPath(controller));
+                blendTree.hideFlags = HideFlags.HideInHierarchy;
+            }
+
         }
 
         private void generateReorderableList()
@@ -390,15 +478,16 @@ namespace ABI.CCK.Scripts
                 type = AnimatorControllerParameterType.Float,
                 defaultFloat = defaultValue
             };
+            
+            if (usedType == ParameterType.GenerateInt)
+                animatorParameter = new AnimatorControllerParameter
+                {
+                    name = machineName,
+                    type = AnimatorControllerParameterType.Int,
+                    defaultInt = defaultValue
+                };
 
             controller.AddParameter(animatorParameter);
-
-            var animatorState = animatorLayer.stateMachine.AddState(machineName + " Blend Tree");
-            
-            var blendTree = new BlendTree();
-            blendTree.name = machineName + " Blend Tree";
-            blendTree.blendParameter = machineName;
-            blendTree.useAutomaticThresholds = false;
 
             var animationCurveOn = new AnimationCurve();
             var keyframe = new Keyframe(0f, 1);
@@ -418,6 +507,7 @@ namespace ABI.CCK.Scripts
 
             var i = 0;
             AnimationClip animation;
+            List<AnimationClip> animations = new List<AnimationClip>();
             foreach (var option in options)
             {
                 animation = new AnimationClip();
@@ -473,14 +563,52 @@ namespace ABI.CCK.Scripts
                     
                     AssetDatabase.CreateAsset(animation, folderPath + "/Anim_" + machineName + "_Dropdown_" + i + ".anim");
                 }
-                blendTree.AddChild(animation, i);
+
+                animations.Add(animation);
                 i++;
             }
 
-            animatorState.motion = blendTree;
+            if (usedType == ParameterType.GenerateFloat)
+            {
+                var animatorState = animatorLayer.stateMachine.AddState(machineName + " Blend Tree");
+
+                var blendTree = new BlendTree();
+                blendTree.name = machineName + " Blend Tree";
+                blendTree.blendParameter = machineName;
+                blendTree.useAutomaticThresholds = false;
+
+                i = 0;
+                foreach (AnimationClip animationClip in animations)
+                {
+                    blendTree.AddChild(animationClip, i);
+                    i++;
+                }
+
+                animatorState.motion = blendTree;
+
+                AssetDatabase.AddObjectToAsset(blendTree, AssetDatabase.GetAssetPath(controller));
+                blendTree.hideFlags = HideFlags.HideInHierarchy;
+            }
             
-            AssetDatabase.AddObjectToAsset(blendTree, AssetDatabase.GetAssetPath(controller));
-            blendTree.hideFlags = HideFlags.HideInHierarchy;
+            if (usedType == ParameterType.GenerateInt)
+            {
+                i = 0;
+                foreach (AnimationClip animationClip in animations)
+                {
+                    var state = animatorLayer.stateMachine.AddState(machineName + " Option " + i);
+
+                    state.motion = animationClip;
+
+                    animatorLayer.stateMachine.AddAnyStateTransition(state);
+                    animatorLayer.stateMachine.anyStateTransitions[i].destinationState = state;
+                    animatorLayer.stateMachine.anyStateTransitions[i].duration = 0f;
+                    animatorLayer.stateMachine.anyStateTransitions[i].hasExitTime = false;
+                    animatorLayer.stateMachine.anyStateTransitions[i].canTransitionToSelf = false;
+                    animatorLayer.stateMachine.anyStateTransitions[i].AddCondition(AnimatorConditionMode.Equals, i, machineName);
+
+                    i++;
+                }
+            }
         }
 
         private void generateReorderableList()
@@ -1007,8 +1135,33 @@ namespace ABI.CCK.Scripts
             }
 
             // is Collapsed
-            if (!entity.isCollapsed) return;
+            if (!entity.isCollapsed)
+            {
+                switch (entity.propertyTypeIdentifier)
+                {
+                    case "SMR":
+                        entity.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                    case "MSR":
+                        entity.propertyType = typeof(MeshRenderer);
+                        break;
+                    case "PTR":
+                        entity.propertyType = typeof(ParticleSystemRenderer);
+                        break;
+                    case "LNR":
+                        entity.propertyType = typeof(LineRenderer);
+                        break;
+                    case "TLR":
+                        entity.propertyType = typeof(TrailRenderer);
+                        break;
+                    default:
+                        entity.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                }
             
+                return;
+            }
+
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
@@ -1065,6 +1218,34 @@ namespace ABI.CCK.Scripts
             GUI.Label(_rect, "Material Properties");
         }
         
+        public void RunCollapsedSetup()
+        {
+            foreach (var materialColorTarget in materialColorTargets)
+            {
+                switch (materialColorTarget.propertyTypeIdentifier)
+                {
+                    case "SMR":
+                        materialColorTarget.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                    case "MSR":
+                        materialColorTarget.propertyType = typeof(MeshRenderer);
+                        break;
+                    case "PTR":
+                        materialColorTarget.propertyType = typeof(ParticleSystemRenderer);
+                        break;
+                    case "LNR":
+                        materialColorTarget.propertyType = typeof(LineRenderer);
+                        break;
+                    case "TLR":
+                        materialColorTarget.propertyType = typeof(TrailRenderer);
+                        break;
+                    default:
+                        materialColorTarget.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                }
+            }
+        }
+        
         #endif
     }
     
@@ -1078,6 +1259,10 @@ namespace ABI.CCK.Scripts
         
         private CVRAdvancedSettingsTargetEntryMaterialProperty entity;
 #if UNITY_EDITOR
+        public bool useAnimationClip;
+        public AnimationClip minAnimationClip;
+        public AnimationClip maxAnimationClip;
+        
         private ReorderableList gameObjectList;
         private CVRAvatar target;
         
@@ -1129,10 +1314,17 @@ namespace ABI.CCK.Scripts
                 maxClip.SetCurve(target.treePath, target.propertyType, "material." + target.propertyName, animationCurve1);
             }
 
+            if (useAnimationClip) {
+                minClip = minAnimationClip;
+                maxClip = maxAnimationClip;
+            }
+            else {
+                AssetDatabase.CreateAsset(minClip, folderPath + "/Anim_" + machineName + "_Slider_Min.anim");
+                AssetDatabase.CreateAsset(maxClip, folderPath + "/Anim_" + machineName + "_Slider_Max.anim");
+            }
+            
             blendTree.AddChild(minClip, 0f);
-            AssetDatabase.CreateAsset(minClip, folderPath + "/Anim_" + machineName + "_Slider_Min.anim");
             blendTree.AddChild(maxClip, 1f);
-            AssetDatabase.CreateAsset(maxClip, folderPath + "/Anim_" + machineName + "_Slider_Max.anim");
 
             animatorState.motion = blendTree;
             
@@ -1359,7 +1551,32 @@ namespace ABI.CCK.Scripts
             }
 
             // is Collapsed
-            if (!entity.isCollapsed) return;
+            if (!entity.isCollapsed)
+            {
+                switch (entity.propertyTypeIdentifier)
+                {
+                    case "SMR":
+                        entity.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                    case "MSR":
+                        entity.propertyType = typeof(MeshRenderer);
+                        break;
+                    case "PTR":
+                        entity.propertyType = typeof(ParticleSystemRenderer);
+                        break;
+                    case "LNR":
+                        entity.propertyType = typeof(LineRenderer);
+                        break;
+                    case "TLR":
+                        entity.propertyType = typeof(TrailRenderer);
+                        break;
+                    default:
+                        entity.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                }
+                
+                return;
+            }
             
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
@@ -1381,6 +1598,8 @@ namespace ABI.CCK.Scripts
             _rect.x += 100;
             _rect.width = rect.width - 100;
             var propertyIndex = EditorGUI.Popup(_rect, Array.IndexOf(propertyNames, entity.propertyTypeIdentifier + ":" + entity.propertyName), propertyDescriptions);
+            
+            
             if (propertyIndex >= 0)
             {
                 var property = propertyNames[propertyIndex];
@@ -1430,6 +1649,34 @@ namespace ABI.CCK.Scripts
         {
             Rect _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
             GUI.Label(_rect, "Material Properties");
+        }
+        
+        public void RunCollapsedSetup()
+        {
+            foreach (var materialPropertyTarget in materialPropertyTargets)
+            {
+                switch (materialPropertyTarget.propertyTypeIdentifier)
+                {
+                    case "SMR":
+                        materialPropertyTarget.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                    case "MSR":
+                        materialPropertyTarget.propertyType = typeof(MeshRenderer);
+                        break;
+                    case "PTR":
+                        materialPropertyTarget.propertyType = typeof(ParticleSystemRenderer);
+                        break;
+                    case "LNR":
+                        materialPropertyTarget.propertyType = typeof(LineRenderer);
+                        break;
+                    case "TLR":
+                        materialPropertyTarget.propertyType = typeof(TrailRenderer);
+                        break;
+                    default:
+                        materialPropertyTarget.propertyType = typeof(SkinnedMeshRenderer);
+                        break;
+                }
+            }
         }
         
         #endif
@@ -2098,6 +2345,7 @@ namespace ABI.CCK.Scripts
 #endif
         public GameObject gameObject;
         public string treePath;
+        [SerializeField]
         public Type propertyType;
         public string propertyTypeIdentifier;
         public string propertyName;
@@ -2111,6 +2359,7 @@ namespace ABI.CCK.Scripts
 #endif
         public GameObject gameObject;
         public string treePath;
+        [SerializeField]
         public Type propertyType;
         public string propertyTypeIdentifier;
         public string propertyName;

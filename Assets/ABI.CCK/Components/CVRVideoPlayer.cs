@@ -5,44 +5,104 @@ using UnityEditor;
 using UnityEditorInternal;
 #endif
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace ABI.CCK.Components
 {
-    [RequireComponent(typeof(CVRVideoSyncSolver))]
     public class CVRVideoPlayer : MonoBehaviour
     {
         public enum AudioMode
         {
-            Direct2D = 1,
-            Direct3D = 2,
-            RoomScale3D = 3,
+            // Direct2D in CCK = 1
+            Direct = 2,
+            AudioSource = 3,
+            RoomScale = 4,
         }
         
         [HideInInspector]
         public string playerId;
-
-        public bool Stereo360Experimental;
-        public AudioMode AudioPlaybackMode = AudioMode.Direct3D;
+        
+        public AudioMode audioPlaybackMode = AudioMode.Direct;
+        public AudioSource customAudioSource;
+        public List<VideoPlayerAudioSource> roomScaleAudioSources;
+        [Range(0,1)] public float playbackVolume = 1f;
+        public bool syncEnabled = true;
         [Range(0.5f,2)] public float localPlaybackSpeed = 1.0f;
+        public CVRVideoPlayerPlaylistEntity playOnAwakeObject;
 
         public RenderTexture ProjectionTexture;
         public bool interactiveUI = true;
         public bool autoplay;
+        public List<Text> subtitleTextComponents;
 
         public List<CVRVideoPlayerPlaylist> entities = new List<CVRVideoPlayerPlaylist>();
         
-        protected void OnEnable()
+        [SerializeField]
+        public UnityEvent startedPlayback; 
+        [SerializeField]
+        public UnityEvent finishedPlayback; 
+        [SerializeField]
+        public UnityEvent pausedPlayback; 
+        [SerializeField]
+        public UnityEvent setUrl;
+
+        public Transform videoPlayerUIPosition;
+        
+        private void OnDrawGizmos()
         {
-            playerId = Guid.NewGuid() + gameObject.GetInstanceID().ToString();
+            if (videoPlayerUIPosition == null || !interactiveUI) return;
+            
+            Gizmos.color = Color.white;
+            Matrix4x4 rotationMatrix = Matrix4x4.TRS(videoPlayerUIPosition.position, videoPlayerUIPosition.rotation, videoPlayerUIPosition.lossyScale);
+            Gizmos.matrix = rotationMatrix;
+            Gizmos.DrawWireCube(new Vector3(0, 0.62f, 0), new Vector3(2.22f, 1.24f, 0f));
+            Gizmos.DrawLine(new Vector3(-1.11f, 1.11f, 0f), new Vector3(1.11f, 1.11f, 0f));
+            Gizmos.DrawLine(new Vector3(-0.78f, 1.24f, 0f), new Vector3(-0.78f, 1.11f, 0f));
+            
+            Gizmos.DrawLine(new Vector3(-0.3f, 0.75f, 0f), new Vector3(-0.3f, 0.25f, 0f));
+            Gizmos.DrawLine(new Vector3(-0.3f, 0.75f, 0f), new Vector3(0.3f, 0.5f, 0f));
+            Gizmos.DrawLine(new Vector3(-0.3f, 0.25f, 0f), new Vector3(0.3f, 0.5f, 0f));
+            
+            var scale = videoPlayerUIPosition.lossyScale;
+            scale.Scale(new Vector3(1f, 1f, 0f));
+            rotationMatrix = Matrix4x4.TRS(videoPlayerUIPosition.position, videoPlayerUIPosition.rotation, scale);
+            Gizmos.matrix = rotationMatrix;
+            Gizmos.DrawWireSphere(new Vector3(1.04f, 1.174f, 0), 0.05f);
+            Gizmos.DrawWireSphere(new Vector3(0.94f, 1.174f, 0), 0.05f);
+            Gizmos.DrawWireSphere(new Vector3(0.84f, 1.174f, 0), 0.05f);
+            Gizmos.DrawWireSphere(new Vector3(0.74f, 1.174f, 0), 0.05f);
+            Gizmos.DrawWireSphere(new Vector3(0.64f, 1.174f, 0), 0.05f);
         }
 
         public void Play() {}
         public void Pause() {}
         public void Previous() {}
         public void Next() {}
-        public void Resync() {}
+        public void SetUrl(string url) {}
+        public void SetNetworkSync(bool sync) {}
+        public void SetAudioMode(AudioMode mode) {}
+        public void SetAudioMode(int mode) => SetAudioMode((AudioMode)mode);
 
+    }
+    
+    public enum AudioChannelMaskFlags : int
+    {
+        FrontLeft 			= 0x1,
+        FrontRight 			= 0x2,
+        FrontCenter 		= 0x4,
+        LowFrequency 		= 0x8,
+        BackLeft 			= 0x10,
+        BackRight 			= 0x20,
+        SideLeft 			= 0x200,
+        SideRight 			= 0x400,
+    }
+
+    [Serializable]
+    public class VideoPlayerAudioSource
+    {
+        public AudioChannelMaskFlags type;
+        public AudioSource audioSource;
     }
 
     [System.Serializable]
@@ -56,6 +116,7 @@ namespace ABI.CCK.Components
         private CVRVideoPlayerPlaylistEntity entity;
         public ReorderableList list;
         public bool isCollapsed;
+        private CVRVideoPlayer videoPlayer;
 
         public void OnDrawHeader(Rect rect)
         {
@@ -74,10 +135,24 @@ namespace ABI.CCK.Components
             rect.width -= 12;
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            entity.isCollapsed = EditorGUI.Foldout(_rect, entity.isCollapsed, "Title", true);
+            EditorGUI.BeginChangeCheck();
+            bool isCollapsed = EditorGUI.Foldout(_rect, entity.isCollapsed, "Title", true);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(videoPlayer, "Video Expand");
+                entity.isCollapsed = isCollapsed;
+            }
+            
             _rect.x += 80;
             _rect.width = rect.width - 80;
-            entity.videoTitle = EditorGUI.TextField(_rect, entity.videoTitle);
+            
+            EditorGUI.BeginChangeCheck();
+            string videoTitle = EditorGUI.TextField(_rect, entity.videoTitle);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(videoPlayer, "Video Title");
+                entity.videoTitle = videoTitle;
+            }
             
             if (!entity.isCollapsed) return;
         
@@ -87,7 +162,14 @@ namespace ABI.CCK.Components
             EditorGUI.LabelField(_rect, "Video Url");
             _rect.x += 80;
             _rect.width = rect.width - 80;
-            entity.videoUrl = EditorGUI.TextField(_rect, entity.videoUrl);
+            
+            EditorGUI.BeginChangeCheck();
+            string videoUrl = EditorGUI.TextField(_rect, entity.videoUrl);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(videoPlayer, "Video Url");
+                entity.videoUrl = videoUrl;
+            }
             
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
@@ -95,7 +177,14 @@ namespace ABI.CCK.Components
             EditorGUI.LabelField(_rect, "Thumbnail Url");
             _rect.x += 80;
             _rect.width = rect.width - 80;
-            entity.thumbnailUrl = EditorGUI.TextField(_rect, entity.thumbnailUrl);
+            
+            EditorGUI.BeginChangeCheck();
+            string thumbnailUrl = EditorGUI.TextField(_rect, entity.thumbnailUrl);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(videoPlayer, "Video Thumbnail Url");
+                entity.thumbnailUrl = thumbnailUrl;
+            }
         
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
@@ -103,7 +192,14 @@ namespace ABI.CCK.Components
             EditorGUI.LabelField(_rect, "Start");
             _rect.x += 80;
             _rect.width = rect.width - 80;
-            entity.introEndInSeconds = EditorGUI.IntField(_rect, entity.introEndInSeconds);
+            
+            EditorGUI.BeginChangeCheck();
+            int introEndInSeconds = EditorGUI.IntField(_rect, entity.introEndInSeconds);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(videoPlayer, "Video Intro End");
+                entity.introEndInSeconds = introEndInSeconds;
+            }
         
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
@@ -111,7 +207,22 @@ namespace ABI.CCK.Components
             EditorGUI.LabelField(_rect, "End");
             _rect.x += 80;
             _rect.width = rect.width - 80;
-            entity.creditsStartInSeconds = EditorGUI.IntField(_rect, entity.creditsStartInSeconds);
+            
+            EditorGUI.BeginChangeCheck();
+            int creditsStartInSeconds = EditorGUI.IntField(_rect, entity.creditsStartInSeconds);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(videoPlayer, "Video Credits Start");
+                entity.creditsStartInSeconds = creditsStartInSeconds;
+            }
+            
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+            _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
+
+            if (GUI.Button(_rect, "Set as Play On Awake Object"))
+            {
+                videoPlayer.playOnAwakeObject = entity;
+            }
         }
 
         public float OnHeightElement(int index)
@@ -121,21 +232,24 @@ namespace ABI.CCK.Components
             
             if(!entity.isCollapsed) return EditorGUIUtility.singleLineHeight * 1.25f;
             
-            return EditorGUIUtility.singleLineHeight * 6.25f;
+            return EditorGUIUtility.singleLineHeight * 7.5f;
         }
 
         public void OnAdd(ReorderableList reorderableList)
         {
+            Undo.RecordObject(videoPlayer, "Add Video Entry");
             playlistVideos.Add(null);
         }
 
         public void OnChanged(ReorderableList reorderableList)
         {
-            //EditorUtility.SetDirty(target);
+            Undo.RecordObject(videoPlayer, "Video List changed");
         }
 
-        public ReorderableList GetReorderableList()
+        public ReorderableList GetReorderableList(CVRVideoPlayer player)
         {
+            videoPlayer = player;
+            
             if (list == null)
             {
                 list = new ReorderableList(playlistVideos, typeof(CVRVideoPlayerPlaylistEntity), true, true, true,

@@ -22,7 +22,15 @@ public class CCK_Init
             SerializedProperty sp = layers.GetArrayElementAtIndex(index);
             if (sp != null) sp.stringValue = name;
         }
-        
+
+        string cckSymbol = "CVR_CCK_EXISTS";
+        string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+        if (!defines.Contains(cckSymbol))
+        {
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, (defines + ";" + cckSymbol));
+            Debug.Log("[CCK:Init] Added CVR_CCK_EXISTS Scripting Symbol.");
+        }
+
         if (LayerMask.LayerToName(10) != "PlayerNetwork" || LayerMask.LayerToName(15) != "CVRReserved4" || LayerMask.LayerToName(17) != "CVRPickup")
         {
             Debug.Log("[CCK:Init] TagManager asset has to be recreated. Now recreating.");
@@ -71,7 +79,7 @@ public class CCK_Init
             EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
             PlayerSettings.colorSpace = UnityEngine.ColorSpace.Linear;
 
-            PlayerSettings.SetApiCompatibilityLevel(BuildTargetGroup.Standalone, ApiCompatibilityLevel.NET_4_6);
+            PlayerSettings.apiCompatibilityLevel = ApiCompatibilityLevel.NET_4_6;
             
             PlayerSettings.virtualRealitySupported = true;
             PlayerSettings.SetVirtualRealitySDKs(BuildTargetGroup.Standalone, new string[] { "None", "Oculus", "OpenVR", "MockHMD" });

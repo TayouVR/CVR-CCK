@@ -16,6 +16,6 @@ namespace ABI.CCK.Components
 
         
         public AssetType type;
-        public string guid;
+        public string objectId;
     }
 }

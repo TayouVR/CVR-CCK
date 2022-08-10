@@ -16,35 +16,50 @@ namespace ABI.CCK.Scripts.Editor
         {
             if (_info == null) _info = (CVRAssetInfo)target;
 
-            EditorGUILayout.HelpBox("This script is used to store object metadata. Please do not modify the data on it unless you know what you are doing. To reupload an avatar, detach the Guid and reupload.", MessageType.Info);
+            EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_HEADER_INFORMATION"), MessageType.Info);
 
-            if (!string.IsNullOrEmpty(_info.guid))
+            if (!string.IsNullOrEmpty(_info.objectId))
             {
-                EditorGUILayout.HelpBox("The currently stored Guid is: " + _info.guid, MessageType.Info);
-                if (GUILayout.Button("Detach asset unique identifier"))
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_GUID_LABEL") + _info.objectId, MessageType.Info);
+
+                EditorGUILayout.BeginHorizontal();
+                
+                if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_DETACH_BUTTON")))
                 {
-                    bool detach = EditorUtility.DisplayDialog("Detach Guid from Asset Info Manager",
-                        "The asset unique identifier will be detached. This means that your content will most likely be uploaded as new on runtime. Continue?",
-                        "Yes!", "No!");
+                    bool detach = EditorUtility.DisplayDialog(
+                        CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_DETACH_BUTTON_DIALOG_TITLE"),
+                        CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_DETACH_BUTTON_DIALOG_BODY"),
+                        CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_DETACH_BUTTON_DIALOG_ACCEPT"), 
+                        CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_DETACH_BUTTON_DIALOG_DENY"));
                     if (detach) DetachGuid();
                 }
+                
+                if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_COPY_BUTTON")))
+                {
+                    if (!string.IsNullOrEmpty(_info.objectId))
+                    {
+                        GUIUtility.systemCopyBuffer = _info.objectId;
+                    }
+                }
+                
+                EditorGUILayout.EndHorizontal();
             }
             else
             {
-                _newGuid = EditorGUILayout.TextField("Unique identifier", _newGuid);
-                EditorGUILayout.HelpBox("You do not need to re-attach a Guid if you do not plan to overwrite any old upload. A new one will be generated on upload if none is attached.", MessageType.Warning);
-                if (GUILayout.Button("Re-Attach guid")) ReattachGuid(_newGuid);
+                _newGuid = EditorGUILayout.TextField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_ATTACH_LABEL"), _newGuid);
+                EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_ATTACH_INFO"), MessageType.Warning);
+                if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_ASSET_INFO_ATTACH_BUTTON"))) ReattachGuid(_newGuid);
             }
             
         }
 
         private void DetachGuid()
         {
-            if (!string.IsNullOrEmpty(_info.guid)) _info.guid = string.Empty;
+            if (!string.IsNullOrEmpty(_info.objectId)) _info.objectId = string.Empty;
         }
         private void ReattachGuid(string Guid)
         {
-            _info.guid = Guid;
+            _info.objectId = Guid;
         }
 
     }

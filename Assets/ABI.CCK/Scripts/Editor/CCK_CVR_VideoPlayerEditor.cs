@@ -1,32 +1,31 @@
-﻿using System;
-using ABI.CCK.Components;
+﻿using ABI.CCK.Components;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
 
-[CustomEditor(typeof(ABI.CCK.Components.CVRVideoPlayer))]
-public class CCK_CVR_VideoPlayerEditor : UnityEditor.Editor
+[CustomEditor(typeof(CVRVideoPlayer))]
+public class CCK_CVR_VideoPlayerEditor : Editor
 {
-    
-    private ReorderableList reorderableList;
+    private ReorderableList _reorderableList;
     private CVRVideoPlayer _player;
-#pragma warning disable 414
-    private CVRVideoPlayerPlaylist entity = null;
-#pragma warning restore 414
-    
+    private static bool _showGeneral = true;
+    private static bool _showAudio = true;
+    private static bool _showPlaylists = true;
+    private static bool _showEvents = true;
+
     private const string TypeLabel = "Playlists";
 
     private void OnEnable()
     {
-        if (_player == null) _player = (CVRVideoPlayer) target;
-    
-        reorderableList = new ReorderableList(_player.entities, typeof(CVRVideoPlayerPlaylist), true, true, true, true);
-        reorderableList.drawHeaderCallback = OnDrawHeader;
-        reorderableList.drawElementCallback = OnDrawElement;
-        reorderableList.elementHeightCallback = OnHeightElement;
-        reorderableList.onAddCallback = OnAdd;
-        reorderableList.onChangedCallback = OnChanged;
+        if (_player == null) _player = (CVRVideoPlayer)target;
+
+        _reorderableList = new ReorderableList(_player.entities, typeof(CVRVideoPlayerPlaylist), true, true, true, true);
+        _reorderableList.drawHeaderCallback = OnDrawHeader;
+        _reorderableList.drawElementCallback = OnDrawElement;
+        _reorderableList.elementHeightCallback = OnHeightElement;
+        _reorderableList.onAddCallback = OnAdd;
+        _reorderableList.onChangedCallback = OnChanged;
     }
 
     private float OnHeightElement(int index)
@@ -38,10 +37,17 @@ public class CCK_CVR_VideoPlayerEditor : UnityEditor.Editor
         height += EditorGUIUtility.singleLineHeight * (3f + 2.5f);
 
         if (_player.entities[index].playlistVideos.Count == 0) height += 1.25f * EditorGUIUtility.singleLineHeight;
-        
+
         foreach (var entry in _player.entities[index].playlistVideos)
         {
-            height += (entry.isCollapsed ? 6.25f : 1.25f) * EditorGUIUtility.singleLineHeight;
+            if (entry == null)
+            {
+                height += 1.25f * EditorGUIUtility.singleLineHeight;
+            }
+            else
+            {
+                height += (entry.isCollapsed ? 7.5f : 1.25f) * EditorGUIUtility.singleLineHeight;
+            }
         }
 
         return height;
@@ -49,93 +55,192 @@ public class CCK_CVR_VideoPlayerEditor : UnityEditor.Editor
 
     private void OnDrawHeader(Rect rect)
     {
-        Rect _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
+        Rect rectA = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
 
-        GUI.Label(_rect, TypeLabel);
+        GUI.Label(rectA, TypeLabel);
     }
 
     private void OnDrawElement(Rect rect, int index, bool isActive, bool isFocused)
     {
         if (index > _player.entities.Count) return;
-        
+
         rect.y += 2;
         rect.x += 12;
         rect.width -= 12;
-        Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+        Rect rectA = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-        _player.entities[index].isCollapsed = EditorGUI.Foldout(_rect, _player.entities[index].isCollapsed, "Playlist Title", true);
-        _rect.x += 80;
-        _rect.width = rect.width - 80;
-        _player.entities[index].playlistTitle = EditorGUI.TextField(_rect, _player.entities[index].playlistTitle);
-        
+        EditorGUI.BeginChangeCheck();
+
+        bool collapse = EditorGUI.Foldout(rectA, _player.entities[index].isCollapsed, "Playlist Title", true);
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(target, "Playlist Expand");
+            _player.entities[index].isCollapsed = collapse;
+        }
+
+        rectA.x += 80;
+        rectA.width = rect.width - 80;
+
+        EditorGUI.BeginChangeCheck();
+
+        string playlistTitle = EditorGUI.TextField(rectA, _player.entities[index].playlistTitle);
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(target, "Playlist Title");
+            _player.entities[index].playlistTitle = playlistTitle;
+        }
+
         if (!_player.entities[index].isCollapsed) return;
-        
-        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-        _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-        EditorGUI.LabelField(_rect, "Thumbnail Url");
-        _rect.x += 80;
-        _rect.width = rect.width - 80;
-        _player.entities[index].playlistThumbnailUrl = EditorGUI.TextField(_rect, _player.entities[index].playlistThumbnailUrl);
-            
         rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-        _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+        rectA = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-        var videoList = _player.entities[index].GetReorderableList();
+        EditorGUI.LabelField(rectA, "Thumbnail Url");
+        rectA.x += 80;
+        rectA.width = rect.width - 80;
+
+        EditorGUI.BeginChangeCheck();
+
+        string playlistThumbnailUrl = EditorGUI.TextField(rectA, _player.entities[index].playlistThumbnailUrl);
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(target, "Playlist Thumbnail Url");
+            _player.entities[index].playlistThumbnailUrl = playlistThumbnailUrl;
+        }
+
+        rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+        //_rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+        var videoList = _player.entities[index].GetReorderableList(_player);
         videoList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
     }
-    
+
     private void OnAdd(ReorderableList list)
     {
+        Undo.RecordObject(target, "Add Playlist Entry");
         _player.entities.Add(null);
     }
 
     private void OnChanged(ReorderableList list)
     {
-        //EditorUtility.SetDirty(target);
+        Undo.RecordObject(target, "Playlist List changed");
     }
-    
+
     public override void OnInspectorGUI()
     {
-        EditorGUILayout.HelpBox("Please note that experimental settings are not properly implemented yet and might break at anytime.", MessageType.Warning);
-        EditorGUILayout.Space();
-        
-        _player.Stereo360Experimental = EditorGUILayout.Toggle("[Experimental] 360 Video ", _player.Stereo360Experimental);
-        EditorGUILayout.Space();
-        
-        _player.AudioPlaybackMode = (CVRVideoPlayer.AudioMode) EditorGUILayout.EnumPopup("[Experimental] Audio Playback Mode ",  _player.AudioPlaybackMode);
-        EditorGUILayout.Space();
-        
-        _player.localPlaybackSpeed = EditorGUILayout.Slider("Playback Speed", _player.localPlaybackSpeed, 0.5f, 2.0f);
-        EditorGUILayout.Space();
+        #region General settings
 
-        _player.ProjectionTexture = (RenderTexture) EditorGUILayout.ObjectField("Projection Texture", _player.ProjectionTexture, typeof(RenderTexture), true);
-        EditorGUILayout.Space();
-        if (_player.ProjectionTexture == null)
+        _showGeneral = EditorGUILayout.BeginFoldoutHeaderGroup(_showGeneral, "General");
+        if (_showGeneral)
         {
-            EditorGUILayout.HelpBox("The video player output texture is empty, please fill it or no video will be drawn.", MessageType.Warning);
-            if (GUILayout.Button("Create Sample Render Texture"))
+            _player.syncEnabled = EditorGUILayout.Toggle("Network Sync", _player.syncEnabled);
+            _player.autoplay = EditorGUILayout.Toggle("Play On Awake", _player.autoplay);
+            _player.interactiveUI = EditorGUILayout.Toggle("Use Interactive Library UI", _player.interactiveUI);
+            _player.videoPlayerUIPosition = (Transform)EditorGUILayout.ObjectField("UI Position/Parent", _player.videoPlayerUIPosition, typeof(Transform), true);
+            _player.localPlaybackSpeed = EditorGUILayout.Slider("Playback Speed", _player.localPlaybackSpeed, 0.5f, 2.0f);
+
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            _player.ProjectionTexture = (RenderTexture)EditorGUILayout.ObjectField("Projection Texture", _player.ProjectionTexture, typeof(RenderTexture), true);
+            EditorGUILayout.Space();
+            
+            if (_player.ProjectionTexture == null)
             {
-                RenderTexture tex = new RenderTexture(1920,1080,24);
-                if(!AssetDatabase.IsValidFolder("Assets/ABI.Generated"))
-                    AssetDatabase.CreateFolder("Assets", "ABI.Generated");
-                if(!AssetDatabase.IsValidFolder("Assets/ABI.Generated/VideoPlayer"))
-                    AssetDatabase.CreateFolder("Assets/ABI.Generated", "VideoPlayer");
-                if(!AssetDatabase.IsValidFolder("Assets/ABI.Generated/VideoPlayer/RenderTextures"))
-                    AssetDatabase.CreateFolder("Assets/ABI.Generated/VideoPlayer", "RenderTextures");
-                AssetDatabase.CreateAsset(tex, "Assets/ABI.Generated/VideoPlayer/RenderTextures/"+_player.gameObject.GetInstanceID()+".renderTexture");
-                _player.ProjectionTexture = tex;
+                EditorGUILayout.HelpBox("The video player output texture is empty, please fill it or no video will be drawn.", MessageType.Warning);
+                if (GUILayout.Button("Create Sample Render Texture"))
+                {
+                    RenderTexture tex = new RenderTexture(1920, 1080, 24);
+                    if (!AssetDatabase.IsValidFolder("Assets/ABI.Generated"))
+                        AssetDatabase.CreateFolder("Assets", "ABI.Generated");
+                    if (!AssetDatabase.IsValidFolder("Assets/ABI.Generated/VideoPlayer"))
+                        AssetDatabase.CreateFolder("Assets/ABI.Generated", "VideoPlayer");
+                    if (!AssetDatabase.IsValidFolder("Assets/ABI.Generated/VideoPlayer/RenderTextures"))
+                        AssetDatabase.CreateFolder("Assets/ABI.Generated/VideoPlayer", "RenderTextures");
+                    AssetDatabase.CreateAsset(tex,
+                        "Assets/ABI.Generated/VideoPlayer/RenderTextures/" + _player.gameObject.GetInstanceID() +
+                        ".renderTexture");
+                    _player.ProjectionTexture = tex;
+                }
             }
+            
+            EditorGUILayout.Space();
         }
 
-        EditorGUILayout.HelpBox("To use this feature, you have to use the prefab provided with the CCK.", MessageType.Info);
-        _player.interactiveUI = EditorGUILayout.Toggle("Use Default Interactive Library UI", _player.interactiveUI);
-        EditorGUILayout.Space();
-        
-        _player.autoplay = EditorGUILayout.Toggle("Play on Startup", _player.autoplay);
-        EditorGUILayout.Space();
-        
-        reorderableList.DoLayoutList();
-    }
+        EditorGUILayout.EndFoldoutHeaderGroup();
 
+        #endregion
+
+        #region Audio settings
+
+        _showAudio = EditorGUILayout.BeginFoldoutHeaderGroup(_showAudio, "Audio");
+        
+        if (_showAudio)
+        {
+            _player.playbackVolume = EditorGUILayout.Slider("Playback Volume", _player.playbackVolume, 0.0f, 1.0f);
+            _player.audioPlaybackMode = (CVRVideoPlayer.AudioMode)EditorGUILayout.EnumPopup("Audio Playback Mode ", _player.audioPlaybackMode);
+            _player.customAudioSource = (AudioSource)EditorGUILayout.ObjectField("Custom Audio Source", _player.customAudioSource, typeof(AudioSource), true);
+
+            var list = serializedObject.FindProperty("roomScaleAudioSources");
+            EditorGUILayout.PropertyField(list, new GUIContent("Room Scale Audio Sources"), true);
+            serializedObject.ApplyModifiedProperties();
+            
+            EditorGUILayout.Space();
+        }
+        
+        EditorGUILayout.EndFoldoutHeaderGroup();
+
+        #endregion
+
+        #region Playlists
+
+        _showPlaylists = EditorGUILayout.BeginFoldoutHeaderGroup(_showPlaylists, "Playlists");
+
+        if (_showPlaylists)
+        {
+            EditorGUILayout.LabelField(new GUIContent("Play On Awake Object", "Default video to play on start/awake"), new GUIContent(_player.playOnAwakeObject?.videoTitle));
+            if (GUILayout.Button("Remove Play on Awake Object")) _player.playOnAwakeObject = null;
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            
+            _reorderableList.DoLayoutList();
+            EditorGUILayout.Space();
+        }
+
+        EditorGUILayout.EndFoldoutHeaderGroup();
+
+        #endregion
+
+        #region Events
+
+        _showEvents = EditorGUILayout.BeginFoldoutHeaderGroup(_showEvents, "Events");
+
+        if (_showEvents)
+        {
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("startedPlayback"), true);
+            serializedObject.ApplyModifiedProperties();
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("finishedPlayback"), true);
+            serializedObject.ApplyModifiedProperties();
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("pausedPlayback"), true);
+            serializedObject.ApplyModifiedProperties();
+
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("setUrl"), true);
+            serializedObject.ApplyModifiedProperties();
+            EditorGUILayout.Space();
+        }
+        
+        EditorGUILayout.EndFoldoutHeaderGroup();
+
+        #endregion
+    }
 }

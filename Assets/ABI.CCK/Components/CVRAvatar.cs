@@ -1,4 +1,5 @@
-﻿using ABI.CCK.Scripts;
+﻿using System.Collections.Generic;
+using ABI.CCK.Scripts;
 using UnityEngine;
 
 namespace ABI.CCK.Components
@@ -26,10 +27,23 @@ namespace ABI.CCK.Components
         public SkinnedMeshRenderer bodyMesh;
 
         public string[] blinkBlendshape = new string[4];
+
+        public enum CVRAvatarVisemeMode
+        {
+            Visemes = 0,
+            SingleBlendshape = 1,
+            JawBone = 2
+        }
+
+        public CVRAvatarVisemeMode visemeMode = CVRAvatarVisemeMode.Visemes;
+        
         public string[] visemeBlendshapes = new string[15];
 
         [Space] [Header("Avatar customization")] [Space]
         public AnimatorOverrideController overrides;
+
+        public bool enableAdvancedTagging = false;
+        public List<CVRAvatarAdvancedTaggingEntry> advancedTaggingList = new List<CVRAvatarAdvancedTaggingEntry>();
 
         public bool avatarUsesAdvancedSettings = false;
         public CVRAdvancedAvatarSettings avatarSettings = null;
@@ -54,5 +68,28 @@ namespace ABI.CCK.Components
             info.type = CVRAssetInfo.AssetType.Avatar;
         }
 
+    }
+
+    [System.Serializable]
+    public class CVRAvatarAdvancedTaggingEntry
+    {
+        public enum Tags
+        {
+            LoudAudio = 1,
+            LongRangeAudio = 2,
+            ScreenFx = 4,
+            FlashingColors = 8,
+            FlashingLights = 16,
+            Violence = 32,
+            Gore = 64,
+            //Suggestive = 128,
+            //Nudity = 256,
+            Horror = 512
+        }
+
+        public Tags tags = 0;
+
+        public GameObject gameObject;
+        public GameObject fallbackGameObject;
     }
 }

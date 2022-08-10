@@ -34,24 +34,28 @@ namespace ABI.CCK.Components
                     retPos.value = ((Transform) component).position.ToString("F6");
                     retPos.intVal = intVal;
                     return retPos;
+                    break;
                 case TaskType.Rotation:
                     var retRot = new CVRSerializableObjectSyncTask();
                     retRot.type = TaskType.Rotation;
                     retRot.value = ((Transform) component).eulerAngles.ToString("F3");
                     retRot.intVal = intVal;
                     return retRot;
+                    break;
                 case TaskType.ActivityState:
                     var retAct = new CVRSerializableObjectSyncTask();
                     retAct.type = TaskType.ActivityState;
                     retAct.value = ((Transform) component).gameObject.activeSelf ? "1" : "0";
                     retAct.intVal = intVal;
                     return retAct;
+                    break;
                 case TaskType.PickupOwner:
                     var retPick = new CVRSerializableObjectSyncTask();
                     retPick.type = TaskType.PickupOwner;
                     retPick.value = "";
                     retPick.intVal = intVal;
                     return retPick;
+                    break;
                 case TaskType.AnimatorParameter:
                     var retAniParam = new CVRSerializableObjectSyncTask();
                     retAniParam.type = TaskType.AnimatorParameter;
@@ -76,18 +80,21 @@ namespace ABI.CCK.Components
                     }
                     retAniParam.intVal = intVal;
                     return retAniParam;
+                    break;
                 case TaskType.AnimatorAnimationProgress:
                     var retAniProg = new CVRSerializableObjectSyncTask();
                     retAniProg.type = TaskType.AnimatorAnimationProgress;
                     retAniProg.value = (0f).ToString("F8");
                     retAniProg.intVal = intVal;
                     return retAniProg;
+                    break;
                 case TaskType.VariableBufferValue:
                     var retVar = new CVRSerializableObjectSyncTask();
                     retVar.type = TaskType.VariableBufferValue;
                     retVar.value = ((CVRVariableBuffer) component).defaultValue.ToString("F8");
                     retVar.intVal = intVal;
                     return retVar;
+                    break;
             }
             
             return null;

@@ -1,11 +1,10 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Xml.Linq;
-using System.Xml.XPath;
+using System.Net.Http;
+using System.Text;
+using Abi.Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Networking;
 
 namespace ABI.CCK.Scripts.Runtime
 {
@@ -18,93 +17,166 @@ namespace ABI.CCK.Scripts.Runtime
 
         private IEnumerator StreamVars()
         {
-            
             OnGuiUpdater updater = gameObject.GetComponent<OnGuiUpdater>();
             string type = updater.asset.type.ToString();
-            var values = new Dictionary<string, string>
+
+            using (HttpClient httpclient = new HttpClient())
             {
-                #if UNITY_EDITOR
-                {"user", EditorPrefs.GetString("m_ABI_Username")},
-                {"accesskey", EditorPrefs.GetString("m_ABI_Key")},
-                #endif
-                {"type", type},
-                {"guid", updater.asset.guid},
-            };
-            using (UnityWebRequest www = UnityWebRequest.Post("https://api.alphablend.cloud/IContentCreation/GetAssetInfoValues", values))
-            {
-                
-                www.downloadHandler = new DownloadHandlerBuffer();
-                yield return www.SendWebRequest();
+                HttpResponseMessage response;
+                response = httpclient.PostAsync(
+                    "https://api.abinteractive.net/1/cck/parameterStream",
+                    new StringContent(JsonConvert.SerializeObject(new
+                        {
+                            ContentType = type, ContentId = updater.asset.objectId,
+#if UNITY_EDITOR
+                            Username = EditorPrefs.GetString("m_ABI_Username"),
+                            AccessKey = EditorPrefs.GetString("m_ABI_Key"),
+                            UploadRegion = EditorPrefs.GetInt("ABI_PREF_UPLOAD_REGION").ToString()
+#endif 
+                        }),
+                        Encoding.UTF8, "application/json")
+                ).GetAwaiter().GetResult();
 
-                if (www.isNetworkError || www.isHttpError)
+                if (response.IsSuccessStatusCode)
                 {
-                    Debug.Log("[CCK:RuntimeVariableStream] Unable to open api connection. Can not stream old asset info values.");
-                    yield break;
-                }
+                    string result = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    BaseResponse<VariableStreamResponse> streamResponse = Abi.Newtonsoft.Json.JsonConvert .DeserializeObject<BaseResponse<VariableStreamResponse>>(result);
 
-                string sd = www.downloadHandler.text;
 
-                try
-                {
-                    XDocument doc = XDocument.Parse(sd);
-                    
-                    //General asset info
-                    updater.assetName.text = (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AssetName");
-                    updater.assetDesc.text = (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AssetDesc");
-                    //SFW Level
-                    if ((string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SfwLevel") == "nsfw")
+
+                    if (streamResponse == null || streamResponse.Data == null)
                     {
-                        updater.sfw.isOn = false;
-                        updater.nsfw.isOn = true;
+#if UNITY_EDITOR
+                        EditorUtility.ClearProgressBar();
+                        if (UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK",
+                            "Request failed. Unable to connect to the Gateway. The Gateway might be unavailable. Check https://status.abinteractive.net for more info.",
+                            "Okay"))
+                        {
+                            EditorApplication.isPlaying = false;
+                        }
+#endif
+                        yield break;
                     }
-                    else
-                    {
-                        updater.sfw.isOn = true;
-                        updater.nsfw.isOn = false;
-                    }
-                    
-                    //Additional NSFW
-                    if ((string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SfwSuggestive") == "YES") updater.nsfwSubSuggestive.isOn = true;
-                    if ((string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SfwNudity") == "YES") updater.nsfwSubNudity.isOn = true;
-                    
-                    //Avatar
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarLoudAudio") == "YES") updater.avtrLoudAudio.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarLongRangeAudio") == "YES") updater.avtrLongRangeAudio.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarScreenEffects") == "YES") updater.avtrScreenFx.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarFlashingColors") == "YES") updater.avtrFlashingColors.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarFlashingLights") == "YES") updater.avtrFlashingLights.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarParticleSystems") == "YES") updater.avtrParticleSystems.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarViolence") == "YES") updater.avtrViolence.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarGore") == "YES") updater.avtrGore.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarExcessivelyHuge") == "YES") updater.avtrExcessivelyHuge.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarExcessivelySmall") == "YES") updater.avtrExcessivelySmall.isOn = true;
-                    if (type == "Avatar" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/AvatarSpawnAudio") == "YES") updater.avtrSpawnAudio.isOn = true;
-                    //World
-                    if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldScreenEffects") == "YES") updater.wrldScreenFx.isOn = true;
-                    if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldFlashingColors") == "YES") updater.wrldFlashingColors.isOn = true;
-                    if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldFlashingLights") == "YES") updater.wrldFlashingLights.isOn = true;
-                    if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldParticleSystems") == "YES") updater.wrldParticleSystems.isOn = true;
-                    if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldViolence") == "YES") updater.wrldViolence.isOn = true;
-                    if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldGore") == "YES") updater.wrldGore.isOn = true;
-                    if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldWeaponSystem") == "YES") updater.wrldWeaponSystem.isOn = true;
-                    if (type == "World" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/WorldMinigames") == "YES") updater.wrldMinigame.isOn = true;
-                    //Spawnable
-                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableLoudAudio") == "YES") updater.propLoudAudio.isOn = true;
-                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableLongRangeAudio") == "YES") updater.propLongRangeAudio.isOn = true;
-                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableScreenEffects") == "YES") updater.propScreenFx.isOn = true;
-                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableFlashingColors") == "YES") updater.propFlashingColors.isOn = true;
-                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableFlashingLights") == "YES") updater.propFlashingLights.isOn = true;
-                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableParticleSystems") == "YES") updater.propParticleSystems.isOn = true;
-                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableViolence") == "YES") updater.propViolence.isOn = true;
-                    if (type == "Spawnable" && (string) doc.XPathSelectElement("IContentCreation/GetAssetInfoValues/Meta/SpawnableGore") == "YES") updater.propGore.isOn = true;
-                }
-                catch
-                {
-                    Debug.Log("[CCK:RuntimeVariableStream] Unable to stream variable entries. Received XML is invalid. Is Alpha Blend Interactive down?");
-                }
 
+                    if (!streamResponse.Data.HasPermission)
+                    {
+#if UNITY_EDITOR
+                        EditorUtility.ClearProgressBar();
+                        if (UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK",
+                            "Request failed. The provided content ID does not belong to your account.", "Okay"))
+                        {
+                            EditorApplication.isPlaying = false;
+                        }
+#endif
+                        yield break;
+                    }
+
+                    if (streamResponse.Data.IsAtUploadLimit)
+                    {
+#if UNITY_EDITOR
+                        EditorUtility.ClearProgressBar();
+                        if (UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK",
+                            "Request failed. Your account has reached the upload limit. Please consider buying the Unlocked account.",
+                            "Okay"))
+                        {
+                            EditorApplication.isPlaying = false;
+                        }
+#endif
+                    }
+
+                    if (streamResponse.Data.IsBannedFromUploading)
+                    {
+#if UNITY_EDITOR
+                        EditorUtility.ClearProgressBar();
+                        if (UnityEditor.EditorUtility.DisplayDialog("Alpha Blend Interactive CCK",
+                            "Request failed. Your upload permissions are suspended. For more information, consult your moderation profile in the ABI community hub.",
+                            "Okay"))
+                        {
+                            EditorApplication.isPlaying = false;
+                        }
+#endif
+                    }
+
+                    updater.UploadLocation = streamResponse.Data.UploadLocation;
+
+                    updater.assetName.text = streamResponse.Data.ObjectName;
+                    updater.assetDesc.text = streamResponse.Data.ObjectDescription;
+
+                    updater.LoudAudio.isOn = streamResponse.Data.LoudAudio;
+                    updater.LongRangeAudio.isOn = streamResponse.Data.LongRangeAudio;
+                    updater.SpawnAudio.isOn = streamResponse.Data.SpawnAudio;
+                    updater.ContainsMusic.isOn = streamResponse.Data.ContainsMusic;
+
+                    updater.ScreenEffects.isOn = streamResponse.Data.ScreenFx;
+                    updater.FlashingColors.isOn = streamResponse.Data.FlashingColors;
+                    updater.FlashingLights.isOn = streamResponse.Data.FlashingLights;
+                    updater.ExtremelyBright.isOn = streamResponse.Data.ExtremelyBright;
+                    updater.ParticleSystems.isOn = streamResponse.Data.ParticleSystems;
+
+                    updater.Violence.isOn = streamResponse.Data.Violence;
+                    updater.Gore.isOn = streamResponse.Data.Gore;
+                    updater.Horror.isOn = streamResponse.Data.Horror;
+                    updater.Jumpscare.isOn = streamResponse.Data.Jumpscare;
+
+                    updater.ExcessivelySmall.isOn = streamResponse.Data.ExtremelySmall;
+                    updater.ExcessivelyHuge.isOn = streamResponse.Data.ExtremelyHuge;
+
+                    updater.Suggestive.isOn = streamResponse.Data.Suggestive;
+                    updater.Nudity.isOn = streamResponse.Data.Nudity;
+                }
             }
         }
+    }
+
+    [Serializable]
+    public class VariableStreamResponse
+    {
+        public bool HasPermission { get; set; }
+        public bool IsAtUploadLimit { get; set; }
+        public bool IsBannedFromUploading { get; set; }
+
+        public string UploadLocation { get; set; }
         
+        public string ObjectName { get; set; }
+        public string ObjectDescription { get; set; }
+        
+        public bool LoudAudio { get; set; }
+        public bool LongRangeAudio { get; set; }
+        public bool SpawnAudio { get; set; }
+        public bool ContainsMusic { get; set; }
+
+        public bool ScreenFx { get; set; }
+        public bool FlashingColors { get; set; }
+        public bool FlashingLights { get; set; }
+        public bool ExtremelyBright { get; set; }
+        public bool ParticleSystems { get; set; }
+
+        public bool Violence { get; set; }
+        public bool Gore { get; set; }
+        public bool Horror { get; set; }
+        public bool Jumpscare { get; set; }
+
+        public bool ExtremelySmall { get; set; }
+        public bool ExtremelyHuge { get; set; }
+
+        public bool Suggestive { get; set; }
+        public bool Nudity { get; set; }
+    }
+    
+    public class BaseResponse<T>
+    {
+        public string Message { get; set; }
+        public T Data { get; set; }
+
+        public BaseResponse(string message = null, T data = default)
+        {
+            Message = message;
+            Data = data;
+        }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 }

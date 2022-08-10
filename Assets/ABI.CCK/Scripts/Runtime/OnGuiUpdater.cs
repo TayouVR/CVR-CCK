@@ -1,12 +1,11 @@
-using System;
+﻿using System;
+using System.Collections;
 using System.IO;
 using ABI.CCK.Components;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-
-#pragma warning disable
 
 namespace ABI.CCK.Scripts.Runtime
 {
@@ -16,44 +15,29 @@ namespace ABI.CCK.Scripts.Runtime
         public Text uiTitle;
         public InputField assetName;
         public InputField assetDesc;
+        public InputField assetChangelog;
         
         [Space] [Header("Object tags")] [Space]
-        public Toggle sfw;
-        public Toggle nsfw;
-        public Toggle nsfwSubSuggestive;
-        public Toggle nsfwSubNudity;
-        //Avatar
-        public Toggle avtrLoudAudio;
-        public Toggle avtrLongRangeAudio;
-        public Toggle avtrSpawnAudio;
-        public Toggle avtrScreenFx;
-        public Toggle avtrFlashingColors;
-        public Toggle avtrFlashingLights;
-        public Toggle avtrParticleSystems;
-        public Toggle avtrViolence;
-        public Toggle avtrGore;
-        public Toggle avtrExcessivelyHuge;
-        public Toggle avtrExcessivelySmall;
-        //World
-        public Toggle wrldScreenFx;
-        public Toggle wrldFlashingColors;
-        public Toggle wrldFlashingLights;
-        public Toggle wrldParticleSystems;
-        public Toggle wrldViolence;
-        public Toggle wrldGore;
-        public Toggle wrldWeaponSystem;
-        public Toggle wrldMinigame;
-        //Props
-        public Toggle propLoudAudio;
-        public Toggle propLongRangeAudio;
-        public Toggle propScreenFx;
-        public Toggle propFlashingColors;
-        public Toggle propFlashingLights;
-        public Toggle propParticleSystems;
-        public Toggle propViolence;
-        public Toggle propGore;
+        public Toggle LoudAudio;
+        public Toggle LongRangeAudio;
+        public Toggle SpawnAudio;
+        public Toggle ContainsMusic;
+        public Toggle ScreenEffects;
+        public Toggle FlashingColors;
+        public Toggle FlashingLights;
+        public Toggle ExtremelyBright;
+        public Toggle ParticleSystems;
+        public Toggle Violence;
+        public Toggle Gore;
+        public Toggle Horror;
+        public Toggle Jumpscare;
+        public Toggle ExcessivelyHuge;
+        public Toggle ExcessivelySmall;
+        public Toggle Suggestive;
+        public Toggle Nudity;
 
         public Toggle dontOverridePicture;
+        public Toggle SetAsActive;
         
         //Regulatory
         public Toggle contentOwnership;
@@ -63,33 +47,45 @@ namespace ABI.CCK.Scripts.Runtime
         public CVRAssetInfo asset;
 
         [Space] [Header("UIHelper objects")] [Space]
-        public GameObject wrldSafety;
-        public GameObject propSafety;
-        public GameObject avtrSafety;
         public GameObject camObj;
         public RenderTexture tex;
         public RawImage texView;
+        public RawImage texViewBig;
         public GameObject tagsObject;
         public GameObject detailsObject;
+        public GameObject legalObject;
         public GameObject uploadObject;
         public Image stepOne;
         public Image stepTwo;
+        public Image stepThree;
         public Image tagsImage;
         public Image detailsImage;
+        public Image legalImage;
         public Image uploadImage;
         public Text tagsText;
         public Text detailsText;
+        public Text legalText;
         public Text uploadText;
         public Image uploadProgress;
         public Text uploadProgressText;
-        public Text fileSizeText;
+        public Image processingProgress;
+        public Text processingProgressText;
+        public Text assetFileSizeText;
+        public Text assetImageFileSizeText;
+        public Text assetFileManifestSizeText;
+        public Text assetFilePano1SizeText;
+        public Text assetFilePano4SizeText;
 
+        [HideInInspector] public string UploadLocation;
+
+        public CCK_RuntimeUploaderMaster uploader;
+        
         public void ToggleObject(GameObject obj)
         {
             obj.SetActive(!obj.activeInHierarchy);
         }
         
-        public static string GetHumanReadableFileSize(long fileSize)
+        public static string ToFileSizeString(long fileSize)
         {
             string[] sizes = { "B", "KB", "MB", "GB", "TB" };
             int order = 0;
@@ -97,10 +93,8 @@ namespace ABI.CCK.Scripts.Runtime
                 order++;
                 fileSize = fileSize/1024;
             }
-
-            // Adjust the format string to your preferences. For example "{0:0.#}{1}" would
-            // show a single decimal place, and no space.
-            return String.Format("{0:0.##} {1}", fileSize, sizes[order]);
+            
+            return $"{fileSize:0.##} {sizes[order]}";
         }
         
         void Start()
@@ -108,11 +102,8 @@ namespace ABI.CCK.Scripts.Runtime
             SwitchPage(0);
             CVRAssetInfo.AssetType type = asset.GetComponent<CVRAssetInfo>().type;
             
-            if (type == CVRAssetInfo.AssetType.Avatar) avtrSafety.SetActive(true);
-            if (type == CVRAssetInfo.AssetType.Spawnable) propSafety.SetActive(true);
             if (type == CVRAssetInfo.AssetType.World)
             {
-                wrldSafety.SetActive(true);
                 Scripts.Editor.CCK_WorldPreviewCapture.CreatePanoImages();
             }
 
@@ -129,24 +120,38 @@ namespace ABI.CCK.Scripts.Runtime
             cam.nearClipPlane = 0.01f;
             cam.targetTexture = tex;
             texView.texture = tex;
+            texViewBig.texture = tex;
             
             #if UNITY_EDITOR
 
 #endif
-
-            string handle;
-            if (type == CVRAssetInfo.AssetType.Avatar) fileSizeText.text = "Asset Bundle File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvravatar").Length)
-                                                                                                 + "\nAsset Bundle Manifest File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvravatar.manifest").Length)
-                                                                                                 + "\nThumbnail File: creation pending";
-            if (type == CVRAssetInfo.AssetType.Spawnable) fileSizeText.text = "Asset Bundle File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvrprop").Length)
-                                                                                                 + "\nAsset Bundle Manifest File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvrprop.manifest").Length)
-                                                                                                 + "\nThumbnail File: creation pending";
             
-            if (type == CVRAssetInfo.AssetType.World) fileSizeText.text = "Asset Bundle File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvrworld").Length) 
-                                                                                                + "\nAsset Bundle Manifest File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle.cvrworld.manifest").Length)
-                                                                                                + "\n1K Pano File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle_pano_1024.png").Length)
-                                                                                                + "\n4K Pano File: " + GetHumanReadableFileSize(new FileInfo(Application.persistentDataPath + "/bundle_pano_4096.png").Length)
-                                                                                                + "\nThumbnail File: creation pending";
+            if (type == CVRAssetInfo.AssetType.Avatar)
+            {
+                assetFileSizeText.text = ToFileSizeString(new FileInfo(Application.persistentDataPath + "/bundle.cvravatar").Length);
+                assetImageFileSizeText.text = "N/A";
+                assetFileManifestSizeText.text = ToFileSizeString(new FileInfo(Application.persistentDataPath + "/bundle.cvravatar.manifest").Length);
+                assetFilePano1SizeText.text = "N/A";
+                assetFilePano4SizeText.text = "N/A";
+            }
+
+            if (type == CVRAssetInfo.AssetType.Spawnable)
+            {
+                assetFileSizeText.text = ToFileSizeString(new FileInfo(Application.persistentDataPath + "/bundle.cvrprop").Length);
+                assetImageFileSizeText.text = "";
+                assetFileManifestSizeText.text = ToFileSizeString(new FileInfo(Application.persistentDataPath + "/bundle.cvrprop.manifest").Length);
+                assetFilePano1SizeText.text = "N/A";
+                assetFilePano4SizeText.text = "N/A";
+            }
+            
+            if (type == CVRAssetInfo.AssetType.World)
+            {
+                assetFileSizeText.text = ToFileSizeString(new FileInfo(Application.persistentDataPath + "/bundle.cvrworld").Length);
+                assetImageFileSizeText.text = "N/A";
+                assetFileManifestSizeText.text = ToFileSizeString(new FileInfo(Application.persistentDataPath + "/bundle.cvrworld.manifest").Length);
+                assetFilePano1SizeText.text = ToFileSizeString(new FileInfo(Application.persistentDataPath + "/bundle_pano_1024.png").Length);
+                assetFilePano4SizeText.text = ToFileSizeString(new FileInfo(Application.persistentDataPath + "/bundle_pano_4096.png").Length);
+            }
             
         }
 
@@ -157,47 +162,106 @@ namespace ABI.CCK.Scripts.Runtime
                 case 0:
                     tagsObject.SetActive(true);
                     detailsObject.SetActive(false);
+                    legalObject.SetActive(false);
                     uploadObject.SetActive(false);
                     stepOne.color = Color.white;
                     stepTwo.color = Color.white;
+                    stepThree.color = Color.white;
                     tagsImage.color = Color.yellow;
                     detailsImage.color = Color.white;
+                    legalImage.color = Color.white;
                     uploadImage.color = Color.white;
                     tagsText.color = Color.yellow;
                     detailsText.color = Color.white;
+                    legalText.color = Color.white;
                     uploadText.color = Color.white;
                     break;
                 case 1:
                     tagsObject.SetActive(false);
                     detailsObject.SetActive(true);
+                    legalObject.SetActive(false);
                     uploadObject.SetActive(false);
                     stepOne.color = Color.green;
                     stepTwo.color = Color.white;
+                    stepThree.color = Color.white;
                     tagsImage.color = Color.green;
                     detailsImage.color = Color.yellow;
+                    legalImage.color = Color.white;
                     uploadImage.color = Color.white;
                     tagsText.color = Color.green;
                     detailsText.color = Color.yellow;
+                    legalText.color = Color.white;
                     uploadText.color = Color.white;
                     break;
                 case 2:
                     tagsObject.SetActive(false);
                     detailsObject.SetActive(false);
+                    legalObject.SetActive(true);
+                    uploadObject.SetActive(false);
+                    stepOne.color = Color.green;
+                    stepTwo.color = Color.green;
+                    stepThree.color = Color.white;
+                    tagsImage.color = Color.green;
+                    detailsImage.color = Color.green;
+                    legalImage.color = Color.yellow;
+                    uploadImage.color = Color.white;
+                    tagsText.color = Color.green;
+                    detailsText.color = Color.green;
+                    legalText.color = Color.yellow;
+                    uploadText.color = Color.white;
+                    break;
+                case 3:
+                    tagsObject.SetActive(false);
+                    detailsObject.SetActive(false);
+                    legalObject.SetActive(false);
                     uploadObject.SetActive(true);
                     stepOne.color = Color.green;
                     stepTwo.color = Color.green;
+                    stepThree.color = Color.green;
                     tagsImage.color = Color.green;
                     detailsImage.color = Color.green;
+                    legalImage.color = Color.green;
                     uploadImage.color = Color.yellow;
                     tagsText.color = Color.green;
                     detailsText.color = Color.green;
+                    legalText.color = Color.green;
                     uploadText.color = Color.yellow;
-                    if (string.IsNullOrEmpty(assetName.text) || string.IsNullOrEmpty(assetDesc.text) || !contentOwnership.isOn || !tagsCorrect.isOn) SwitchPage(1);
+                    if (string.IsNullOrEmpty(assetName.text))
+                    {
+#if UNITY_EDITOR
+                        EditorUtility.DisplayDialog("Alpha Blend Interactive CCK", CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDSTEP_UPLOAD_DETAILS_MISSING"), "Okay");
+#endif
+                        SwitchPage(1);
+                        return;
+                    }
+
+                    if (!contentOwnership.isOn || !tagsCorrect.isOn)
+                    {
+#if UNITY_EDITOR
+                        EditorUtility.DisplayDialog("Alpha Blend Interactive CCK", CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDSTEP_UPLOAD_LEGAL_MISSING"), "Okay");
+#endif
+                        SwitchPage(2);
+                        return;
+                    }
+                    uploader.StartUpload();
                     break;
             }
         }
-        
-        
 
+        public void MakePhotoAndDisableCamera()
+        {
+            
+            Camera c = camObj.GetComponent<Camera>();
+            if (!c.enabled)
+            {
+                c.targetTexture = tex;
+                c.enabled = true;
+            }
+            gameObject.GetComponent<CCK_TexImageCreation>().SaveTexture(c, tex);
+            assetImageFileSizeText.text = ToFileSizeString(new FileInfo(Application.persistentDataPath + "/bundle.png").Length);
+            c.enabled = false;
+            //
+            //StartCoroutine(MakePhotoAndDisableCamera__Internal());
+        }
     }
 }

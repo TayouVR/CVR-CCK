@@ -2,8 +2,10 @@
 
 namespace ABI.CCK.Components
 {
-    public class CVRPointer : MonoBehaviour 
+    public class CVRPointer : MonoBehaviour
     {
+        public string type;
+        
         private void OnDrawGizmos()
         {
             if (isActiveAndEnabled)
