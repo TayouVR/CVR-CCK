@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using ABI.CCK.Components;
 using UnityEngine;
+using System.Text.RegularExpressions;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Animations;
@@ -256,11 +257,11 @@ namespace ABI.CCK.Scripts
             
             if (useAnimationClip) {
                 onClip = animationClip;
-                AssetDatabase.CreateAsset(offClip, folderPath + "/Anim_" + machineName + "_Toggle_Off.anim");
+                AssetDatabase.CreateAsset(offClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Toggle_Off.anim");
             }
             else {
-                AssetDatabase.CreateAsset(offClip, folderPath + "/Anim_" + machineName + "_Toggle_Off.anim");
-                AssetDatabase.CreateAsset(onClip, folderPath + "/Anim_" + machineName + "_Toggle_On.anim");
+                AssetDatabase.CreateAsset(offClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Toggle_Off.anim");
+                AssetDatabase.CreateAsset(onClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Toggle_On.anim");
             }
             
             if (usedType == ParameterType.GenerateBool)
@@ -561,7 +562,7 @@ namespace ABI.CCK.Scripts
                         );
                     }
                     
-                    AssetDatabase.CreateAsset(animation, folderPath + "/Anim_" + machineName + "_Dropdown_" + i + ".anim");
+                    AssetDatabase.CreateAsset(animation, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Dropdown_" + i + ".anim");
                 }
 
                 animations.Add(animation);
@@ -894,24 +895,24 @@ namespace ABI.CCK.Scripts
             }
             
             blendTreeRedMinGreenMin.AddChild(clipR0G0B0, 0);
-            AssetDatabase.CreateAsset(clipR0G0B0, folderPath + "/Anim_" + machineName + "_Color_R0G0B0.anim");
+            AssetDatabase.CreateAsset(clipR0G0B0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Color_R0G0B0.anim");
             blendTreeRedMinGreenMin.AddChild(clipR0G0B1, 1);
-            AssetDatabase.CreateAsset(clipR0G0B1, folderPath + "/Anim_" + machineName + "_Color_R0G0B1.anim");
+            AssetDatabase.CreateAsset(clipR0G0B1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Color_R0G0B1.anim");
             
             blendTreeRedMinGreenMax.AddChild(clipR0G1B0, 0);
-            AssetDatabase.CreateAsset(clipR0G1B0, folderPath + "/Anim_" + machineName + "_Color_R0G1B0.anim");
+            AssetDatabase.CreateAsset(clipR0G1B0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Color_R0G1B0.anim");
             blendTreeRedMinGreenMax.AddChild(clipR0G1B1, 1);
-            AssetDatabase.CreateAsset(clipR0G1B1, folderPath + "/Anim_" + machineName + "_Color_R0G1B1.anim");
+            AssetDatabase.CreateAsset(clipR0G1B1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Color_R0G1B1.anim");
             
             blendTreeRedMaxGreenMin.AddChild(clipR1G0B0, 0);
-            AssetDatabase.CreateAsset(clipR1G0B0, folderPath + "/Anim_" + machineName + "_Color_R1G0B0.anim");
+            AssetDatabase.CreateAsset(clipR1G0B0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Color_R1G0B0.anim");
             blendTreeRedMaxGreenMin.AddChild(clipR1G0B1, 1);
-            AssetDatabase.CreateAsset(clipR1G0B1, folderPath + "/Anim_" + machineName + "_Color_R1G0B1.anim");
+            AssetDatabase.CreateAsset(clipR1G0B1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Color_R1G0B1.anim");
             
             blendTreeRedMaxGreenMax.AddChild(clipR1G1B0, 0);
-            AssetDatabase.CreateAsset(clipR1G1B0, folderPath + "/Anim_" + machineName + "_Color_R1G1B0.anim");
+            AssetDatabase.CreateAsset(clipR1G1B0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Color_R1G1B0.anim");
             blendTreeRedMaxGreenMax.AddChild(clipR1G1B1, 1);
-            AssetDatabase.CreateAsset(clipR1G1B1, folderPath + "/Anim_" + machineName + "_Color_R1G1B1.anim");
+            AssetDatabase.CreateAsset(clipR1G1B1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Color_R1G1B1.anim");
 
             animatorState.motion = blendTreeRed;
             
@@ -1319,8 +1320,8 @@ namespace ABI.CCK.Scripts
                 maxClip = maxAnimationClip;
             }
             else {
-                AssetDatabase.CreateAsset(minClip, folderPath + "/Anim_" + machineName + "_Slider_Min.anim");
-                AssetDatabase.CreateAsset(maxClip, folderPath + "/Anim_" + machineName + "_Slider_Max.anim");
+                AssetDatabase.CreateAsset(minClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Slider_Min.anim");
+                AssetDatabase.CreateAsset(maxClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Slider_Max.anim");
             }
             
             blendTree.AddChild(minClip, 0f);
@@ -1750,14 +1751,14 @@ namespace ABI.CCK.Scripts
             var X1Y1Clip = new AnimationClip();
 
             blendTreeXMin.AddChild(X0Y0Clip, rangeMin.y);
-            AssetDatabase.CreateAsset(X0Y0Clip, folderPath + "/Anim_" + machineName + "_Joystick2D_X0Y0.anim");
+            AssetDatabase.CreateAsset(X0Y0Clip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick2D_X0Y0.anim");
             blendTreeXMin.AddChild(X0Y1Clip, rangeMax.y);
-            AssetDatabase.CreateAsset(X0Y1Clip, folderPath + "/Anim_" + machineName + "_Joystick2D_X0Y1.anim");
+            AssetDatabase.CreateAsset(X0Y1Clip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick2D_X0Y1.anim");
             
             blendTreeXMax.AddChild(X1Y0Clip, rangeMin.y);
-            AssetDatabase.CreateAsset(X1Y0Clip, folderPath + "/Anim_" + machineName + "_Joystick2D_X1Y0.anim");
+            AssetDatabase.CreateAsset(X1Y0Clip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick2D_X1Y0.anim");
             blendTreeXMax.AddChild(X1Y1Clip, rangeMax.y);
-            AssetDatabase.CreateAsset(X1Y1Clip, folderPath + "/Anim_" + machineName + "_Joystick2D_X1Y1.anim");
+            AssetDatabase.CreateAsset(X1Y1Clip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick2D_X1Y1.anim");
 
             animatorState.motion = blendTree;
             
@@ -1879,24 +1880,24 @@ namespace ABI.CCK.Scripts
             var clipX1Y1Z1 = new AnimationClip();
 
             blendTreeXMinYMin.AddChild(clipX0Y0Z0, 0f);
-            AssetDatabase.CreateAsset(clipX0Y0Z0, folderPath + "/Anim_" + machineName + "_Joystick3D_X0Y0Z0.anim");
+            AssetDatabase.CreateAsset(clipX0Y0Z0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick3D_X0Y0Z0.anim");
             blendTreeXMinYMin.AddChild(clipX0Y0Z1, 1f);
-            AssetDatabase.CreateAsset(clipX0Y0Z1, folderPath + "/Anim_" + machineName + "_Joystick3D_X0Y0Z1.anim");
+            AssetDatabase.CreateAsset(clipX0Y0Z1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick3D_X0Y0Z1.anim");
             
             blendTreeXMinYMax.AddChild(clipX0Y1Z0, 0f);
-            AssetDatabase.CreateAsset(clipX0Y1Z0, folderPath + "/Anim_" + machineName + "_Joystick3D_X0Y1Z0.anim");
+            AssetDatabase.CreateAsset(clipX0Y1Z0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick3D_X0Y1Z0.anim");
             blendTreeXMinYMax.AddChild(clipX0Y1Z1, 1f);
-            AssetDatabase.CreateAsset(clipX0Y1Z1, folderPath + "/Anim_" + machineName + "_Joystick3D_X0Y1Z1.anim");
+            AssetDatabase.CreateAsset(clipX0Y1Z1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick3D_X0Y1Z1.anim");
             
             blendTreeXMaxYMin.AddChild(clipX1Y0Z0, 0f);
-            AssetDatabase.CreateAsset(clipX1Y0Z0, folderPath + "/Anim_" + machineName + "_Joystick3D_X1Y0Z0.anim");
+            AssetDatabase.CreateAsset(clipX1Y0Z0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick3D_X1Y0Z0.anim");
             blendTreeXMaxYMin.AddChild(clipX1Y0Z1, 1f);
-            AssetDatabase.CreateAsset(clipX1Y0Z1, folderPath + "/Anim_" + machineName + "_Joystick3D_X1Y0Z1.anim");
+            AssetDatabase.CreateAsset(clipX1Y0Z1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick3D_X1Y0Z1.anim");
             
             blendTreeXMaxYMax.AddChild(clipX1Y1Z0, 0f);
-            AssetDatabase.CreateAsset(clipX1Y1Z0, folderPath + "/Anim_" + machineName + "_Joystick3D_X1Y1Z0.anim");
+            AssetDatabase.CreateAsset(clipX1Y1Z0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick3D_X1Y1Z0.anim");
             blendTreeXMaxYMax.AddChild(clipX1Y1Z1, 1f);
-            AssetDatabase.CreateAsset(clipX1Y1Z1, folderPath + "/Anim_" + machineName + "_Joystick3D_X1Y1Z1.anim");
+            AssetDatabase.CreateAsset(clipX1Y1Z1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Joystick3D_X1Y1Z1.anim");
 
             animatorState.motion = blendTreeX;
             
@@ -1962,9 +1963,9 @@ namespace ABI.CCK.Scripts
             var maxClip = new AnimationClip();
 
             blendTree.AddChild(minClip, -9999f);
-            AssetDatabase.CreateAsset(minClip, folderPath + "/Anim_" + machineName + "_InputSingle_Min.anim");
+            AssetDatabase.CreateAsset(minClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputSingle_Min.anim");
             blendTree.AddChild(maxClip, 9999f);
-            AssetDatabase.CreateAsset(maxClip, folderPath + "/Anim_" + machineName + "_InputSingle_Max.anim");
+            AssetDatabase.CreateAsset(maxClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputSingle_Max.anim");
 
             animatorState.motion = blendTree;
             
@@ -2041,14 +2042,14 @@ namespace ABI.CCK.Scripts
             var X1Y1Clip = new AnimationClip();
 
             blendTreeXMin.AddChild(X0Y0Clip, -9999f);
-            AssetDatabase.CreateAsset(X0Y0Clip, folderPath + "/Anim_" + machineName + "_InputVector2_X0Y0.anim");
+            AssetDatabase.CreateAsset(X0Y0Clip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector2_X0Y0.anim");
             blendTreeXMin.AddChild(X0Y1Clip, 9999f);
-            AssetDatabase.CreateAsset(X0Y1Clip, folderPath + "/Anim_" + machineName + "_InputVector2_X0Y1.anim");
+            AssetDatabase.CreateAsset(X0Y1Clip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector2_X0Y1.anim");
             
             blendTreeXMax.AddChild(X1Y0Clip, -9999f);
-            AssetDatabase.CreateAsset(X1Y0Clip, folderPath + "/Anim_" + machineName + "_InputVector2_X1Y0.anim");
+            AssetDatabase.CreateAsset(X1Y0Clip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector2_X1Y0.anim");
             blendTreeXMax.AddChild(X1Y1Clip, 9999f);
-            AssetDatabase.CreateAsset(X1Y1Clip, folderPath + "/Anim_" + machineName + "_InputVector2_X1Y1.anim");
+            AssetDatabase.CreateAsset(X1Y1Clip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector2_X1Y1.anim");
 
             animatorState.motion = blendTree;
             
@@ -2168,24 +2169,24 @@ namespace ABI.CCK.Scripts
             var clipX1Y1Z1 = new AnimationClip();
 
             blendTreeXMinYMin.AddChild(clipX0Y0Z0, -9999f);
-            AssetDatabase.CreateAsset(clipX0Y0Z0, folderPath + "/Anim_" + machineName + "_InputVector3_X0Y0Z0.anim");
+            AssetDatabase.CreateAsset(clipX0Y0Z0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector3_X0Y0Z0.anim");
             blendTreeXMinYMin.AddChild(clipX0Y0Z1, 9999f);
-            AssetDatabase.CreateAsset(clipX0Y0Z1, folderPath + "/Anim_" + machineName + "_InputVector3_X0Y0Z1.anim");
+            AssetDatabase.CreateAsset(clipX0Y0Z1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector3_X0Y0Z1.anim");
             
             blendTreeXMinYMax.AddChild(clipX0Y1Z0, -9999f);
-            AssetDatabase.CreateAsset(clipX0Y1Z0, folderPath + "/Anim_" + machineName + "_InputVector3_X0Y1Z0.anim");
+            AssetDatabase.CreateAsset(clipX0Y1Z0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector3_X0Y1Z0.anim");
             blendTreeXMinYMax.AddChild(clipX0Y1Z1, 9999f);
-            AssetDatabase.CreateAsset(clipX0Y1Z1, folderPath + "/Anim_" + machineName + "_InputVector3_X0Y1Z1.anim");
+            AssetDatabase.CreateAsset(clipX0Y1Z1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector3_X0Y1Z1.anim");
             
             blendTreeXMaxYMin.AddChild(clipX1Y0Z0, -9999f);
-            AssetDatabase.CreateAsset(clipX1Y0Z0, folderPath + "/Anim_" + machineName + "_InputVector3_X1Y0Z0.anim");
+            AssetDatabase.CreateAsset(clipX1Y0Z0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector3_X1Y0Z0.anim");
             blendTreeXMaxYMin.AddChild(clipX1Y0Z1, 9999f);
-            AssetDatabase.CreateAsset(clipX1Y0Z1, folderPath + "/Anim_" + machineName + "_InputVector3_X1Y0Z1.anim");
+            AssetDatabase.CreateAsset(clipX1Y0Z1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector3_X1Y0Z1.anim");
             
             blendTreeXMaxYMax.AddChild(clipX1Y1Z0, -9999f);
-            AssetDatabase.CreateAsset(clipX1Y1Z0, folderPath + "/Anim_" + machineName + "_InputVector3_X1Y1Z0.anim");
+            AssetDatabase.CreateAsset(clipX1Y1Z0, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector3_X1Y1Z0.anim");
             blendTreeXMaxYMax.AddChild(clipX1Y1Z1, 9999f);
-            AssetDatabase.CreateAsset(clipX1Y1Z1, folderPath + "/Anim_" + machineName + "_InputVector3_X1Y1Z1.anim");
+            AssetDatabase.CreateAsset(clipX1Y1Z1, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_InputVector3_X1Y1Z1.anim");
 
             animatorState.motion = blendTreeX;
             
