@@ -8,7 +8,13 @@ Official CCK available here: https://cck.cvr.gg/
 This repo is purely for convenience features for the existing functionality
 
 If you have ideas on what could be added then you can ask that via the issues and I might make it and/or bring it up with the ChilloutVR Developers. 
-However they are working on a proper feedback board right now, so that really shouldn't be necessary.
+~~However they are working on a proper feedback board right now, so that really shouldn't be necessary.~~ The feedback board is now live at [feedback.abinteractive.net](https://feedback.abinteractive.net/b/cck-featurerequests)
+
+### Branches
+this repo has quite a few branches, so let me explain;
+- Upstream contains the newest CCK without any modifications, it also contains any readme update first.
+- main contains all tweaks I am done with, and gets rebased on the newer CCk versions each update
+- other branches get merged into main when a feature is done.
 
 ### TODO
 - overhaul slider inputs to be able to 
