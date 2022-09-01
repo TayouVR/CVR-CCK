@@ -98,7 +98,7 @@ namespace ABI.CCK.Scripts.Editor
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
             
             var propertyList = new Dictionary<string, string>();
-            var rendererFound = false;
+            //var rendererFound = false;
             
             if (entity.Renderer != null)
             {
@@ -126,7 +126,7 @@ namespace ABI.CCK.Scripts.Editor
                         }
                     }
 
-                    rendererFound = true;
+                    //rendererFound = true;
                 }
             }
             

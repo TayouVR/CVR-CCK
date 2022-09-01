@@ -61,7 +61,7 @@ namespace ABI.CCK.Scripts.Editor
             EditorGUI.LabelField(_rect, "Transform");
             _rect.x += 120;
             _rect.width = rect.width - 120;
-            subSyncEntity.transform = (Transform) EditorGUI.ObjectField(_rect, subSyncEntity.transform, typeof(Transform));
+            subSyncEntity.transform = (Transform) EditorGUI.ObjectField(_rect, subSyncEntity.transform, typeof(Transform), true);
             
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 120, EditorGUIUtility.singleLineHeight);
@@ -180,7 +180,7 @@ namespace ABI.CCK.Scripts.Editor
             EditorGUI.LabelField(_rect, "Connected Animator");
             _rect.x += 120;
             _rect.width = rect.width - 120;
-            entity.animator = (Animator) EditorGUI.ObjectField(_rect, entity.animator, typeof(Animator));
+            entity.animator = (Animator) EditorGUI.ObjectField(_rect, entity.animator, typeof(Animator), true);
             
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 120, EditorGUIUtility.singleLineHeight);

@@ -181,7 +181,7 @@ namespace ABI.CCK.Scripts.Editor
                 }
 
                 _avatar.avatarSettings.baseController = (RuntimeAnimatorController) EditorGUILayout.ObjectField("Base Animator",
-                    _avatar.avatarSettings.baseController, typeof(RuntimeAnimatorController));
+                    _avatar.avatarSettings.baseController, typeof(RuntimeAnimatorController), true);
                 if (_avatar.avatarSettings.baseController is AnimatorOverrideController)
                     _avatar.avatarSettings.baseController = null;
                 
@@ -190,7 +190,7 @@ namespace ABI.CCK.Scripts.Editor
                                         "From the Directory \"ABI.CCK/Animations\" is used here.", MessageType.Info);
                 
                 _avatar.avatarSettings.baseOverrideController = (RuntimeAnimatorController) EditorGUILayout.ObjectField("Override Controller",
-                    _avatar.avatarSettings.baseOverrideController, typeof(RuntimeAnimatorController));
+                    _avatar.avatarSettings.baseOverrideController, typeof(RuntimeAnimatorController), true);
                 if (_avatar.avatarSettings.baseOverrideController is AnimatorController)
                     _avatar.avatarSettings.baseOverrideController = null;
                 
@@ -539,7 +539,6 @@ namespace ABI.CCK.Scripts.Editor
                 case CVRAdvancedSettingsEntry.SettingsType.Joystick2D:
                 case CVRAdvancedSettingsEntry.SettingsType.Joystick3D:
                     return EditorGUIUtility.singleLineHeight * 11.25f;
-                    break;
             }
 
             return EditorGUIUtility.singleLineHeight * 8.75f;

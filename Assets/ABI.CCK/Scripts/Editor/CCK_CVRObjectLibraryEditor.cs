@@ -84,7 +84,7 @@ namespace ABI.CCK.Scripts.Editor
             _rect.x += 50;
             _rect.width = rect.width - 50 - 50;
             
-            objectCatalogCategory.image = (Texture2D) EditorGUI.ObjectField(_rect, objectCatalogCategory.image, typeof(Texture2D));
+            objectCatalogCategory.image = (Texture2D) EditorGUI.ObjectField(_rect, objectCatalogCategory.image, typeof(Texture2D), true);
 
             if (objectCatalogCategory.image != null)
             {
@@ -156,7 +156,7 @@ namespace ABI.CCK.Scripts.Editor
             _rect.x += 60;
             _rect.width = rect.width - 160;
             
-            objectCatalogEntry.prefab = (GameObject) EditorGUI.ObjectField(_rect, objectCatalogEntry.prefab, typeof(GameObject));
+            objectCatalogEntry.prefab = (GameObject) EditorGUI.ObjectField(_rect, objectCatalogEntry.prefab, typeof(GameObject), true);
 
             if (objectCatalogEntry.prefab != null)
             {
@@ -184,7 +184,7 @@ namespace ABI.CCK.Scripts.Editor
             _rect.x += 60;
             _rect.width = rect.width - 160;
             
-            objectCatalogEntry.preview = (Texture2D) EditorGUI.ObjectField(_rect, objectCatalogEntry.preview, typeof(Texture2D));
+            objectCatalogEntry.preview = (Texture2D) EditorGUI.ObjectField(_rect, objectCatalogEntry.preview, typeof(Texture2D), true);
             
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);

@@ -133,7 +133,7 @@ namespace ABI.CCK.Scripts.Editor
                         for (int i = 0; i < trigger.specificParticleSystems.Count; i++)
                         {
                             trigger.specificParticleSystems[i] = (ParticleSystem) EditorGUILayout.ObjectField("Element " + i,
-                                trigger.specificParticleSystems[i], typeof(ParticleSystem));
+                                trigger.specificParticleSystems[i], typeof(ParticleSystem), true);
                         }
                     }
 
@@ -162,7 +162,7 @@ namespace ABI.CCK.Scripts.Editor
                         for (int i = 0; i < trigger.allowedPointer.Count; i++)
                         {
                             trigger.allowedPointer[i] = (CVRPointer) EditorGUILayout.ObjectField("Element " + i,
-                                trigger.allowedPointer[i], typeof(CVRPointer));
+                                trigger.allowedPointer[i], typeof(CVRPointer), true);
                         }
                     }
 
@@ -873,7 +873,7 @@ namespace ABI.CCK.Scripts.Editor
                             break;
                         case CVRInteractableActionOperation.ActionType.SetPropertyByValue:
 
-                            trigger.operations[j].varBufferVal = (CVRVariableBuffer) EditorGUILayout.ObjectField("Variable Buffer", trigger.operations[j].varBufferVal, typeof(CVRVariableBuffer));
+                            trigger.operations[j].varBufferVal = (CVRVariableBuffer) EditorGUILayout.ObjectField("Variable Buffer", trigger.operations[j].varBufferVal, typeof(CVRVariableBuffer), true);
                             
                             trigger.operations[j].gameObjectVal = (GameObject) EditorGUILayout.ObjectField(
                                 "Target:", 
@@ -971,7 +971,7 @@ namespace ABI.CCK.Scripts.Editor
                             break;
                         case CVRInteractableActionOperation.ActionType.DeleteGameObject:
                             trigger.operations[j].gameObjectVal = (GameObject) EditorGUILayout.ObjectField("Target",
-                                trigger.operations[j].gameObjectVal, typeof(GameObject));
+                                trigger.operations[j].gameObjectVal, typeof(GameObject), true);
                             break;
                     }
                     

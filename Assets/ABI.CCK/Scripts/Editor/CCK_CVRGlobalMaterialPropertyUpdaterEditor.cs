@@ -15,7 +15,7 @@ namespace ABI.CCK.Scripts.Editor
             
             EditorGUI.BeginChangeCheck();
 
-            Material material = (Material) EditorGUILayout.ObjectField("Material", _target.material, typeof(Material));
+            Material material = (Material) EditorGUILayout.ObjectField("Material", _target.material, typeof(Material), true);
 
             CVRGlobalMaterialPropertyUpdater.PropertyType type = (CVRGlobalMaterialPropertyUpdater.PropertyType) EditorGUILayout.EnumPopup("Property Type", _target.propertyType);
 
