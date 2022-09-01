@@ -93,6 +93,11 @@ namespace ABI.CCK.Scripts.Translation
                 "ABI_UI_BUILDPANEL_SETTINGS_HINT_CCK_SANITIZE_PARAMETERS", 
                 "The CCK automatically filters out uncommon characters from parameter names to ensure compatibility and stability"
             },
+            {"ABI_UI_BUILDPANEL_SETTINGS_CCK_DISABLE_NOT_USED_AAS_UI_EELEMENTS", "Disable unused UI Elements on Advanced Avatar Settings"},
+            {
+                "ABI_UI_BUILDPANEL_SETTINGS_HINT_CCK_DISABLE_NOT_USED_AAS_UI_EELEMENTS",
+                "Disables UI elements when the parameter you entered already exists, in which case that parameter will be skipped anyways upon generating the Animator."
+            },
             {
                 "ABI_UI_BUILDPANEL_WARNING_FOLDERPATH",
                 "Please do not move the folder location of the CCK or CCK Mods folder. This will render the CCK unusable."
