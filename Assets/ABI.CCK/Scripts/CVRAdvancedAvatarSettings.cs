@@ -444,6 +444,10 @@ namespace ABI.CCK.Scripts
         private ReorderableList gameObjectList;
         private CVRAvatar target;
         
+        public CVRAdvancesAvatarSettingGameObjectDropdown() {
+            usedType = ParameterType.GenerateInt;
+        }
+
         #endif
 
         public string[] getOptionsList()
