@@ -35,7 +35,7 @@ namespace ABI.CCK.Scripts.Editor
             string globalTextureName = "";
             if (textureType == CVRTexturePropertyParser.TextureType.LocalTexture)
             {
-                texture = (RenderTexture) EditorGUILayout.ObjectField("Texture", _parser.texture, typeof(RenderTexture));
+                texture = (RenderTexture) EditorGUILayout.ObjectField("Texture", _parser.texture, typeof(RenderTexture), true);
             }
             else
             {
@@ -120,7 +120,7 @@ namespace ABI.CCK.Scripts.Editor
             EditorGUI.LabelField(_rect, "Target");
             _rect.x += 100;
             _rect.width = rect.width - 100;
-            GameObject target = (GameObject) EditorGUI.ObjectField(_rect, _element.target, typeof(GameObject));
+            GameObject target = (GameObject) EditorGUI.ObjectField(_rect, _element.target, typeof(GameObject), true);
 
             if (target != _element.target) _element.component = null;
             

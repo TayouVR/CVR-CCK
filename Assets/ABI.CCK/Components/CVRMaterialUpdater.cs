@@ -13,7 +13,9 @@ namespace ABI.CCK.Components
 
         public UpdateType updateType = UpdateType.Update;
 
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         private Renderer renderer;
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
         private Vector3 lastPos;
         private Vector3 velocity;
         private Vector3 lastRot;  

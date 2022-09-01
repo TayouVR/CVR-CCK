@@ -7,8 +7,10 @@ namespace ABI.CCK.Components
     {
         [ReadOnly]
         public string referenceID;
-        
+
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         public ParticleSystem particleSystem;
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
         public List<AudioClip> shootSounds = new List<AudioClip>();
         public List<AudioClip> reloadSounds = new List<AudioClip>();
         public List<AudioClip> emptyShootSounds = new List<AudioClip>();

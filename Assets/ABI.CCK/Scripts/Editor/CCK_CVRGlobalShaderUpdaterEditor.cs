@@ -39,7 +39,7 @@ namespace ABI.CCK.Scripts.Editor
 
             if (updateTexture)
             {
-                renderTexture = (RenderTexture) EditorGUILayout.ObjectField("Render Texture", _globalShaderUpdater.renderTexture, typeof(RenderTexture));
+                renderTexture = (RenderTexture) EditorGUILayout.ObjectField("Render Texture", _globalShaderUpdater.renderTexture, typeof(RenderTexture), true);
                 propertyName = EditorGUILayout.TextField("Property Name", _globalShaderUpdater.propertyName);
             }
             

@@ -87,7 +87,7 @@ namespace ABI.CCK.Components
                         entity.Text = EditorGUI.TextArea(_rect, entity.Text);
                         break;
                     case TranslatableType.AudioClip:
-                        entity.Clip = (AudioClip) EditorGUI.ObjectField(_rect, entity.Clip, typeof(AudioClip));
+                        entity.Clip = (AudioClip) EditorGUI.ObjectField(_rect, entity.Clip, typeof(AudioClip), true);
                         break;
                     case TranslatableType.GameObject:
                         entity.Object = (GameObject) EditorGUI.ObjectField(_rect, entity.Object, typeof(GameObject), true);

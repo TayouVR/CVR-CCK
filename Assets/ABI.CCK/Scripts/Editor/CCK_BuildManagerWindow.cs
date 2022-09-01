@@ -99,7 +99,9 @@ namespace ABI.CCK.Scripts.Editor
 
             _username = EditorPrefs.GetString("m_ABI_Username");
             _key = EditorPrefs.GetString("m_ABI_Key");
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             Login();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
         void OnEditorStateUpdated(PlayModeStateChange state)
@@ -183,7 +185,9 @@ namespace ABI.CCK.Scripts.Editor
 
             if (GUILayout.Button(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_LOGIN_BUTTON")))
             {
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 Login();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             }
 
             if (_hasAttemptedToLogin && !_loggedIn)

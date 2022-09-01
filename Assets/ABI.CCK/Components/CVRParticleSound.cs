@@ -9,8 +9,10 @@ namespace ABI.CCK.Components
 {
     public class CVRParticleSound : MonoBehaviour
     {
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         public ParticleSystem particleSystem;
-        
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
+
         public AudioClip[] spawnSound;
         public AudioClip[] dieSound;
 

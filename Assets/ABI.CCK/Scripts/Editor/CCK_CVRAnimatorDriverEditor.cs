@@ -180,52 +180,36 @@ namespace ABI.CCK.Scripts.Editor
             {
                 case 0:
                     return _driver.animatorParameter01;
-                    break;
                 case 1:
                     return _driver.animatorParameter02;
-                    break;
                 case 2:
                     return _driver.animatorParameter03;
-                    break;
                 case 3:
                     return _driver.animatorParameter04;
-                    break;
                 case 4:
                     return _driver.animatorParameter05;
-                    break;
                 case 5:
                     return _driver.animatorParameter06;
-                    break;
                 case 6:
                     return _driver.animatorParameter07;
-                    break;
                 case 7:
                     return _driver.animatorParameter08;
-                    break;
                 case 8:
                     return _driver.animatorParameter09;
-                    break;
                 case 9:
                     return _driver.animatorParameter10;
-                    break;
                 case 10:
                     return _driver.animatorParameter11;
-                    break;
                 case 11:
                     return _driver.animatorParameter12;
-                    break;
                 case 12:
                     return _driver.animatorParameter13;
-                    break;
                 case 13:
                     return _driver.animatorParameter14;
-                    break;
                 case 14:
                     return _driver.animatorParameter15;
-                    break;
                 default:
                     return _driver.animatorParameter16;
-                    break;
             }
         }
         

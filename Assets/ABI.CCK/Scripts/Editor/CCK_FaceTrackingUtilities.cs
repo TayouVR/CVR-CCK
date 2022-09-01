@@ -55,7 +55,7 @@ namespace ABI.CCK.Scripts.Editor
 
         private void OnGUI()
         {
-            var avatar = (CVRAvatar) EditorGUILayout.ObjectField("Avatar", Avatar, typeof(CVRAvatar));
+            var avatar = (CVRAvatar) EditorGUILayout.ObjectField("Avatar", Avatar, typeof(CVRAvatar), true);
 
             if (avatar != Avatar) FaceTracking = null;
             Avatar = avatar;
@@ -344,9 +344,11 @@ namespace ABI.CCK.Scripts.Editor
             var maxX = 0f;
             var minY = 0f;
             var maxY = 0f;
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
             var minZ = 0f;
             var maxZ = 0f;
-            
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
+
             var leftWeight = 0f;
             var rightWeight = 0f;
             var upWeight = 0f;
