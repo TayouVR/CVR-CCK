@@ -392,6 +392,7 @@ namespace ABI.CCK.Scripts.Editor
                         break;
                 }
 
+                entry.setting.target = _avatar;
                 entry.setting.SetupAnimator(ref _avatar.avatarSettings.animator, entry.machineName, folderPath);
             }
 
@@ -424,7 +425,7 @@ namespace ABI.CCK.Scripts.Editor
                 case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle:
                 {
                     var gameObjectToggle = (CVRAdvancesAvatarSettingGameObjectToggle) entity.setting;
-                    if (gameObjectToggle == null || gameObjectToggle.gameObjectTargets == null)
+                    if (gameObjectToggle == null || gameObjectToggle.targets == null)
                         return EditorGUIUtility.singleLineHeight * 11.50f;
                     float height = 10.50f;
                     if (gameObjectToggle.useAnimationClip) 
@@ -433,7 +434,7 @@ namespace ABI.CCK.Scripts.Editor
                     } 
                     else 
                     {
-                        foreach (var target in gameObjectToggle.gameObjectTargets) 
+                        foreach (var target in gameObjectToggle.targets) 
                         {
                             if (!target.isCollapsed) 
                             {
@@ -441,10 +442,10 @@ namespace ABI.CCK.Scripts.Editor
                             } 
                             else 
                             {
-                                height += 3.75f;
+                                height += target.targetType == AdvancedAvatarSettingsTargetType.Animations ? 2.5f : 3.75f;
                             }
                         }
-                        if (gameObjectToggle.gameObjectTargets.Count == 0) 
+                        if (gameObjectToggle.targets.Count == 0) 
                         {
                             height += 1f;
                         }
@@ -470,9 +471,9 @@ namespace ABI.CCK.Scripts.Editor
                             } 
                             else 
                             {
-                                if (option.gameObjectTargets.Count != 0) 
+                                if (option.targets.Count != 0) 
                                 {
-                                    foreach (var target in option.gameObjectTargets) 
+                                    foreach (var target in option.targets) 
                                     {
                                         if (!target.isCollapsed) 
                                         {
@@ -480,7 +481,7 @@ namespace ABI.CCK.Scripts.Editor
                                         } 
                                         else 
                                         {
-                                            height += 3;
+                                            height += target.targetType == AdvancedAvatarSettingsTargetType.Animations ? 2f : 3f;
                                         }
                                     }
                                 }
@@ -796,30 +797,8 @@ namespace ABI.CCK.Scripts.Editor
                     gameObjectToggle.defaultValue = EditorGUI.Toggle(_rect, gameObjectToggle.defaultValue);
 
                     rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                    _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                    // Use Animation Clip
-                    EditorGUI.LabelField(_rect, "Use Animation");
-                    _rect.x += 100;
-                    _rect.width = rect.width - 100;
-                    gameObjectToggle.useAnimationClip = EditorGUI.Toggle(_rect, gameObjectToggle.useAnimationClip);
-
-                    rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                    if (gameObjectToggle.useAnimationClip)
-                    {
-                        _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                        // Animation Clip Slot
-                        EditorGUI.LabelField(_rect, "Clip");
-                        _rect.x += 100;
-                        _rect.width = rect.width - 100;
-                        gameObjectToggle.animationClip = (AnimationClip)EditorGUI.ObjectField(_rect, gameObjectToggle.animationClip, typeof(AnimationClip), true);
-                    }
-                    else
-                    {
-                        var gameObjectList = gameObjectToggle.GetReorderableList(_avatar);
-                        gameObjectList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
-                    }
+                    var gameObjectList = gameObjectToggle.GetReorderableList(_avatar);
+                    gameObjectList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
                     break;
                 case CVRAdvancedSettingsEntry.SettingsType.GameObjectDropdown:
 

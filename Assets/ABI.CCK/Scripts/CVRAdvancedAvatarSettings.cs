@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using ABI.CCK.Components;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using UnityEngine.Serialization;
+using System.Runtime.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Animations;
@@ -149,6 +151,8 @@ namespace ABI.CCK.Scripts
 #endif        
     }
 
+    // Setting Types
+
     [System.Serializable]
     public class CVRAdvancesAvatarSettingBase
     {
@@ -164,6 +168,8 @@ namespace ABI.CCK.Scripts
         #if UNITY_EDITOR
 
         public bool isCollapsed = true;
+        public CVRAvatar target;
+
         public virtual void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             
@@ -172,20 +178,35 @@ namespace ABI.CCK.Scripts
     }
 
     [System.Serializable]
-    public class CVRAdvancesAvatarSettingGameObjectToggle : CVRAdvancesAvatarSettingBase 
-    {
+    public class CVRAdvancesAvatarSettingGameObjectToggle : CVRAdvancesAvatarSettingBase
+#if UNITY_EDITOR
+        , ISerializationCallbackReceiver
+#endif
+        {
         public bool defaultValue;
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
+
+        [Obsolete] public bool useAnimationClip;
+        [Obsolete] public AnimationClip animationClip;
+
+        [FormerlySerializedAs("gameObjectTargets")]
+        public List<CVRAdvancedSettingsTargetBase> targets = new List<CVRAdvancedSettingsTargetBase>();
         
-        public bool useAnimationClip;
-        public AnimationClip animationClip;
-        
-        public List<CVRAdvancedSettingsTargetEntryGameObject> gameObjectTargets =
-            new List<CVRAdvancedSettingsTargetEntryGameObject>();
-        
-        private ReorderableList gameObjectList;
+        private ReorderableList targetsList;
         private CVRAvatar target;
+
+        public void OnBeforeSerialize() {
+            // empty
+        }
+
+        public void OnAfterDeserialize() {
+            if (useAnimationClip) {
+                targets.Add(new CVRAdvancedSettingsTargetEntryAnimations() { onClip = animationClip });
+                useAnimationClip = false;
+                animationClip = null;
+            }
+        }
 
         public CVRAdvancesAvatarSettingGameObjectToggle() {
             usedType = ParameterType.GenerateBool;
@@ -250,23 +271,42 @@ namespace ABI.CCK.Scripts
             keyframe.outTangent = Mathf.Infinity;
             animationCurveOff.AddKey(keyframe);
 
-            foreach (var target in gameObjectTargets)
+            foreach (var target in targets)
             {
-                if(target.gameObject == null || target.treePath == null) continue;
-                
-                onClip.SetCurve(target.treePath, typeof(GameObject), "m_IsActive", target.onState ? animationCurveOn : animationCurveOff);
-                
-                offClip.SetCurve(target.treePath, typeof(GameObject), "m_IsActive", !target.onState ? animationCurveOn : animationCurveOff);
+                if (target.targetType == AdvancedAvatarSettingsTargetType.GameObject || target.onClip == null) {
+                    if (target == null || target.gameObject == null || target.treePath == null) continue;
+
+                    onClip.SetCurve(target.treePath, typeof(GameObject), "m_IsActive", target.onState ? animationCurveOn : animationCurveOff);
+                } else {
+                    foreach (var editorCurveBinding in AnimationUtility.GetCurveBindings(target.onClip)) {
+                        UnityEngine.Object targetObject = AnimationUtility.GetAnimatedObject(this.target.gameObject, editorCurveBinding);
+                        if (targetObject == null) continue;
+                        onClip.SetCurve(
+                            AnimationUtility.CalculateTransformPath(targetObject is GameObject ? (targetObject as GameObject).transform : (targetObject as Component).transform, this.target.transform),
+                            targetObject.GetType(),
+                            editorCurveBinding.propertyName,
+                            AnimationUtility.GetEditorCurve(target.onClip, editorCurveBinding));
+                    }
+                }
+                if (target.targetType == AdvancedAvatarSettingsTargetType.GameObject || target.offClip == null) {
+                    if (target == null || target.gameObject == null || target.treePath == null) continue;
+
+                    offClip.SetCurve(target.treePath, typeof(GameObject), "m_IsActive", !target.onState ? animationCurveOn : animationCurveOff);
+                } else {
+                    foreach (var editorCurveBinding in AnimationUtility.GetCurveBindings(target.offClip)) {
+                        UnityEngine.Object targetObject = AnimationUtility.GetAnimatedObject(this.target.gameObject, editorCurveBinding);
+                        if (targetObject == null) continue;
+                        offClip.SetCurve(
+                            AnimationUtility.CalculateTransformPath(targetObject is GameObject ? (targetObject as GameObject).transform : (targetObject as Component).transform, this.target.transform),
+                            targetObject.GetType(),
+                            editorCurveBinding.propertyName,
+                            AnimationUtility.GetEditorCurve(target.offClip, editorCurveBinding));
+                    }
+                }
             }
             
-            if (useAnimationClip) {
-                onClip = animationClip;
-                AssetDatabase.CreateAsset(offClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Toggle_Off.anim");
-            }
-            else {
-                AssetDatabase.CreateAsset(offClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Toggle_Off.anim");
-                AssetDatabase.CreateAsset(onClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Toggle_On.anim");
-            }
+            AssetDatabase.CreateAsset(offClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Toggle_Off.anim");
+            AssetDatabase.CreateAsset(onClip, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Toggle_On.anim");
             
             if (usedType == ParameterType.GenerateBool)
             {
@@ -333,37 +373,43 @@ namespace ABI.CCK.Scripts
 
         private void generateReorderableList()
         {
-            gameObjectList = new ReorderableList(gameObjectTargets, typeof(CVRAdvancedSettingsTargetEntryGameObject), 
+            targetsList = new ReorderableList(targets, typeof(CVRAdvancedSettingsTargetEntryGameObject), 
                                                  true, true, true, true);
-            gameObjectList.drawHeaderCallback = OnDrawHeader;
-            gameObjectList.drawElementCallback = OnDrawElement;
-            gameObjectList.elementHeightCallback = OnHeightElement;
-            gameObjectList.onAddCallback = OnAdd;
-            gameObjectList.onChangedCallback = OnChanged;
+            targetsList.drawHeaderCallback = OnDrawHeader;
+            targetsList.drawElementCallback = OnDrawElement;
+            targetsList.elementHeightCallback = OnHeightElement;
+            targetsList.onAddDropdownCallback = OnAddDropdown;
+            targetsList.onChangedCallback = OnChanged;
         }
         
         public ReorderableList GetReorderableList(CVRAvatar avatar)
         {
             target = avatar;
             
-            if (gameObjectList == null) generateReorderableList();
+            if (targetsList == null) generateReorderableList();
 
-            return gameObjectList;
+            return targetsList;
         }
 
         private void OnChanged(ReorderableList list)
         {
             EditorUtility.SetDirty(target);
         }
-
-        private void OnAdd(ReorderableList list)
+        private void OnAddDropdown(Rect buttonRect, ReorderableList list)
         {
-            gameObjectTargets.Add(new CVRAdvancedSettingsTargetEntryGameObject());
+            GenericMenu menu = new GenericMenu();
+            menu.AddItem(new GUIContent("Game Object"), false, () => {
+                targets.Add(new CVRAdvancedSettingsTargetEntryGameObject());
+            });
+            menu.AddItem(new GUIContent("Animations"), false, () => {
+                targets.Add(new CVRAdvancedSettingsTargetEntryAnimations());
+            });
+            menu.ShowAsContext();
         }
 
         private float OnHeightElement(int index)
         {
-            CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
+            CVRAdvancedSettingsTargetBase entity = targets[index];
             float height = 0;
             if (!entity.isCollapsed)
             {
@@ -371,64 +417,84 @@ namespace ABI.CCK.Scripts
             } 
             else 
             {
-                height += 3f;
+                height += entity.targetType == AdvancedAvatarSettingsTargetType.GameObject ? 3f : 2f;
             }
             return EditorGUIUtility.singleLineHeight * height * 1.25f;
         }
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
         {
-            if (index > gameObjectTargets.Count) return;
-            CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
+            if (index > targets.Count) return;
+            CVRAdvancedSettingsTargetBase entity = targets[index];
             
             rect.y += 2;
             rect.x += 12;
             rect.width -= 12;
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            entity.isCollapsed = EditorGUI.Foldout(_rect, entity.isCollapsed, "Name", true);
-            _rect.x += 100;
-            _rect.width = rect.width - 100;
-            var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
-
-            if (targetGameObject != null && targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
+            if (entity.targetType == AdvancedAvatarSettingsTargetType.GameObject)
             {
-                entity.gameObject = targetGameObject;
-                entity.treePath =
-                    AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
+                entity.isCollapsed = EditorGUI.Foldout(_rect, entity.isCollapsed, "Game Object", true);
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                var targetGameObject = (GameObject)EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
+
+                if (targetGameObject != null &&
+                    targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
+                {
+                    entity.gameObject = targetGameObject;
+                    entity.treePath =
+                        AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
+                }
+                else if (entity.gameObject != targetGameObject)
+                {
+                    entity.gameObject = null;
+                    entity.treePath = "";
+                }
+
+                // is Collapsed
+                if (!entity.isCollapsed) return;
+
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                EditorGUI.LabelField(_rect, "Path");
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                EditorGUI.LabelField(_rect, entity.treePath);
+
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                EditorGUI.LabelField(_rect, new GUIContent("Set to",
+                                                           "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
+                                                           "will be deactivated when the toggle is pressed."));
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                entity.onState = EditorGUI.Toggle(_rect, entity.onState);
+            } else if (entity.targetType == AdvancedAvatarSettingsTargetType.Animations) {
+                entity.isCollapsed = EditorGUI.Foldout(_rect, entity.isCollapsed, "On Clip", true);
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                entity.onClip = (AnimationClip)EditorGUI.ObjectField(_rect, entity.onClip, typeof(AnimationClip), true);
+
+                // is Collapsed
+                if (!entity.isCollapsed) return;
+
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+
+                EditorGUI.LabelField(_rect, "Off Clip");
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                entity.offClip = (AnimationClip)EditorGUI.ObjectField(_rect, entity.offClip, typeof(AnimationClip), true);
             }
-            else if (entity.gameObject != targetGameObject)
-            {
-                entity.gameObject = null;
-                entity.treePath = "";
-            }
-            
-            // is Collapsed
-            if (!entity.isCollapsed) return;
-
-            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-            EditorGUI.LabelField(_rect, "Path");
-            _rect.x += 100;
-            _rect.width = rect.width - 100;
-            EditorGUI.LabelField(_rect, entity.treePath);
-            
-            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-            EditorGUI.LabelField(_rect, new GUIContent("Set to",
-                                                       "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
-                                                       "will be deactivated when the toggle is pressed."));
-            _rect.x += 100;
-            _rect.width = rect.width - 100;
-            entity.onState = EditorGUI.Toggle(_rect, entity.onState);
         }
 
         private void OnDrawHeader(Rect rect)
         {
             Rect _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
-            GUI.Label(_rect, "GameObjects");
+            GUI.Label(_rect, "Targets");
         }
         
         #endif
@@ -515,63 +581,70 @@ namespace ABI.CCK.Scripts
             animationCurveOff.AddKey(keyframe);
 
             var i = 0;
-            AnimationClip animation;
+            
             List<AnimationClip> animations = new List<AnimationClip>();
             foreach (var option in options)
             {
-                animation = new AnimationClip();
+                AnimationClip animation = new AnimationClip();
                 var j = 0;
-                if (option.useAnimationClip && option.animationClip != null) 
-                {
-                    animation = option.animationClip;
-                } 
-                else
-                {
-                    var activeGameobjects = new List<CVRAdvancedSettingsTargetEntryGameObject>();
-                    var inActiveGameobjects = new List<CVRAdvancedSettingsTargetEntryGameObject>();
+                var activeGameobjects = new List<CVRAdvancedSettingsTargetBase>();
+                var inActiveGameobjects = new List<CVRAdvancedSettingsTargetBase>();
                     
-                    foreach (var activeOption in options)
+                foreach (var activeOption in options)
+                {
+                    foreach (var target in activeOption.targets)
                     {
-                        foreach (var gameObjectTarget in activeOption.gameObjectTargets)
-                        {
-                            if (gameObjectTarget == null || gameObjectTarget.gameObject == null || gameObjectTarget.treePath == null) continue;
+                        if (target.targetType == AdvancedAvatarSettingsTargetType.GameObject || target.onClip == null) {
+                            if (target == null || target.gameObject == null || target.treePath == null) continue;
 
-                            if (i == j && gameObjectTarget.onState)
+                            if (i == j && target.onState)
                             {
-                                activeGameobjects.Add(gameObjectTarget);
+                                activeGameobjects.Add(target);
                             }
                             else
                             {
-                                inActiveGameobjects.Add(gameObjectTarget);
+                                inActiveGameobjects.Add(target);
+                            }
+                        } else {
+                            if (i == j) {
+                                foreach (var editorCurveBinding in AnimationUtility.GetCurveBindings(target.onClip)) {
+                                    UnityEngine.Object targetObject = AnimationUtility.GetAnimatedObject(this.target.gameObject, editorCurveBinding);
+                                    if (targetObject == null) continue;
+                                    animation.SetCurve(
+                                        AnimationUtility.CalculateTransformPath(targetObject is GameObject ? (targetObject as GameObject).transform : (targetObject as Component).transform, this.target.transform),
+                                        targetObject.GetType(),
+                                        editorCurveBinding.propertyName,
+                                        AnimationUtility.GetEditorCurve(target.onClip, editorCurveBinding));
+                                }
                             }
                         }
-                        j++;
                     }
-
-                    foreach (var gameObjectTarget in activeGameobjects)
-                    {
-                        animation.SetCurve(
-                            gameObjectTarget.treePath, 
-                            typeof(GameObject), 
-                            "m_IsActive", 
-                            animationCurveOn
-                        );
-                    }
-                    
-                    foreach (var gameObjectTarget in inActiveGameobjects)
-                    {
-                        if(activeGameobjects.Find(match => match.treePath == gameObjectTarget.treePath) != null) continue;
-                        
-                        animation.SetCurve(
-                            gameObjectTarget.treePath, 
-                            typeof(GameObject), 
-                            "m_IsActive", 
-                            animationCurveOff
-                        );
-                    }
-                    
-                    AssetDatabase.CreateAsset(animation, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Dropdown_" + i + ".anim");
+                    j++;
                 }
+
+                foreach (var gameObjectTarget in activeGameobjects)
+                {
+                    animation.SetCurve(
+                        gameObjectTarget.treePath, 
+                        typeof(GameObject), 
+                        "m_IsActive", 
+                        animationCurveOn
+                    );
+                }
+                    
+                foreach (var gameObjectTarget in inActiveGameobjects)
+                {
+                    if(activeGameobjects.Find(match => match.treePath == gameObjectTarget.treePath) != null) continue;
+                        
+                    animation.SetCurve(
+                        gameObjectTarget.treePath, 
+                        typeof(GameObject), 
+                        "m_IsActive", 
+                        animationCurveOff
+                    );
+                }
+                    
+                AssetDatabase.CreateAsset(animation, folderPath + "/Anim_" + Regex.Replace(machineName, "[^a-zA-Z0-9#]", "") + "_Dropdown_" + i + ".anim");
 
                 animations.Add(animation);
                 i++;
@@ -667,12 +740,12 @@ namespace ABI.CCK.Scripts
                 } 
                 else 
                 {
-                    if (entity.gameObjectTargets.Count == 0) 
+                    if (entity.targets.Count == 0) 
                     {
                         height += 0.5f;
                     }
                     height += 2.25f;
-                    foreach (var target in entity.gameObjectTargets) 
+                    foreach (var target in entity.targets) 
                     {
                         if (!target.isCollapsed) 
                         {
@@ -709,30 +782,10 @@ namespace ABI.CCK.Scripts
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
             _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            // Use Animation Clip
-            EditorGUI.LabelField(_rect, "Use Animation");
-            _rect.x += 100;
-            _rect.width = rect.width - 100;
-            entity.useAnimationClip = EditorGUI.Toggle(_rect, entity.useAnimationClip);
+            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
 
-            if (entity.useAnimationClip) 
-            {
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
-
-                // Animation Clip Slot
-                EditorGUI.LabelField(_rect, "Clip");
-                _rect.x += 100;
-                _rect.width = rect.width - 100;
-                entity.animationClip = (AnimationClip)EditorGUI.ObjectField(_rect, entity.animationClip, typeof(AnimationClip), true);
-            }
-            else 
-            {
-                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-
-                var gameObjectList = entity.GetReorderableList(target);
-                gameObjectList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
-            }
+            var gameObjectList = entity.GetReorderableList(target);
+            gameObjectList.DoList(new Rect(rect.x, rect.y, rect.width, 20f));
         }
 
         private void OnDrawHeader(Rect rect)
@@ -756,8 +809,7 @@ namespace ABI.CCK.Scripts
 
         private CVRAdvancedSettingsTargetEntryMaterialColor entity;
         private ReorderableList gameObjectList;
-        private CVRAvatar target;
-        
+
         public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
@@ -1273,8 +1325,7 @@ namespace ABI.CCK.Scripts
         public AnimationClip maxAnimationClip;
         
         private ReorderableList gameObjectList;
-        private CVRAvatar target;
-        
+
         public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
@@ -1698,8 +1749,8 @@ namespace ABI.CCK.Scripts
         public Vector2 rangeMin = new Vector2(0, 0);
         public Vector2 rangeMax = new Vector2(1, 1);
 
-        #if UNITY_EDITOR
-        
+#if UNITY_EDITOR
+
         public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
@@ -1788,8 +1839,8 @@ namespace ABI.CCK.Scripts
         public Vector2 rangeMin = new Vector2(0, 0);
         public Vector2 rangeMax = new Vector2(1, 1);
 
-        #if UNITY_EDITOR
-        
+#if UNITY_EDITOR
+
         public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
@@ -1934,8 +1985,8 @@ namespace ABI.CCK.Scripts
     {
         public float defaultValue;
 
-        #if UNITY_EDITOR
-        
+#if UNITY_EDITOR
+
         public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
@@ -1989,8 +2040,8 @@ namespace ABI.CCK.Scripts
     {
         public Vector2 defaultValue = Vector2.zero;
 
-        #if UNITY_EDITOR
-        
+#if UNITY_EDITOR
+
         public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
@@ -2077,8 +2128,8 @@ namespace ABI.CCK.Scripts
     {
         public Vector3 defaultValue = Vector3.zero;
 
-        #if UNITY_EDITOR
-        
+#if UNITY_EDITOR
+
         public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
@@ -2217,41 +2268,83 @@ namespace ABI.CCK.Scripts
         
         #endif
     }
-    
+
+    // settings sections
+
     [System.Serializable]
-    public class CVRAdvancedSettingsTargetEntryGameObject {
+    public class CVRAdvancedSettingsTargetBase {
 #if UNITY_EDITOR
         public bool isCollapsed;
 #endif
+        // all the data has to be here for serialization, using inheritance doesn't serialize properly in unity
+        public AdvancedAvatarSettingsTargetType targetType;
+
+        //gameObject
         public GameObject gameObject;
         public string treePath;
         public bool onState = true;
+
+        // Animation Clip
+        public AnimationClip onClip;
+        public AnimationClip offClip;
+    }
+
+    [System.Serializable]
+    public class CVRAdvancedSettingsTargetEntryGameObject : CVRAdvancedSettingsTargetBase
+    {
+        public CVRAdvancedSettingsTargetEntryGameObject() {
+            targetType = AdvancedAvatarSettingsTargetType.GameObject;
+        }
+    }
+
+    [System.Serializable]
+    public class CVRAdvancedSettingsTargetEntryAnimations : CVRAdvancedSettingsTargetBase
+    {
+        public CVRAdvancedSettingsTargetEntryAnimations()
+        {
+            targetType = AdvancedAvatarSettingsTargetType.Animations;
+        }
     }
 
     [System.Serializable]
     public class CVRAdvancedSettingsDropDownEntry
+#if UNITY_EDITOR
+        : ISerializationCallbackReceiver
+#endif
     {
         public string name;
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         public bool isCollapsed;
         
         public bool useAnimationClip;
         public AnimationClip animationClip;
-        
-        public List<CVRAdvancedSettingsTargetEntryGameObject> gameObjectTargets = new List<CVRAdvancedSettingsTargetEntryGameObject>();
+
+        [FormerlySerializedAs("gameObjectTargets")]
+        public List<CVRAdvancedSettingsTargetBase> targets = new List<CVRAdvancedSettingsTargetBase>();
         
         private ReorderableList gameObjectList;
         private CVRAvatar target;
-        
+
+        public void OnBeforeSerialize() {
+        }
+
+        public void OnAfterDeserialize() {
+            if (useAnimationClip) {
+                targets.Add(new CVRAdvancedSettingsTargetEntryAnimations() { onClip = animationClip });
+                useAnimationClip = false;
+                animationClip = null;
+            }
+        }
+
         private void generateReorderableList()
         {
-            gameObjectList = new ReorderableList(gameObjectTargets, typeof(CVRAdvancedSettingsTargetEntryGameObject), 
+            gameObjectList = new ReorderableList(targets, typeof(CVRAdvancedSettingsTargetBase), 
                                                  true, true, true, true);
             gameObjectList.drawHeaderCallback = OnDrawHeader;
             gameObjectList.drawElementCallback = OnDrawElement;
             gameObjectList.elementHeightCallback = OnHeightElement;
-            gameObjectList.onAddCallback = OnAdd;
+            gameObjectList.onAddDropdownCallback = OnAddDropdown;
             gameObjectList.onChangedCallback = OnChanged;
         }
         
@@ -2268,15 +2361,21 @@ namespace ABI.CCK.Scripts
         {
             EditorUtility.SetDirty(target);
         }
-
-        private void OnAdd(ReorderableList list)
+        private void OnAddDropdown(Rect buttonRect, ReorderableList list)
         {
-            gameObjectTargets.Add(new CVRAdvancedSettingsTargetEntryGameObject());
+            GenericMenu menu = new GenericMenu();
+            menu.AddItem(new GUIContent("Game Object"), false, () => {
+                targets.Add(new CVRAdvancedSettingsTargetEntryGameObject());
+            });
+            menu.AddItem(new GUIContent("Animations"), false, () => {
+                targets.Add(new CVRAdvancedSettingsTargetEntryAnimations());
+            });
+            menu.ShowAsContext();
         }
 
         private float OnHeightElement(int index)
         {
-            CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
+            CVRAdvancedSettingsTargetBase entity = targets[index];
             if (!entity.isCollapsed)
             {
                 return EditorGUIUtility.singleLineHeight * 1.25f;
@@ -2289,61 +2388,68 @@ namespace ABI.CCK.Scripts
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
         {
-            if (index > gameObjectTargets.Count) return;
-            CVRAdvancedSettingsTargetEntryGameObject entity = gameObjectTargets[index];
+            if (index > targets.Count) return;
+            CVRAdvancedSettingsTargetBase entity = targets[index];
             
             rect.y += 2;
             rect.x += 12;
             rect.width -= 12;
             Rect _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            entity.isCollapsed = EditorGUI.Foldout(_rect, entity.isCollapsed, "Name", true);
-            _rect.x += 100;
-            _rect.width = rect.width - 100;
-            var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
+            if (entity.targetType == AdvancedAvatarSettingsTargetType.GameObject) {
+                entity.isCollapsed = EditorGUI.Foldout(_rect, entity.isCollapsed, "Game Object", true);
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                var targetGameObject = (GameObject) EditorGUI.ObjectField(_rect, entity.gameObject, typeof(GameObject), true);
 
-            if (targetGameObject != null &&
-                targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
-            {
-                entity.gameObject = targetGameObject;
-                entity.treePath =
-                    AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
-            }
-            else if (entity.gameObject != targetGameObject)
-            {
-                entity.gameObject = null;
-                entity.treePath = "";
-            }
+                if (targetGameObject != null &&
+                    targetGameObject.transform.GetComponentInParent(typeof(CVRAvatar)) == target)
+                {
+                    entity.gameObject = targetGameObject;
+                    entity.treePath =
+                        AnimationUtility.CalculateTransformPath(targetGameObject.transform, target.transform);
+                }
+                else if (entity.gameObject != targetGameObject)
+                {
+                    entity.gameObject = null;
+                    entity.treePath = "";
+                }
 
-            // is Collapsed
-            if (!entity.isCollapsed) return;
+                // is Collapsed
+                if (!entity.isCollapsed) return;
             
-            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            EditorGUI.LabelField(_rect, "Path");
-            _rect.x += 100;
-            _rect.width = rect.width - 100;
-            EditorGUI.LabelField(_rect, entity.treePath);
+                EditorGUI.LabelField(_rect, "Path");
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                EditorGUI.LabelField(_rect, entity.treePath);
 
-            rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
-            _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
+                rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
+                _rect = new Rect(rect.x, rect.y, 100, EditorGUIUtility.singleLineHeight);
 
-            EditorGUI.LabelField(_rect, new GUIContent("Set to",
-                                                       "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
-                                                       "will be deactivated when the toggle is pressed."));
-            _rect.x += 100;
-            _rect.width = rect.width - 100;
-            entity.onState = EditorGUI.Toggle(_rect, entity.onState);
+                EditorGUI.LabelField(_rect, new GUIContent("Set to",
+                                                           "If checked, the object will be active once the toggle was pressed. If unchecked the object " +
+                                                           "will be deactivated when the toggle is pressed."));
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                entity.onState = EditorGUI.Toggle(_rect, entity.onState);
+            } else if (entity.targetType == AdvancedAvatarSettingsTargetType.Animations) {
+                EditorGUI.LabelField(_rect, "Animation Clip");
+                _rect.x += 100;
+                _rect.width = rect.width - 100;
+                entity.onClip = (AnimationClip)EditorGUI.ObjectField(_rect, entity.onClip, typeof(AnimationClip), true);
+            }
         }
 
         private void OnDrawHeader(Rect rect)
         {
             Rect _rect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
-            GUI.Label(_rect, "GameObjects");
+            GUI.Label(_rect, "Targets");
         }
-        
-        #endif
+
+#endif
     }
     
     [System.Serializable]
@@ -2374,5 +2480,10 @@ namespace ABI.CCK.Scripts
         public string propertyName;
         public float minValue;
         public float maxValue;
+    }
+
+    public enum AdvancedAvatarSettingsTargetType {
+        GameObject,
+        Animations
     }
 }
