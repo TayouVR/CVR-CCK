@@ -363,6 +363,24 @@ namespace ABI.CCK.Scripts.Editor
             EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_HINT_CCK_LANGUAGE"), MessageType.Info);
             
             EditorGUILayout.Space();
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.LabelField(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_CCK_DISABLE_NOT_USED_AAS_UI_EELEMENTS"));
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.BeginVertical();
+            bool disableNotUsedAASUIElements = EditorPrefs.GetBool("ABI_CCKDisableNotUsedAASUIElements", true);
+            disableNotUsedAASUIElements = EditorGUILayout.Toggle(disableNotUsedAASUIElements);
+            EditorPrefs.SetBool("ABI_CCKDisableNotUsedAASUIElements", disableNotUsedAASUIElements);
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.HelpBox(CCKLocalizationProvider.GetLocalizedText("ABI_UI_BUILDPANEL_SETTINGS_HINT_CCK_DISABLE_NOT_USED_AAS_UI_EELEMENTS"), MessageType.Info);
+
+            EditorGUILayout.Space();
         }
         
         void OnGUIAvatar(CVRAvatar avatar)

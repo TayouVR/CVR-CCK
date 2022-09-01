@@ -592,6 +592,8 @@ namespace ABI.CCK.Scripts.Editor
             {
                 definitionContainsError = true;
             }
+
+            bool willNotBeRegenerated = false;
             
             EditorGUI.LabelField(_rect, "Parameter");
             _rect.x += 100;
@@ -607,6 +609,9 @@ namespace ABI.CCK.Scripts.Editor
                     {
                         EditorGUI.HelpBox(warningRect, "", MessageType.Warning);
                         EditorGUI.LabelField(warningRect, new GUIContent("", "This Layer already exists and will not be regenerated."));
+                        willNotBeRegenerated = true;
+                    } else {
+                        willNotBeRegenerated = false;
                     }
                     break;
                 case CVRAdvancedSettingsEntry.SettingsType.GameObjectDropdown:
@@ -615,6 +620,9 @@ namespace ABI.CCK.Scripts.Editor
                     {
                         EditorGUI.HelpBox(warningRect, "", MessageType.Warning);
                         EditorGUI.LabelField(warningRect, new GUIContent("", "This Layer already exists and will not be regenerated."));
+                        willNotBeRegenerated = true;
+                    } else {
+                        willNotBeRegenerated = false;
                     }
                     break;
                 case CVRAdvancedSettingsEntry.SettingsType.MaterialColor:
@@ -623,6 +631,9 @@ namespace ABI.CCK.Scripts.Editor
                     {
                         EditorGUI.HelpBox(warningRect, "", MessageType.Warning);
                         EditorGUI.LabelField(warningRect, new GUIContent("", "This Layer already exists and will not be regenerated."));
+                        willNotBeRegenerated = true;
+                    } else {
+                        willNotBeRegenerated = false;
                     }
                     break;
                 case CVRAdvancedSettingsEntry.SettingsType.Slider:
@@ -631,6 +642,9 @@ namespace ABI.CCK.Scripts.Editor
                     {
                         EditorGUI.HelpBox(warningRect, "", MessageType.Warning);
                         EditorGUI.LabelField(warningRect, new GUIContent("", "This Layer already exists and will not be regenerated."));
+                        willNotBeRegenerated = true;
+                    } else {
+                        willNotBeRegenerated = false;
                     }
                     break;
                 case CVRAdvancedSettingsEntry.SettingsType.Joystick2D:
@@ -639,6 +653,9 @@ namespace ABI.CCK.Scripts.Editor
                     {
                         EditorGUI.HelpBox(warningRect, "", MessageType.Warning);
                         EditorGUI.LabelField(warningRect, new GUIContent("", "This Layer already exists and will not be regenerated."));
+                        willNotBeRegenerated = true;
+                    } else {
+                        willNotBeRegenerated = false;
                     }
                     break;
                 case CVRAdvancedSettingsEntry.SettingsType.Joystick3D:
@@ -647,6 +664,9 @@ namespace ABI.CCK.Scripts.Editor
                     {
                         EditorGUI.HelpBox(warningRect, "", MessageType.Warning);
                         EditorGUI.LabelField(warningRect, new GUIContent("", "This Layer already exists and will not be regenerated."));
+                        willNotBeRegenerated = true;
+                    } else {
+                        willNotBeRegenerated = false;
                     }
                     break;
                 case CVRAdvancedSettingsEntry.SettingsType.InputSingle:
@@ -655,6 +675,9 @@ namespace ABI.CCK.Scripts.Editor
                     {
                         EditorGUI.HelpBox(warningRect, "", MessageType.Warning);
                         EditorGUI.LabelField(warningRect, new GUIContent("", "This Layer already exists and will not be regenerated."));
+                        willNotBeRegenerated = true;
+                    } else {
+                        willNotBeRegenerated = false;
                     }
                     break;
                 case CVRAdvancedSettingsEntry.SettingsType.InputVector2:
@@ -663,6 +686,9 @@ namespace ABI.CCK.Scripts.Editor
                     {
                         EditorGUI.HelpBox(warningRect, "", MessageType.Warning);
                         EditorGUI.LabelField(warningRect, new GUIContent("", "This Layer already exists and will not be regenerated."));
+                        willNotBeRegenerated = true;
+                    } else {
+                        willNotBeRegenerated = false;
                     }
                     break;
                 case CVRAdvancedSettingsEntry.SettingsType.InputVector3:
@@ -671,8 +697,16 @@ namespace ABI.CCK.Scripts.Editor
                     {
                         EditorGUI.HelpBox(warningRect, "", MessageType.Warning);
                         EditorGUI.LabelField(warningRect, new GUIContent("", "This Layer already exists and will not be regenerated."));
+                        willNotBeRegenerated = true;
+                    } else {
+                        willNotBeRegenerated = false;
                     }
                     break;
+            }
+
+            if (EditorPrefs.GetBool("ABI_CCKDisableNotUsedAASUIElements"))
+            {
+                GUI.enabled = !willNotBeRegenerated;
             }
 
             rect.y += EditorGUIUtility.singleLineHeight * 1.25f;
@@ -988,6 +1022,10 @@ namespace ABI.CCK.Scripts.Editor
                                              "But it will create the necessary Animator Layers, Parameters and Animations. "+
                                              "So you can edit them to your liking after the animator was created.", MessageType.Info);
                     break;
+            }
+
+            if (EditorPrefs.GetBool("ABI_CCKDisableNotUsedAASUIElements")) {
+                GUI.enabled = true;
             }
         }
         
