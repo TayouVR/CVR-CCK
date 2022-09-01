@@ -185,6 +185,10 @@ namespace ABI.CCK.Scripts
         
         private ReorderableList gameObjectList;
         private CVRAvatar target;
+
+        public CVRAdvancesAvatarSettingGameObjectToggle() {
+            usedType = ParameterType.GenerateBool;
+        }
         
         public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
         {
