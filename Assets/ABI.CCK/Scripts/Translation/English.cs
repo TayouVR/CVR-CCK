@@ -88,6 +88,11 @@ namespace ABI.CCK.Scripts.Translation
                 "ABI_UI_BUILDPANEL_SETTINGS_HINT_CCK_LANGUAGE",
                 "You can switch your CCK language here in order to get notifications and UI texts in your preferred language."
             },
+            {"ABI_UI_BUILDPANEL_SETTINGS_CCK_SANITIZE_PARAMETERS", "Sanitize Parameter Names"},
+            {
+                "ABI_UI_BUILDPANEL_SETTINGS_HINT_CCK_SANITIZE_PARAMETERS", 
+                "The CCK automatically filters out uncommon characters from parameter names to ensure compatibility and stability"
+            },
             {
                 "ABI_UI_BUILDPANEL_WARNING_FOLDERPATH",
                 "Please do not move the folder location of the CCK or CCK Mods folder. This will render the CCK unusable."
