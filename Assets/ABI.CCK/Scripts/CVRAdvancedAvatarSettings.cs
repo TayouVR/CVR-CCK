@@ -187,8 +187,9 @@ namespace ABI.CCK.Scripts
 
 #if UNITY_EDITOR
 
-        [Obsolete] public bool useAnimationClip;
-        [Obsolete] public AnimationClip animationClip;
+        // legacy, only used for conversion of old data 
+        public bool useAnimationClip;
+        public AnimationClip animationClip;
 
         [FormerlySerializedAs("gameObjectTargets")]
         public List<CVRAdvancedSettingsTargetBase> targets = new List<CVRAdvancedSettingsTargetBase>();
@@ -2316,7 +2317,8 @@ namespace ABI.CCK.Scripts
 
 #if UNITY_EDITOR
         public bool isCollapsed;
-        
+
+        // legacy, only used for conversion of old data 
         public bool useAnimationClip;
         public AnimationClip animationClip;
 
