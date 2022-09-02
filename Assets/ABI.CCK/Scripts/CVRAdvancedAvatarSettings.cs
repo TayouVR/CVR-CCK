@@ -191,8 +191,8 @@ namespace ABI.CCK.Scripts
         public bool useAnimationClip;
         public AnimationClip animationClip;
 
-        [FormerlySerializedAs("gameObjectTargets")]
-        public List<CVRAdvancedSettingsTargetBase> targets = new List<CVRAdvancedSettingsTargetBase>();
+        [FormerlySerializedAs("targets")]
+        public List<CVRAdvancedSettingsTargetBase> gameObjectTargets = new List<CVRAdvancedSettingsTargetBase>();
         
         private ReorderableList targetsList;
         private CVRAvatar target;
@@ -203,7 +203,7 @@ namespace ABI.CCK.Scripts
 
         public void OnAfterDeserialize() {
             if (useAnimationClip) {
-                targets.Add(new CVRAdvancedSettingsTargetEntryAnimations() { onClip = animationClip });
+                gameObjectTargets.Add(new CVRAdvancedSettingsTargetEntryAnimations() { onClip = animationClip });
                 useAnimationClip = false;
                 animationClip = null;
             }
@@ -272,7 +272,7 @@ namespace ABI.CCK.Scripts
             keyframe.outTangent = Mathf.Infinity;
             animationCurveOff.AddKey(keyframe);
 
-            foreach (var target in targets)
+            foreach (var target in gameObjectTargets)
             {
                 if (target.targetType == AdvancedAvatarSettingsTargetType.GameObject || target.onClip == null) {
                     if (target == null || target.gameObject == null || target.treePath == null) continue;
@@ -374,7 +374,7 @@ namespace ABI.CCK.Scripts
 
         private void generateReorderableList()
         {
-            targetsList = new ReorderableList(targets, typeof(CVRAdvancedSettingsTargetEntryGameObject), 
+            targetsList = new ReorderableList(gameObjectTargets, typeof(CVRAdvancedSettingsTargetEntryGameObject), 
                                                  true, true, true, true);
             targetsList.drawHeaderCallback = OnDrawHeader;
             targetsList.drawElementCallback = OnDrawElement;
@@ -400,17 +400,17 @@ namespace ABI.CCK.Scripts
         {
             GenericMenu menu = new GenericMenu();
             menu.AddItem(new GUIContent("Game Object"), false, () => {
-                targets.Add(new CVRAdvancedSettingsTargetEntryGameObject());
+                gameObjectTargets.Add(new CVRAdvancedSettingsTargetEntryGameObject());
             });
             menu.AddItem(new GUIContent("Animations"), false, () => {
-                targets.Add(new CVRAdvancedSettingsTargetEntryAnimations());
+                gameObjectTargets.Add(new CVRAdvancedSettingsTargetEntryAnimations());
             });
             menu.ShowAsContext();
         }
 
         private float OnHeightElement(int index)
         {
-            CVRAdvancedSettingsTargetBase entity = targets[index];
+            CVRAdvancedSettingsTargetBase entity = gameObjectTargets[index];
             float height = 0;
             if (!entity.isCollapsed)
             {
@@ -425,8 +425,8 @@ namespace ABI.CCK.Scripts
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
         {
-            if (index > targets.Count) return;
-            CVRAdvancedSettingsTargetBase entity = targets[index];
+            if (index > gameObjectTargets.Count) return;
+            CVRAdvancedSettingsTargetBase entity = gameObjectTargets[index];
             
             rect.y += 2;
             rect.x += 12;
@@ -593,7 +593,7 @@ namespace ABI.CCK.Scripts
                     
                 foreach (var activeOption in options)
                 {
-                    foreach (var target in activeOption.targets)
+                    foreach (var target in activeOption.gameObjectTargets)
                     {
                         if (target.targetType == AdvancedAvatarSettingsTargetType.GameObject || target.onClip == null) {
                             if (target == null || target.gameObject == null || target.treePath == null) continue;
@@ -741,12 +741,12 @@ namespace ABI.CCK.Scripts
                 } 
                 else 
                 {
-                    if (entity.targets.Count == 0) 
+                    if (entity.gameObjectTargets.Count == 0) 
                     {
                         height += 0.5f;
                     }
                     height += 2.25f;
-                    foreach (var target in entity.targets) 
+                    foreach (var target in entity.gameObjectTargets) 
                     {
                         if (!target.isCollapsed) 
                         {
@@ -2322,8 +2322,8 @@ namespace ABI.CCK.Scripts
         public bool useAnimationClip;
         public AnimationClip animationClip;
 
-        [FormerlySerializedAs("gameObjectTargets")]
-        public List<CVRAdvancedSettingsTargetBase> targets = new List<CVRAdvancedSettingsTargetBase>();
+        [FormerlySerializedAs("targets")]
+        public List<CVRAdvancedSettingsTargetBase> gameObjectTargets = new List<CVRAdvancedSettingsTargetBase>();
         
         private ReorderableList gameObjectList;
         private CVRAvatar target;
@@ -2333,7 +2333,7 @@ namespace ABI.CCK.Scripts
 
         public void OnAfterDeserialize() {
             if (useAnimationClip) {
-                targets.Add(new CVRAdvancedSettingsTargetEntryAnimations() { onClip = animationClip });
+                gameObjectTargets.Add(new CVRAdvancedSettingsTargetEntryAnimations() { onClip = animationClip });
                 useAnimationClip = false;
                 animationClip = null;
             }
@@ -2341,7 +2341,7 @@ namespace ABI.CCK.Scripts
 
         private void generateReorderableList()
         {
-            gameObjectList = new ReorderableList(targets, typeof(CVRAdvancedSettingsTargetBase), 
+            gameObjectList = new ReorderableList(gameObjectTargets, typeof(CVRAdvancedSettingsTargetBase), 
                                                  true, true, true, true);
             gameObjectList.drawHeaderCallback = OnDrawHeader;
             gameObjectList.drawElementCallback = OnDrawElement;
@@ -2367,17 +2367,17 @@ namespace ABI.CCK.Scripts
         {
             GenericMenu menu = new GenericMenu();
             menu.AddItem(new GUIContent("Game Object"), false, () => {
-                targets.Add(new CVRAdvancedSettingsTargetEntryGameObject());
+                gameObjectTargets.Add(new CVRAdvancedSettingsTargetEntryGameObject());
             });
             menu.AddItem(new GUIContent("Animations"), false, () => {
-                targets.Add(new CVRAdvancedSettingsTargetEntryAnimations());
+                gameObjectTargets.Add(new CVRAdvancedSettingsTargetEntryAnimations());
             });
             menu.ShowAsContext();
         }
 
         private float OnHeightElement(int index)
         {
-            CVRAdvancedSettingsTargetBase entity = targets[index];
+            CVRAdvancedSettingsTargetBase entity = gameObjectTargets[index];
             if (!entity.isCollapsed)
             {
                 return EditorGUIUtility.singleLineHeight * 1.25f;
@@ -2390,8 +2390,8 @@ namespace ABI.CCK.Scripts
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
         {
-            if (index > targets.Count) return;
-            CVRAdvancedSettingsTargetBase entity = targets[index];
+            if (index > gameObjectTargets.Count) return;
+            CVRAdvancedSettingsTargetBase entity = gameObjectTargets[index];
             
             rect.y += 2;
             rect.x += 12;

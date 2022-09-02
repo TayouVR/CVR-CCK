@@ -425,7 +425,7 @@ namespace ABI.CCK.Scripts.Editor
                 case CVRAdvancedSettingsEntry.SettingsType.GameObjectToggle:
                 {
                     var gameObjectToggle = (CVRAdvancesAvatarSettingGameObjectToggle) entity.setting;
-                    if (gameObjectToggle == null || gameObjectToggle.targets == null)
+                    if (gameObjectToggle == null || gameObjectToggle.gameObjectTargets == null)
                         return EditorGUIUtility.singleLineHeight * 11.50f;
                     float height = 10.50f;
                     if (gameObjectToggle.useAnimationClip) 
@@ -434,7 +434,7 @@ namespace ABI.CCK.Scripts.Editor
                     } 
                     else 
                     {
-                        foreach (var target in gameObjectToggle.targets) 
+                        foreach (var target in gameObjectToggle.gameObjectTargets) 
                         {
                             if (!target.isCollapsed) 
                             {
@@ -445,7 +445,7 @@ namespace ABI.CCK.Scripts.Editor
                                 height += target.targetType == AdvancedAvatarSettingsTargetType.Animations ? 2.5f : 3.75f;
                             }
                         }
-                        if (gameObjectToggle.targets.Count == 0) 
+                        if (gameObjectToggle.gameObjectTargets.Count == 0) 
                         {
                             height += 1f;
                         }
@@ -471,9 +471,9 @@ namespace ABI.CCK.Scripts.Editor
                             } 
                             else 
                             {
-                                if (option.targets.Count != 0) 
+                                if (option.gameObjectTargets.Count != 0) 
                                 {
-                                    foreach (var target in option.targets) 
+                                    foreach (var target in option.gameObjectTargets) 
                                     {
                                         if (!target.isCollapsed) 
                                         {
