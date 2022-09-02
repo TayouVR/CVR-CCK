@@ -392,8 +392,7 @@ namespace ABI.CCK.Scripts.Editor
                         break;
                 }
 
-                entry.setting.target = _avatar;
-                entry.setting.SetupAnimator(ref _avatar.avatarSettings.animator, entry.machineName, folderPath);
+                entry.setting.SetupAnimator(ref _avatar.avatarSettings.animator, entry.machineName, folderPath, _avatar.gameObject);
             }
 
             if (_avatar.avatarSettings.baseOverrideController != null)

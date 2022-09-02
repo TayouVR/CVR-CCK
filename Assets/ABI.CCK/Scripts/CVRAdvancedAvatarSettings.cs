@@ -170,7 +170,7 @@ namespace ABI.CCK.Scripts
         public bool isCollapsed = true;
         public CVRAvatar target;
 
-        public virtual void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
+        public virtual void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath, GameObject avatarRoot)
         {
             
         }
@@ -195,7 +195,6 @@ namespace ABI.CCK.Scripts
         public List<CVRAdvancedSettingsTargetBase> gameObjectTargets = new List<CVRAdvancedSettingsTargetBase>();
         
         private ReorderableList targetsList;
-        private CVRAvatar target;
 
         public void OnBeforeSerialize() {
             // empty
@@ -213,7 +212,7 @@ namespace ABI.CCK.Scripts
             usedType = ParameterType.GenerateBool;
         }
         
-        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
+        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath, GameObject avatarRoot)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
             {
@@ -280,10 +279,10 @@ namespace ABI.CCK.Scripts
                     onClip.SetCurve(target.treePath, typeof(GameObject), "m_IsActive", target.onState ? animationCurveOn : animationCurveOff);
                 } else {
                     foreach (var editorCurveBinding in AnimationUtility.GetCurveBindings(target.onClip)) {
-                        UnityEngine.Object targetObject = AnimationUtility.GetAnimatedObject(this.target.gameObject, editorCurveBinding);
+                        UnityEngine.Object targetObject = AnimationUtility.GetAnimatedObject(avatarRoot, editorCurveBinding);
                         if (targetObject == null) continue;
                         onClip.SetCurve(
-                            AnimationUtility.CalculateTransformPath(targetObject is GameObject ? (targetObject as GameObject).transform : (targetObject as Component).transform, this.target.transform),
+                            AnimationUtility.CalculateTransformPath(targetObject is GameObject ? (targetObject as GameObject).transform : (targetObject as Component).transform, avatarRoot.transform),
                             targetObject.GetType(),
                             editorCurveBinding.propertyName,
                             AnimationUtility.GetEditorCurve(target.onClip, editorCurveBinding));
@@ -295,10 +294,10 @@ namespace ABI.CCK.Scripts
                     offClip.SetCurve(target.treePath, typeof(GameObject), "m_IsActive", !target.onState ? animationCurveOn : animationCurveOff);
                 } else {
                     foreach (var editorCurveBinding in AnimationUtility.GetCurveBindings(target.offClip)) {
-                        UnityEngine.Object targetObject = AnimationUtility.GetAnimatedObject(this.target.gameObject, editorCurveBinding);
+                        UnityEngine.Object targetObject = AnimationUtility.GetAnimatedObject(avatarRoot, editorCurveBinding);
                         if (targetObject == null) continue;
                         offClip.SetCurve(
-                            AnimationUtility.CalculateTransformPath(targetObject is GameObject ? (targetObject as GameObject).transform : (targetObject as Component).transform, this.target.transform),
+                            AnimationUtility.CalculateTransformPath(targetObject is GameObject ? (targetObject as GameObject).transform : (targetObject as Component).transform, avatarRoot.transform),
                             targetObject.GetType(),
                             editorCurveBinding.propertyName,
                             AnimationUtility.GetEditorCurve(target.offClip, editorCurveBinding));
@@ -510,7 +509,6 @@ namespace ABI.CCK.Scripts
         #if UNITY_EDITOR
         
         private ReorderableList gameObjectList;
-        private CVRAvatar target;
         
         public CVRAdvancesAvatarSettingGameObjectDropdown() {
             usedType = ParameterType.GenerateInt;
@@ -533,7 +531,7 @@ namespace ABI.CCK.Scripts
         
         #if UNITY_EDITOR
         
-        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
+        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath, GameObject avatarRoot)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
             {
@@ -609,10 +607,10 @@ namespace ABI.CCK.Scripts
                         } else {
                             if (i == j) {
                                 foreach (var editorCurveBinding in AnimationUtility.GetCurveBindings(target.onClip)) {
-                                    UnityEngine.Object targetObject = AnimationUtility.GetAnimatedObject(this.target.gameObject, editorCurveBinding);
+                                    UnityEngine.Object targetObject = AnimationUtility.GetAnimatedObject(avatarRoot, editorCurveBinding);
                                     if (targetObject == null) continue;
                                     animation.SetCurve(
-                                        AnimationUtility.CalculateTransformPath(targetObject is GameObject ? (targetObject as GameObject).transform : (targetObject as Component).transform, this.target.transform),
+                                        AnimationUtility.CalculateTransformPath(targetObject is GameObject ? (targetObject as GameObject).transform : (targetObject as Component).transform, avatarRoot.transform),
                                         targetObject.GetType(),
                                         editorCurveBinding.propertyName,
                                         AnimationUtility.GetEditorCurve(target.onClip, editorCurveBinding));
@@ -811,7 +809,7 @@ namespace ABI.CCK.Scripts
         private CVRAdvancedSettingsTargetEntryMaterialColor entity;
         private ReorderableList gameObjectList;
 
-        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
+        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath, GameObject avatarRoot)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
             {
@@ -1327,7 +1325,7 @@ namespace ABI.CCK.Scripts
         
         private ReorderableList gameObjectList;
 
-        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
+        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath, GameObject avatarRoot)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
             {
@@ -1752,7 +1750,7 @@ namespace ABI.CCK.Scripts
 
 #if UNITY_EDITOR
 
-        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
+        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath, GameObject avatarRoot)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
             {
@@ -1842,7 +1840,7 @@ namespace ABI.CCK.Scripts
 
 #if UNITY_EDITOR
 
-        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
+        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath, GameObject avatarRoot)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
             {
@@ -1988,7 +1986,7 @@ namespace ABI.CCK.Scripts
 
 #if UNITY_EDITOR
 
-        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
+        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath, GameObject avatarRoot)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
             {
@@ -2043,7 +2041,7 @@ namespace ABI.CCK.Scripts
 
 #if UNITY_EDITOR
 
-        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
+        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath, GameObject avatarRoot)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
             {
@@ -2131,7 +2129,7 @@ namespace ABI.CCK.Scripts
 
 #if UNITY_EDITOR
 
-        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath)
+        public override void SetupAnimator(ref AnimatorController controller, string machineName, string folderPath, GameObject avatarRoot)
         {
             var animatorLayer = new UnityEditor.Animations.AnimatorControllerLayer
             {
